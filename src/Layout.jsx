@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Coffee, Briefcase, Store, Award, User, LogOut } from "lucide-react";
+import { Coffee, Briefcase, Store, Award, User, LogOut, ShoppingBag, Calendar, Gift } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import {
   Sidebar,
@@ -41,6 +41,18 @@ const navigationItems = [
     url: createPageUrl("Roasters"),
     icon: Award,
     gradient: "from-amber-500 to-yellow-500",
+  },
+  {
+    title: "Marketplace",
+    url: createPageUrl("Marketplace"),
+    icon: ShoppingBag,
+    gradient: "from-blue-500 to-purple-500",
+  },
+  {
+    title: "Events",
+    url: createPageUrl("Events"),
+    icon: Calendar,
+    gradient: "from-indigo-500 to-purple-500",
   },
   {
     title: "My Profile",
@@ -134,6 +146,19 @@ export default function Layout({ children }) {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+
+            {user && user.loyalty_points > 0 && (
+              <div className="mx-3 mt-4 p-4 rounded-2xl bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                <div className="flex items-center gap-2 mb-1">
+                  <Gift className="w-5 h-5" />
+                  <span className="font-bold text-lg">{user.loyalty_points}</span>
+                </div>
+                <div className="text-xs text-white/90">Loyalty Points</div>
+                <div className="text-xs text-white/80 mt-1">
+                  {user.membership_tier?.toUpperCase()} Member
+                </div>
+              </div>
+            )}
           </SidebarContent>
 
           <SidebarFooter className="border-t border-purple-200 p-4">
