@@ -2,11 +2,8 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Search, MapPin, Calendar, Clock, Euro, Sparkles, TrendingUp } from "lucide-react";
+import { Search, TrendingUp, MapPin, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
 import ShiftCard from "../components/shifts/ShiftCard";
 import ShiftFilters from "../components/shifts/ShiftFilters";
 
@@ -54,40 +51,33 @@ export default function BrowseShifts() {
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50">
+    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-16 h-16 rounded-3xl bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center shadow-2xl">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-                Available Shifts
-              </h1>
-              <p className="text-lg text-gray-600 mt-1">
-                Find your next specialty coffee shift in Ireland ☕
-              </p>
-            </div>
-          </div>
+        <div className="mb-12">
+          <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            Available Shifts
+          </h1>
+          <p className="text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
+            Find your next opportunity in specialty coffee
+          </p>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="relative">
-            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-6 h-6 text-purple-400" />
+            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
             <Input
               placeholder="Search by coffee shop or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-14 h-16 rounded-3xl border-0 text-lg shadow-xl bg-white focus:shadow-2xl transition-all duration-300"
+              className="pl-14 h-14 rounded-2xl border text-base"
+              style={{ 
+                borderColor: 'var(--sand)',
+                backgroundColor: 'var(--warm-white)',
+                color: 'var(--earth)'
+              }}
             />
-            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-              <div className="px-4 py-2 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-semibold">
-                {filteredShifts.length} shifts
-              </div>
-            </div>
           </div>
         </div>
 
@@ -100,56 +90,56 @@ export default function BrowseShifts() {
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-3xl shadow-xl bg-gradient-to-br from-purple-500 to-purple-600 text-white"
+            className="p-6 rounded-2xl hover-lift"
+            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
-            <div className="text-4xl font-bold mb-2">
+            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {filteredShifts.length}
             </div>
-            <div className="text-sm text-purple-100">Available Shifts</div>
-            <Sparkles className="w-8 h-8 absolute top-4 right-4 opacity-20" />
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>AVAILABLE SHIFTS</div>
           </motion.div>
           
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-6 rounded-3xl shadow-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white"
+            className="p-6 rounded-2xl hover-lift"
+            style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
           >
-            <div className="text-4xl font-bold mb-2">
+            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               €{Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}
             </div>
-            <div className="text-sm text-green-100">Avg. Hourly Rate</div>
-            <TrendingUp className="w-8 h-8 absolute top-4 right-4 opacity-20" />
+            <div className="text-xs tracking-wider opacity-90">AVG. HOURLY RATE</div>
           </motion.div>
           
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-6 rounded-3xl shadow-xl bg-gradient-to-br from-orange-500 to-red-600 text-white"
+            className="p-6 rounded-2xl hover-lift"
+            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
-            <div className="text-4xl font-bold mb-2">
+            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {availableLocations.length}
             </div>
-            <div className="text-sm text-orange-100">Locations</div>
-            <MapPin className="w-8 h-8 absolute top-4 right-4 opacity-20" />
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>LOCATIONS</div>
           </motion.div>
           
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-6 rounded-3xl shadow-xl bg-gradient-to-br from-blue-500 to-cyan-600 text-white"
+            className="p-6 rounded-2xl hover-lift"
+            style={{ backgroundColor: 'var(--sage)', color: 'white' }}
           >
-            <div className="text-4xl font-bold mb-2">
+            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {[...new Set(shifts.map(s => s.coffee_shop_id))].length}
             </div>
-            <div className="text-sm text-blue-100">Coffee Shops</div>
-            <Clock className="w-8 h-8 absolute top-4 right-4 opacity-20" />
+            <div className="text-xs tracking-wider opacity-90">COFFEE SHOPS</div>
           </motion.div>
         </div>
 
@@ -157,18 +147,18 @@ export default function BrowseShifts() {
         {isLoading ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-96 rounded-3xl animate-pulse bg-gradient-to-br from-purple-200 to-pink-200" />
+              <div key={i} className="h-96 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--sand)' }} />
             ))}
           </div>
         ) : filteredShifts.length === 0 ? (
-          <div className="text-center py-20 rounded-3xl bg-white shadow-xl">
-            <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-              <Search className="w-12 h-12 text-white" />
+          <div className="text-center py-24 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
+            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+              <Search className="w-10 h-10" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
             </div>
-            <h3 className="text-3xl font-bold mb-2 text-gray-900">
+            <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               No shifts found
             </h3>
-            <p className="text-gray-600">
+            <p className="font-light" style={{ color: 'var(--clay)' }}>
               Try adjusting your filters or check back later
             </p>
           </div>
