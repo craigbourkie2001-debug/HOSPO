@@ -1,0 +1,169 @@
+import React, { useState } from "react";
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Search, MapPin, Calendar, Clock, Euro, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { format } from "date-fns";
+import ShiftCard from "../components/shifts/ShiftCard";
+import ShiftFilters from "../components/shifts/ShiftFilters";
+
+export default function BrowseShifts() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({ location: "all", date: "all", skills: [] });
+  const [user, setUser] = useState(null);
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
+
+  const { data: shifts, isLoading } = useQuery({
+    queryKey: ['shifts'],
+    queryFn: () => base44.entities.Shift.filter({ status: 'available' }, '-created_date'),
+    initialData: [],
+  });
+
+  const claimShiftMutation = useMutation({
+    mutationFn: async (shift) => {
+      await base44.entities.Shift.update(shift.id, {
+        status: 'claimed',
+        claimed_by: user.email,
+        claimed_at: new Date().toISOString()
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['shifts'] });
+      queryClient.invalidateQueries({ queryKey: ['myShifts'] });
+    },
+  });
+
+  const filteredShifts = shifts.filter(shift => {
+    const matchesSearch = shift.coffee_shop_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         shift.location?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesLocation = filters.location === "all" || shift.location === filters.location;
+    const matchesDate = filters.date === "all" || shift.date === filters.date;
+    const matchesSkills = filters.skills.length === 0 || 
+                         filters.skills.some(skill => shift.skills_required?.includes(skill));
+    
+    return matchesSearch && matchesLocation && matchesDate && matchesSkills;
+  });
+
+  const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
+
+  return (
+    <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: 'var(--warm-white)' }}>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles className="w-8 h-8" style={{ color: 'var(--fresh-green)' }} />
+            <h1 className="text-4xl font-bold" style={{ color: 'var(--espresso)' }}>
+              Available Shifts
+            </h1>
+          </div>
+          <p className="text-lg" style={{ color: 'var(--coffee-brown)' }}>
+            Find your next specialty coffee shift in Ireland
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--coffee-brown)' }} />
+            <Input
+              placeholder="Search by coffee shop or location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 h-14 rounded-2xl border-2 text-lg shadow-sm transition-all duration-300 focus:shadow-md"
+              style={{ 
+                borderColor: 'var(--latte)',
+                backgroundColor: 'white',
+                color: 'var(--espresso)'
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Filters */}
+        <ShiftFilters 
+          filters={filters}
+          setFilters={setFilters}
+          availableLocations={availableLocations}
+          shifts={shifts}
+        />
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="p-4 rounded-2xl shadow-sm" style={{ backgroundColor: 'white' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--espresso)' }}>
+              {filteredShifts.length}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--coffee-brown)' }}>Available Shifts</div>
+          </div>
+          <div className="p-4 rounded-2xl shadow-sm" style={{ backgroundColor: 'white' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--fresh-green)' }}>
+              €{Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--coffee-brown)' }}>Avg. Hourly Rate</div>
+          </div>
+          <div className="p-4 rounded-2xl shadow-sm" style={{ backgroundColor: 'white' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--espresso)' }}>
+              {availableLocations.length}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--coffee-brown)' }}>Locations</div>
+          </div>
+          <div className="p-4 rounded-2xl shadow-sm" style={{ backgroundColor: 'white' }}>
+            <div className="text-3xl font-bold mb-1" style={{ color: 'var(--fresh-green)' }}>
+              {[...new Set(shifts.map(s => s.coffee_shop_id))].length}
+            </div>
+            <div className="text-sm" style={{ color: 'var(--coffee-brown)' }}>Coffee Shops</div>
+          </div>
+        </div>
+
+        {/* Shifts Grid */}
+        {isLoading ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-80 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--latte)' }} />
+            ))}
+          </div>
+        ) : filteredShifts.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'var(--latte)' }}>
+              <Search className="w-10 h-10" style={{ color: 'var(--coffee-brown)' }} />
+            </div>
+            <h3 className="text-2xl font-semibold mb-2" style={{ color: 'var(--espresso)' }}>
+              No shifts found
+            </h3>
+            <p style={{ color: 'var(--coffee-brown)' }}>
+              Try adjusting your filters or check back later
+            </p>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence mode="wait">
+              {filteredShifts.map((shift, index) => (
+                <motion.div
+                  key={shift.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <ShiftCard 
+                    shift={shift} 
+                    onClaim={() => claimShiftMutation.mutate(shift)}
+                    isLoading={claimShiftMutation.isPending}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
