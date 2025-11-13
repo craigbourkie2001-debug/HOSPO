@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Clock, Euro, CheckCircle } from "lucide-react";
+import { MapPin, Calendar, Clock, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 
 export default function MyShiftCard({ shift }) {
@@ -14,22 +14,24 @@ export default function MyShiftCard({ shift }) {
   const totalPay = hours * shift.hourly_rate;
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg border-2 rounded-2xl" style={{ borderColor: 'var(--latte)', backgroundColor: 'white' }}>
-      <div className={`h-2 ${isCompleted ? 'bg-green-500' : ''}`} style={!isCompleted ? { background: 'linear-gradient(90deg, var(--fresh-green), var(--coffee-brown))' } : {}} />
+    <Card className="overflow-hidden transition-all duration-300 hover:-translate-y-1 border rounded-2xl hover-lift" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+      {isCompleted && (
+        <div className="h-1" style={{ backgroundColor: 'var(--sage)' }} />
+      )}
       
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="text-xl font-bold mb-1" style={{ color: 'var(--espresso)' }}>
+            <h3 className="text-xl font-normal mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {shift.coffee_shop_name}
             </h3>
-            <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--coffee-brown)' }}>
-              <MapPin className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-sm font-light" style={{ color: 'var(--clay)' }}>
+              <MapPin className="w-4 h-4" style={{ strokeWidth: 1.5 }} />
               {shift.location}
             </div>
           </div>
           {isCompleted && (
-            <Badge className="bg-green-100 text-green-800 border-green-200">
+            <Badge className="border-0 font-normal" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>
               <CheckCircle className="w-3 h-3 mr-1" />
               Completed
             </Badge>
@@ -37,35 +39,35 @@ export default function MyShiftCard({ shift }) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="flex items-center gap-1" style={{ backgroundColor: 'var(--latte)', color: 'var(--espresso)' }}>
-            <Calendar className="w-3 h-3" />
+          <Badge variant="secondary" className="flex items-center gap-1 font-normal border-0" style={{ backgroundColor: 'var(--sand)', color: 'var(--earth)' }}>
+            <Calendar className="w-3 h-3" style={{ strokeWidth: 1.5 }} />
             {format(new Date(shift.date), 'EEE, MMM d, yyyy')}
           </Badge>
-          <Badge variant="secondary" className="flex items-center gap-1" style={{ backgroundColor: 'var(--latte)', color: 'var(--espresso)' }}>
-            <Clock className="w-3 h-3" />
+          <Badge variant="secondary" className="flex items-center gap-1 font-normal border-0" style={{ backgroundColor: 'var(--sand)', color: 'var(--earth)' }}>
+            <Clock className="w-3 h-3" style={{ strokeWidth: 1.5 }} />
             {shift.start_time} - {shift.end_time}
           </Badge>
         </div>
       </CardHeader>
 
       <CardContent>
-        <div className="p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="p-5 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm" style={{ color: 'var(--coffee-brown)' }}>Hourly Rate</span>
-            <span className="font-semibold" style={{ color: 'var(--espresso)' }}>€{shift.hourly_rate}/hr</span>
+            <span className="text-sm font-light" style={{ color: 'var(--clay)' }}>Hourly Rate</span>
+            <span className="font-normal" style={{ color: 'var(--earth)' }}>€{shift.hourly_rate}/hr</span>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm" style={{ color: 'var(--coffee-brown)' }}>Duration</span>
-            <span className="font-semibold" style={{ color: 'var(--espresso)' }}>{hours} hours</span>
+            <span className="text-sm font-light" style={{ color: 'var(--clay)' }}>Duration</span>
+            <span className="font-normal" style={{ color: 'var(--earth)' }}>{hours} hours</span>
           </div>
-          <div className="pt-2 border-t flex justify-between items-center" style={{ borderColor: 'var(--latte)' }}>
-            <span className="font-semibold" style={{ color: 'var(--coffee-brown)' }}>Total Earnings</span>
-            <span className="text-2xl font-bold" style={{ color: 'var(--fresh-green)' }}>€{totalPay}</span>
+          <div className="pt-3 border-t flex justify-between items-center" style={{ borderColor: 'var(--cream)' }}>
+            <span className="font-normal" style={{ color: 'var(--clay)' }}>Total Earnings</span>
+            <span className="text-2xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--terracotta)' }}>€{totalPay}</span>
           </div>
         </div>
 
         {shift.claimed_at && (
-          <div className="mt-3 text-xs text-center" style={{ color: 'var(--coffee-brown)' }}>
+          <div className="mt-3 text-xs text-center font-light" style={{ color: 'var(--clay)' }}>
             Claimed on {format(new Date(shift.claimed_at), 'MMM d, yyyy')}
           </div>
         )}
