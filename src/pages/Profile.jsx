@@ -222,6 +222,31 @@ export default function Profile() {
 
         <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
+            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Skills Showcase</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
+                <div className="text-2xl mb-2">☕</div>
+                <div className="text-sm font-normal mb-1" style={{ color: 'var(--earth)' }}>Espresso</div>
+                <div className="text-xs font-light" style={{ color: 'var(--clay)' }}>Advanced</div>
+              </div>
+              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
+                <div className="text-2xl mb-2">🎨</div>
+                <div className="text-sm font-normal mb-1" style={{ color: 'var(--earth)' }}>Latte Art</div>
+                <div className="text-xs font-light" style={{ color: 'var(--clay)' }}>Expert</div>
+              </div>
+              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
+                <div className="text-2xl mb-2">🔬</div>
+                <div className="text-sm font-normal mb-1" style={{ color: 'var(--earth)' }}>Filter Coffee</div>
+                <div className="text-xs font-light" style={{ color: 'var(--clay)' }}>Intermediate</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
             <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Profile Details</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">

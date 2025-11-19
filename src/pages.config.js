@@ -5,6 +5,7 @@ import Roasters from './pages/Roasters';
 import Profile from './pages/Profile';
 import Marketplace from './pages/Marketplace';
 import Events from './pages/Events';
+import EmployerDashboard from './pages/EmployerDashboard';
 import __Layout from './Layout.jsx';
 
 
@@ -16,6 +17,7 @@ export const PAGES = {
     "Profile": Profile,
     "Marketplace": Marketplace,
     "Events": Events,
+    "EmployerDashboard": EmployerDashboard,
 }
 
 export const pagesConfig = {
