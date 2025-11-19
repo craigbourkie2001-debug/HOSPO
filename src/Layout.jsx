@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Coffee, Briefcase, Store, Award, User, LogOut, ShoppingBag, Calendar, Gift } from "lucide-react";
+import { Coffee, Briefcase, Store, User, LogOut, Clock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import {
   Sidebar,
@@ -32,21 +32,6 @@ const navigationItems = [
     title: "Coffee Shops",
     url: createPageUrl("CoffeeShops"),
     icon: Store,
-  },
-  {
-    title: "Roasters",
-    url: createPageUrl("Roasters"),
-    icon: Award,
-  },
-  {
-    title: "Marketplace",
-    url: createPageUrl("Marketplace"),
-    icon: ShoppingBag,
-  },
-  {
-    title: "Events",
-    url: createPageUrl("Events"),
-    icon: Calendar,
   },
   {
     title: "My Profile",
@@ -144,19 +129,19 @@ export default function Layout({ children }) {
               </SidebarGroupContent>
             </SidebarGroup>
 
-            {user && user.loyalty_points > 0 && (
+            {user && (
               <div className="mx-2 mt-6 p-5 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <Gift className="w-4 h-4" style={{ color: 'var(--terracotta)' }} />
-                    <span className="text-sm font-normal" style={{ color: 'var(--earth)' }}>Loyalty Points</span>
+                    <Clock className="w-4 h-4" style={{ color: 'var(--terracotta)' }} />
+                    <span className="text-sm font-normal" style={{ color: 'var(--earth)' }}>This Week</span>
                   </div>
                   <span className="text-2xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                    {user.loyalty_points}
+                    {user.hours_worked_this_week || 0}h
                   </span>
                 </div>
-                <div className="text-xs tracking-wider mt-2" style={{ color: 'var(--clay)' }}>
-                  {user.membership_tier?.toUpperCase()} MEMBER
+                <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>
+                  {user.weekly_hours_limit ? `of ${user.weekly_hours_limit}h limit` : 'No limit set'}
                 </div>
               </div>
             )}
