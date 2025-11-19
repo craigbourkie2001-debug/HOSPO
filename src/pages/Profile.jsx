@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tantml:react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Star, Briefcase, Award, MapPin, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 const skillOptions = [
@@ -15,6 +16,16 @@ const skillOptions = [
 ];
 
 const dayOptions = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+
+const visaHoursLimits = {
+  "irish_citizen": null,
+  "eu_citizen": null,
+  "stamp_1": 39,
+  "stamp_2": 20,
+  "stamp_3": null,
+  "stamp_4": null,
+  "student_visa": 20
+};
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -29,16 +40,31 @@ export default function Profile() {
         bio: userData.bio || '',
         location: userData.location || '',
         phone: userData.phone || '',
+        visa_status: userData.visa_status || '',
         experience_years: userData.experience_years || 0,
         skills: userData.skills || [],
         certifications: userData.certifications || [],
-        availability: userData.availability || []
+        availability: userData.availability || [],
+        skill_portfolio: userData.skill_portfolio || []
       });
     }).catch(() => {});
   }, []);
 
+  const { data: workerReviews, isLoading: reviewsLoading } = useQuery({
+    queryKey: ['workerReviews', user?.email],
+    queryFn: () => base44.entities.WorkerReview.filter({ worker_email: user?.email }),
+    initialData: [],
+    enabled: !!user?.email
+  });
+
   const updateProfileMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
+    mutationFn: (data) => {
+      const weeklyLimit = visaHoursLimits[data.visa_status];
+      return base44.auth.updateMe({
+        ...data,
+        weekly_hours_limit: weeklyLimit
+      });
+    },
     onSuccess: (updatedUser) => {
       setUser(updatedUser);
       setIsEditing(false);
@@ -92,6 +118,15 @@ export default function Profile() {
                   {user.full_name}
                 </h1>
                 <p className="font-light" style={{ color: 'var(--clay)' }}>{user.email}</p>
+                {user.visa_status && (
+                  <div className="flex items-center gap-2 mt-2 justify-center md:justify-start">
+                    <Shield className="w-4 h-4" style={{ color: 'var(--sage)' }} />
+                    <span className="text-sm font-normal" style={{ color: 'var(--clay)' }}>
+                      {user.visa_status.replace(/_/g, ' ').toUpperCase()}
+                      {user.weekly_hours_limit && ` • ${user.weekly_hours_limit}h/week limit`}
+                    </span>
+                  </div>
+                )}
               </div>
               <Button
                 onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
@@ -105,14 +140,14 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        <div className="grid md:grid-cols-3 gap-5 mb-8">
+        <div className="grid md:grid-cols-4 gap-5 mb-8">
           <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
             <CardContent className="p-6 text-center">
               <Briefcase className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--sage)', strokeWidth: 1.5 }} />
               <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 {user.shifts_completed || 0}
               </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>SHIFTS COMPLETED</div>
+              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>SHIFTS DONE</div>
             </CardContent>
           </Card>
 
@@ -122,7 +157,7 @@ export default function Profile() {
               <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 {user.rating > 0 ? user.rating.toFixed(1) : 'New'}
               </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>AVERAGE RATING</div>
+              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>EMPLOYER RATING</div>
             </CardContent>
           </Card>
 
@@ -130,14 +165,62 @@ export default function Profile() {
             <CardContent className="p-6 text-center">
               <Award className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
               <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                {user.experience_years || 0}
+                {user.experience_years || 0}y
               </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>YEARS EXPERIENCE</div>
+              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>EXPERIENCE</div>
+            </CardContent>
+          </Card>
+
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardContent className="p-6 text-center">
+              <Clock className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--olive)', strokeWidth: 1.5 }} />
+              <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                {user.hours_worked_this_week || 0}
+              </div>
+              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>HOURS THIS WEEK</div>
             </CardContent>
           </Card>
         </div>
 
-        <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Work Authorization</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+                VISA / CITIZENSHIP STATUS *
+              </label>
+              {isEditing ? (
+                <Select value={formData.visa_status} onValueChange={(value) => setFormData(prev => ({ ...prev, visa_status: value }))}>
+                  <SelectTrigger className="rounded-xl border" style={{ borderColor: 'var(--sand)' }}>
+                    <SelectValue placeholder="Select your status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="irish_citizen">Irish Citizen</SelectItem>
+                    <SelectItem value="eu_citizen">EU Citizen</SelectItem>
+                    <SelectItem value="stamp_1">Stamp 1 (39h/week limit)</SelectItem>
+                    <SelectItem value="stamp_2">Stamp 2 (20h/week limit)</SelectItem>
+                    <SelectItem value="stamp_3">Stamp 3 (No restrictions)</SelectItem>
+                    <SelectItem value="stamp_4">Stamp 4 (No restrictions)</SelectItem>
+                    <SelectItem value="student_visa">Student Visa (20h/week limit)</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <p className="font-normal text-lg" style={{ color: 'var(--earth)' }}>
+                  {user.visa_status ? user.visa_status.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'Not set'}
+                  {user.weekly_hours_limit && (
+                    <span className="text-sm ml-2" style={{ color: 'var(--clay)' }}>
+                      ({user.weekly_hours_limit} hours per week maximum)
+                    </span>
+                  )}
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
             <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Profile Details</CardTitle>
           </CardHeader>
@@ -150,7 +233,7 @@ export default function Profile() {
                 <Textarea
                   value={formData.bio}
                   onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  placeholder="Tell us about yourself..."
+                  placeholder="Tell us about your barista journey..."
                   className="rounded-xl border font-light"
                   style={{ borderColor: 'var(--sand)' }}
                 />
@@ -164,13 +247,13 @@ export default function Profile() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
-                  LOCATION
+                  LOCATION *
                 </label>
                 {isEditing ? (
                   <Input
                     value={formData.location}
                     onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="City, Ireland"
+                    placeholder="Dublin, Ireland"
                     className="rounded-xl border"
                     style={{ borderColor: 'var(--sand)' }}
                   />
@@ -184,7 +267,7 @@ export default function Profile() {
 
               <div>
                 <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
-                  PHONE
+                  PHONE *
                 </label>
                 {isEditing ? (
                   <Input
@@ -203,7 +286,7 @@ export default function Profile() {
 
               <div>
                 <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
-                  YEARS OF EXPERIENCE
+                  YEARS OF EXPERIENCE *
                 </label>
                 {isEditing ? (
                   <Input
@@ -224,7 +307,7 @@ export default function Profile() {
 
             <div>
               <label className="text-xs tracking-wider mb-3 block font-normal" style={{ color: 'var(--clay)' }}>
-                SKILLS
+                SKILLS *
               </label>
               {isEditing ? (
                 <div className="flex flex-wrap gap-2">
@@ -265,7 +348,7 @@ export default function Profile() {
 
             <div>
               <label className="text-xs tracking-wider mb-3 block font-normal" style={{ color: 'var(--clay)' }}>
-                AVAILABILITY
+                AVAILABILITY *
               </label>
               {isEditing ? (
                 <div className="flex flex-wrap gap-2">
@@ -322,6 +405,7 @@ export default function Profile() {
                       bio: user.bio || '',
                       location: user.location || '',
                       phone: user.phone || '',
+                      visa_status: user.visa_status || '',
                       experience_years: user.experience_years || 0,
                       skills: user.skills || [],
                       certifications: user.certifications || [],
@@ -337,6 +421,55 @@ export default function Profile() {
             )}
           </CardContent>
         </Card>
+
+        {workerReviews && workerReviews.length > 0 && (
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader>
+              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Employer Reviews ({workerReviews.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {workerReviews.map((review, idx) => (
+                <div key={idx} className="p-5 rounded-xl border" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--cream)' }}>
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 className="font-normal text-lg" style={{ color: 'var(--earth)' }}>{review.coffee_shop_name}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4" style={{ color: i < review.rating ? 'var(--terracotta)' : 'var(--sand)', fill: i < review.rating ? 'var(--terracotta)' : 'none' }} />
+                          ))}
+                        </div>
+                        <span className="text-sm" style={{ color: 'var(--clay)' }}>{review.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                    {review.would_hire_again && (
+                      <Badge className="border-0" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>Would Hire Again</Badge>
+                    )}
+                  </div>
+                  {review.comment && (
+                    <p className="text-sm font-light mb-3" style={{ color: 'var(--earth)' }}>{review.comment}</p>
+                  )}
+                  <div className="grid grid-cols-3 gap-3 text-xs">
+                    <div>
+                      <span className="tracking-wider" style={{ color: 'var(--clay)' }}>PUNCTUALITY:</span>
+                      <span className="ml-2 font-normal" style={{ color: 'var(--earth)' }}>{review.punctuality_rating}/5</span>
+                    </div>
+                    <div>
+                      <span className="tracking-wider" style={{ color: 'var(--clay)' }}>SKILL:</span>
+                      <span className="ml-2 font-normal" style={{ color: 'var(--earth)' }}>{review.skill_rating}/5</span>
+                    </div>
+                    <div>
+                      <span className="tracking-wider" style={{ color: 'var(--clay)' }}>ATTITUDE:</span>
+                      <span className="ml-2 font-normal" style={{ color: 'var(--earth)' }}>{review.attitude_rating}/5</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
