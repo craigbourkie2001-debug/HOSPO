@@ -1,54 +1,46 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
-import { Search, TrendingUp, MapPin, Clock } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Coffee, ChefHat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShiftCard from "../components/shifts/ShiftCard";
 import ShiftFilters from "../components/shifts/ShiftFilters";
+import ApplyModal from "../components/shifts/ApplyModal";
 
 export default function BrowseShifts() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [filters, setFilters] = useState({ location: "all", date: "all", skills: [] });
-  const [user, setUser] = useState(null);
-  const queryClient = useQueryClient();
-
-  React.useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
-  }, []);
+  const [selectedShift, setSelectedShift] = useState(null);
 
   const { data: shifts, isLoading } = useQuery({
     queryKey: ['shifts'],
-    queryFn: () => base44.entities.Shift.filter({ status: 'available' }, '-created_date'),
+    queryFn: async () => {
+      const available = await base44.entities.Shift.filter({ status: 'available' }, '-created_date');
+      const applicationsOpen = await base44.entities.Shift.filter({ status: 'applications_open' }, '-created_date');
+      return [...available, ...applicationsOpen];
+    },
     initialData: [],
   });
 
-  const claimShiftMutation = useMutation({
-    mutationFn: async (shift) => {
-      await base44.entities.Shift.update(shift.id, {
-        status: 'claimed',
-        claimed_by: user.email,
-        claimed_at: new Date().toISOString()
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['shifts'] });
-      queryClient.invalidateQueries({ queryKey: ['myShifts'] });
-    },
-  });
-
   const filteredShifts = shifts.filter(shift => {
-    const matchesSearch = shift.coffee_shop_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const venueName = shift.venue_name || shift.coffee_shop_name || '';
+    const matchesSearch = venueName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          shift.location?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesLocation = filters.location === "all" || shift.location === filters.location;
     const matchesDate = filters.date === "all" || shift.date === filters.date;
     const matchesSkills = filters.skills.length === 0 || 
                          filters.skills.some(skill => shift.skills_required?.includes(skill));
+    const matchesRole = roleFilter === "all" || shift.role_type === roleFilter;
     
-    return matchesSearch && matchesLocation && matchesDate && matchesSkills;
+    return matchesSearch && matchesLocation && matchesDate && matchesSkills && matchesRole;
   });
 
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
+  const baristaCount = shifts.filter(s => s.role_type !== 'chef').length;
+  const chefCount = shifts.filter(s => s.role_type === 'chef').length;
 
   return (
     <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
@@ -59,16 +51,45 @@ export default function BrowseShifts() {
             Available Shifts
           </h1>
           <p className="text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
-            Find your next opportunity in specialty coffee
+            Find your next opportunity in Irish hospitality
           </p>
         </div>
+
+        {/* Role Tabs */}
+        <Tabs value={roleFilter} onValueChange={setRoleFilter} className="mb-6">
+          <TabsList className="grid grid-cols-3 w-full md:w-auto md:inline-grid p-1.5 rounded-2xl h-auto" style={{ backgroundColor: 'var(--sand)' }}>
+            <TabsTrigger 
+              value="all" 
+              className="rounded-xl py-3 px-6 font-normal tracking-wide data-[state=active]:bg-white transition-all"
+              style={{ color: 'var(--earth)' }}
+            >
+              All Shifts ({shifts.length})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="barista" 
+              className="rounded-xl py-3 px-6 font-normal tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-2"
+              style={{ color: 'var(--earth)' }}
+            >
+              <Coffee className="w-4 h-4" />
+              Barista ({baristaCount})
+            </TabsTrigger>
+            <TabsTrigger 
+              value="chef" 
+              className="rounded-xl py-3 px-6 font-normal tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-2"
+              style={{ color: 'var(--earth)' }}
+            >
+              <ChefHat className="w-4 h-4" />
+              Chef ({chefCount})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
         {/* Search Bar */}
         <div className="mb-8">
           <div className="relative">
             <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
             <Input
-              placeholder="Search by coffee shop or location..."
+              placeholder="Search by venue or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-14 h-14 rounded-2xl border text-base"
@@ -175,15 +196,21 @@ export default function BrowseShifts() {
                 >
                   <ShiftCard 
                     shift={shift} 
-                    onClaim={() => claimShiftMutation.mutate(shift)}
-                    isLoading={claimShiftMutation.isPending}
+                    onApply={() => setSelectedShift(shift)}
                   />
                 </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+                ))}
+                </AnimatePresence>
+                </div>
+                )}
+
+                {selectedShift && (
+                <ApplyModal 
+                shift={selectedShift} 
+                onClose={() => setSelectedShift(null)} 
+                />
+                )}
+                </div>
+                </div>
+                );
 }
