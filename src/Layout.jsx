@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard } from "lucide-react";
+import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
 import { base44 } from "@/api/base44Client";
 import {
@@ -27,12 +27,17 @@ const navigationItems = [
   {
     title: "My Shifts",
     url: createPageUrl("MyShifts"),
-    icon: Coffee,
+    icon: Clock,
   },
   {
     title: "Coffee Shops",
     url: createPageUrl("CoffeeShops"),
-    icon: Store,
+    icon: Coffee,
+  },
+  {
+    title: "Restaurants",
+    url: createPageUrl("Restaurants"),
+    icon: ChefHat,
   },
   {
     title: "Employer Dashboard",
@@ -94,11 +99,11 @@ export default function Layout({ children }) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--terracotta)' }}>
-                  <Coffee className="w-5 h-5 text-white" />
+                  <Briefcase className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h2 className="font-light text-2xl tracking-wide" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Bean</h2>
-                  <p className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>SPECIALTY COFFEE</p>
+                  <h2 className="font-light text-2xl tracking-wide" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Hospo</h2>
+                  <p className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>HOSPITALITY IRELAND</p>
                 </div>
               </div>
               <NotificationBell />
@@ -192,9 +197,9 @@ export default function Layout({ children }) {
                 <SidebarTrigger className="p-2 rounded-lg transition-all duration-200" />
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--terracotta)' }}>
-                    <Coffee className="w-4 h-4 text-white" />
+                    <Briefcase className="w-4 h-4 text-white" />
                   </div>
-                  <h1 className="text-xl font-light tracking-wide" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Bean</h1>
+                  <h1 className="text-xl font-light tracking-wide" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Hospo</h1>
                 </div>
               </div>
               <NotificationBell />

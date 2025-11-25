@@ -3,34 +3,68 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Briefcase, Plus, Users, Clock, TrendingUp, Calendar } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Briefcase, Plus, Users, Clock, TrendingUp, Calendar, Coffee, ChefHat, Store } from "lucide-react";
 import { motion } from "framer-motion";
 import ShiftFormModal from "../components/employer/ShiftFormModal";
 import EmployerShiftCard from "../components/employer/EmployerShiftCard";
+import ApplicationsModal from "../components/employer/ApplicationsModal";
 
 export default function EmployerDashboard() {
   const [user, setUser] = useState(null);
   const [showShiftForm, setShowShiftForm] = useState(false);
-  const [coffeeShop, setCoffeeShop] = useState(null);
+  const [venues, setVenues] = useState([]);
+  const [selectedVenue, setSelectedVenue] = useState(null);
+  const [selectedVenueType, setSelectedVenueType] = useState('coffee_shop');
+  const [viewingApplicationsFor, setViewingApplicationsFor] = useState(null);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
     base44.auth.me().then(async (userData) => {
       setUser(userData);
-      // Fetch employer's coffee shop
+      const allVenues = [];
+      
+      // Fetch employer's coffee shops
       if (userData.coffee_shop_id) {
-        const shop = await base44.entities.CoffeeShop.filter({ id: userData.coffee_shop_id });
-        if (shop.length > 0) setCoffeeShop(shop[0]);
+        const shops = await base44.entities.CoffeeShop.filter({ id: userData.coffee_shop_id });
+        allVenues.push(...shops.map(s => ({ ...s, venue_type: 'coffee_shop' })));
+      }
+      
+      // Fetch employer's restaurants
+      if (userData.restaurant_id) {
+        const restaurants = await base44.entities.Restaurant.filter({ id: userData.restaurant_id });
+        allVenues.push(...restaurants.map(r => ({ ...r, venue_type: 'restaurant' })));
+      }
+
+      // For demo: also check by created_by email
+      const myShops = await base44.entities.CoffeeShop.filter({ created_by: userData.email });
+      const myRestaurants = await base44.entities.Restaurant.filter({ created_by: userData.email });
+      
+      myShops.forEach(s => {
+        if (!allVenues.find(v => v.id === s.id)) {
+          allVenues.push({ ...s, venue_type: 'coffee_shop' });
+        }
+      });
+      myRestaurants.forEach(r => {
+        if (!allVenues.find(v => v.id === r.id)) {
+          allVenues.push({ ...r, venue_type: 'restaurant' });
+        }
+      });
+      
+      setVenues(allVenues);
+      if (allVenues.length > 0) {
+        setSelectedVenue(allVenues[0]);
+        setSelectedVenueType(allVenues[0].venue_type);
       }
     }).catch(() => {});
   }, []);
 
   const { data: shifts, isLoading } = useQuery({
-    queryKey: ['employerShifts', coffeeShop?.id],
-    queryFn: () => base44.entities.Shift.filter({ coffee_shop_id: coffeeShop.id }, '-created_date'),
+    queryKey: ['employerShifts', selectedVenue?.id],
+    queryFn: () => base44.entities.Shift.filter({ venue_id: selectedVenue.id }, '-created_date'),
     initialData: [],
-    enabled: !!coffeeShop?.id
+    enabled: !!selectedVenue?.id
   });
 
   const deleteShiftMutation = useMutation({
@@ -40,14 +74,31 @@ export default function EmployerDashboard() {
     },
   });
 
-  const availableShifts = shifts.filter(s => s.status === 'available');
-  const claimedShifts = shifts.filter(s => s.status === 'claimed');
+  const availableShifts = shifts.filter(s => s.status === 'available' || s.status === 'applications_open');
+  const filledShifts = shifts.filter(s => s.status === 'filled');
   const completedShifts = shifts.filter(s => s.status === 'completed');
+  const totalApplications = shifts.reduce((sum, s) => sum + (s.applications_count || 0), 0);
 
-  if (!user || !coffeeShop) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="animate-spin rounded-full h-12 w-12 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+      </div>
+    );
+  }
+
+  if (venues.length === 0) {
+    return (
+      <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-2xl mx-auto text-center py-20">
+          <Store className="w-20 h-20 mx-auto mb-6" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
+          <h1 className="text-4xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            No Venues Found
+          </h1>
+          <p className="font-light mb-8" style={{ color: 'var(--clay)' }}>
+            You need to be associated with a coffee shop or restaurant to use the employer dashboard.
+          </p>
+        </div>
       </div>
     );
   }
@@ -57,14 +108,40 @@ export default function EmployerDashboard() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-5xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Employer Dashboard
               </h1>
-              <p className="text-lg font-light" style={{ color: 'var(--clay)' }}>
-                {coffeeShop.name}
-              </p>
+              {venues.length > 1 ? (
+                <Select 
+                  value={selectedVenue?.id} 
+                  onValueChange={(id) => {
+                    const venue = venues.find(v => v.id === id);
+                    setSelectedVenue(venue);
+                    setSelectedVenueType(venue.venue_type);
+                  }}
+                >
+                  <SelectTrigger className="w-64 rounded-xl border" style={{ borderColor: 'var(--sand)' }}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {venues.map(v => (
+                      <SelectItem key={v.id} value={v.id}>
+                        <div className="flex items-center gap-2">
+                          {v.venue_type === 'restaurant' ? <ChefHat className="w-4 h-4" /> : <Coffee className="w-4 h-4" />}
+                          {v.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <div className="flex items-center gap-2 text-lg font-light" style={{ color: 'var(--clay)' }}>
+                  {selectedVenueType === 'restaurant' ? <ChefHat className="w-5 h-5" /> : <Coffee className="w-5 h-5" />}
+                  {selectedVenue?.name}
+                </div>
+              )}
             </div>
             <Button
               onClick={() => setShowShiftForm(true)}
@@ -89,7 +166,7 @@ export default function EmployerDashboard() {
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {availableShifts.length}
             </div>
-            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>AVAILABLE SHIFTS</div>
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>OPEN SHIFTS</div>
           </motion.div>
           
           <motion.div 
@@ -99,11 +176,11 @@ export default function EmployerDashboard() {
             className="p-6 rounded-2xl hover-lift"
             style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
           >
-            <Clock className="w-8 h-8 mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
+            <Users className="w-8 h-8 mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              {claimedShifts.length}
+              {totalApplications}
             </div>
-            <div className="text-xs tracking-wider opacity-90">CLAIMED SHIFTS</div>
+            <div className="text-xs tracking-wider opacity-90">APPLICATIONS</div>
           </motion.div>
           
           <motion.div 
@@ -113,11 +190,11 @@ export default function EmployerDashboard() {
             className="p-6 rounded-2xl hover-lift"
             style={{ backgroundColor: 'var(--sage)', color: 'white' }}
           >
-            <Users className="w-8 h-8 mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
+            <Clock className="w-8 h-8 mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              {completedShifts.length}
+              {filledShifts.length}
             </div>
-            <div className="text-xs tracking-wider opacity-90">COMPLETED</div>
+            <div className="text-xs tracking-wider opacity-90">FILLED SHIFTS</div>
           </motion.div>
           
           <motion.div 
@@ -129,13 +206,13 @@ export default function EmployerDashboard() {
           >
             <TrendingUp className="w-8 h-8 mb-3" style={{ color: 'var(--olive)', strokeWidth: 1.5 }} />
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              {shifts.length}
+              {completedShifts.length}
             </div>
-            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>TOTAL SHIFTS</div>
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>COMPLETED</div>
           </motion.div>
         </div>
 
-        {/* Shifts Tabs */}
+        {/* Shifts */}
         <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
             <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
@@ -174,6 +251,7 @@ export default function EmployerDashboard() {
                     key={shift.id}
                     shift={shift}
                     onDelete={() => deleteShiftMutation.mutate(shift.id)}
+                    onViewApplications={() => setViewingApplicationsFor(shift)}
                   />
                 ))}
               </div>
@@ -182,10 +260,18 @@ export default function EmployerDashboard() {
         </Card>
       </div>
 
-      {showShiftForm && (
+      {showShiftForm && selectedVenue && (
         <ShiftFormModal
-          coffeeShop={coffeeShop}
+          venue={selectedVenue}
+          venueType={selectedVenueType}
           onClose={() => setShowShiftForm(false)}
+        />
+      )}
+
+      {viewingApplicationsFor && (
+        <ApplicationsModal
+          shift={viewingApplicationsFor}
+          onClose={() => setViewingApplicationsFor(null)}
         />
       )}
     </div>
