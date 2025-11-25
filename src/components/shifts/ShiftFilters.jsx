@@ -4,8 +4,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { X, Filter } from "lucide-react";
 
-const skillOptions = [
+const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "customer_service", "opening", "closing", "cash_handling"
+];
+
+const chefSkillOptions = [
+  "line_cook", "prep_cook", "grill", "saute", "pastry", "sous_chef", "head_chef", 
+  "food_safety", "plating", "butchery", "seafood", "vegetarian"
 ];
 
 export default function ShiftFilters({ filters, setFilters, availableLocations, shifts }) {
