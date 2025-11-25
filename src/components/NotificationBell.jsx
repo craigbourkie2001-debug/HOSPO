@@ -22,10 +22,14 @@ export default function NotificationBell() {
     queryFn: async () => {
       if (!user?.email) return [];
       
-      // Get shifts claimed by the user
+      // Get applications by the user
+      const myApplications = await base44.entities.ShiftApplication.filter({ 
+        applicant_email: user.email
+      }, '-created_date', 10);
+
+      // Get shifts assigned to the user
       const myShifts = await base44.entities.Shift.filter({ 
-        claimed_by: user.email,
-        status: 'claimed'
+        assigned_to: user.email
       });
 
       // Get worker reviews for the user
@@ -34,10 +38,19 @@ export default function NotificationBell() {
       }, '-created_date', 5);
 
       const notifications = [
+        ...myApplications.map(app => ({
+          type: app.status === 'accepted' ? 'application_accepted' : app.status === 'rejected' ? 'application_rejected' : 'application_pending',
+          message: app.status === 'accepted' 
+            ? `🎉 Application accepted at ${app.venue_name}!` 
+            : app.status === 'rejected'
+            ? `Application for ${app.venue_name} was not selected`
+            : `Application pending for ${app.venue_name}`,
+          date: app.created_date
+        })),
         ...myShifts.map(shift => ({
-          type: 'shift_claimed',
-          message: `Shift at ${shift.coffee_shop_name} on ${format(new Date(shift.date), 'MMM d')}`,
-          date: shift.claimed_at
+          type: 'shift_assigned',
+          message: `Shift confirmed at ${shift.venue_name || shift.coffee_shop_name} on ${format(new Date(shift.date), 'MMM d')}`,
+          date: shift.assigned_at || shift.created_date
         })),
         ...reviews.map(review => ({
           type: 'review_received',
