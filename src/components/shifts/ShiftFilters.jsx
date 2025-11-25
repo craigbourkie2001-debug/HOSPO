@@ -13,8 +13,15 @@ const chefSkillOptions = [
   "food_safety", "plating", "butchery", "seafood", "vegetarian"
 ];
 
-export default function ShiftFilters({ filters, setFilters, availableLocations, shifts }) {
+export default function ShiftFilters({ filters, setFilters, availableLocations, shifts, roleFilter }) {
   const availableDates = [...new Set(shifts.map(s => s.date).filter(Boolean))].sort();
+  
+  // Choose skill options based on role filter
+  const skillOptions = roleFilter === 'chef' 
+    ? chefSkillOptions 
+    : roleFilter === 'barista' 
+      ? baristaSkillOptions 
+      : [...baristaSkillOptions, ...chefSkillOptions];
 
   const toggleSkill = (skill) => {
     setFilters(prev => ({
@@ -79,16 +86,13 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
         <div className="flex flex-wrap gap-2">
           {skillOptions.map(skill => {
             const isSelected = filters.skills.includes(skill);
+            const isChefSkill = chefSkillOptions.includes(skill);
             return (
               <Badge
                 key={skill}
-                className={`cursor-pointer transition-all duration-200 hover-lift rounded-xl px-4 py-2 text-xs font-normal tracking-wide ${
-                  isSelected 
-                    ? '' 
-                    : ''
-                }`}
+                className="cursor-pointer transition-all duration-200 hover-lift rounded-xl px-4 py-2 text-xs font-normal tracking-wide"
                 style={isSelected ? {
-                  backgroundColor: 'var(--terracotta)',
+                  backgroundColor: isChefSkill ? 'var(--sage)' : 'var(--terracotta)',
                   color: 'white',
                   border: 'none'
                 } : {

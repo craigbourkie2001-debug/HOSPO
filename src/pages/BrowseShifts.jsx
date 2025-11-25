@@ -108,6 +108,7 @@ export default function BrowseShifts() {
           setFilters={setFilters}
           availableLocations={availableLocations}
           shifts={shifts}
+          roleFilter={roleFilter}
         />
 
         {/* Stats */}
