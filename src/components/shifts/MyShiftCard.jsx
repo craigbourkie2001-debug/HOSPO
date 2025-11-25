@@ -1,11 +1,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Clock, CheckCircle } from "lucide-react";
+import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat } from "lucide-react";
 import { format } from "date-fns";
 
 export default function MyShiftCard({ shift }) {
   const isCompleted = shift.status === 'completed';
+  const isChefRole = shift.role_type === 'chef';
   const hours = (() => {
     const start = parseInt(shift.start_time?.split(':')[0] || 0);
     const end = parseInt(shift.end_time?.split(':')[0] || 0);
@@ -22,8 +23,25 @@ export default function MyShiftCard({ shift }) {
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-3">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              {isChefRole ? (
+                <ChefHat className="w-5 h-5" style={{ color: 'var(--sage)' }} />
+              ) : (
+                <Coffee className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
+              )}
+              <Badge 
+                className="text-xs font-normal" 
+                style={{ 
+                  backgroundColor: isChefRole ? 'var(--sage)' : 'var(--terracotta)', 
+                  color: 'white',
+                  border: 'none'
+                }}
+              >
+                {isChefRole ? 'Chef' : 'Barista'}
+              </Badge>
+            </div>
             <h3 className="text-xl font-normal mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              {shift.coffee_shop_name}
+              {shift.venue_name || shift.coffee_shop_name}
             </h3>
             <div className="flex items-center gap-2 text-sm font-light" style={{ color: 'var(--clay)' }}>
               <MapPin className="w-4 h-4" style={{ strokeWidth: 1.5 }} />
@@ -66,9 +84,9 @@ export default function MyShiftCard({ shift }) {
           </div>
         </div>
 
-        {shift.claimed_at && (
+        {shift.assigned_at && (
           <div className="mt-3 text-xs text-center font-light" style={{ color: 'var(--clay)' }}>
-            Claimed on {format(new Date(shift.claimed_at), 'MMM d, yyyy')}
+            Confirmed on {format(new Date(shift.assigned_at), 'MMM d, yyyy')}
           </div>
         )}
       </CardContent>
