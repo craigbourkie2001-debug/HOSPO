@@ -7,12 +7,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock } from "lucide-react";
+import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat } from "lucide-react";
 import { toast } from "sonner";
 
-const skillOptions = [
+const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
   "customer_service", "training", "opening", "closing", "cash_handling", "management"
+];
+
+const chefSkillOptions = [
+  "line_cook", "prep_cook", "grill", "saute", "pastry", 
+  "sous_chef", "head_chef", "food_safety", "inventory", 
+  "menu_planning", "plating", "butchery", "seafood", "vegetarian"
 ];
 
 const dayOptions = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
@@ -40,9 +46,11 @@ export default function Profile() {
         bio: userData.bio || '',
         location: userData.location || '',
         phone: userData.phone || '',
+        worker_type: userData.worker_type || 'barista',
         visa_status: userData.visa_status || '',
         experience_years: userData.experience_years || 0,
-        skills: userData.skills || [],
+        barista_skills: userData.barista_skills || userData.skills || [],
+        chef_skills: userData.chef_skills || [],
         certifications: userData.certifications || [],
         availability: userData.availability || [],
         skill_portfolio: userData.skill_portfolio || []
@@ -73,12 +81,21 @@ export default function Profile() {
     },
   });
 
-  const toggleSkill = (skill) => {
+  const toggleBaristaSkill = (skill) => {
     setFormData(prev => ({
       ...prev,
-      skills: prev.skills.includes(skill)
-        ? prev.skills.filter(s => s !== skill)
-        : [...prev.skills, skill]
+      barista_skills: prev.barista_skills.includes(skill)
+        ? prev.barista_skills.filter(s => s !== skill)
+        : [...prev.barista_skills, skill]
+    }));
+  };
+
+  const toggleChefSkill = (skill) => {
+    setFormData(prev => ({
+      ...prev,
+      chef_skills: prev.chef_skills.includes(skill)
+        ? prev.chef_skills.filter(s => s !== skill)
+        : [...prev.chef_skills, skill]
     }));
   };
 
@@ -220,28 +237,46 @@ export default function Profile() {
           </CardContent>
         </Card>
 
+        {/* Worker Type */}
         <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Skills Showcase</CardTitle>
+            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Worker Type</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
-                <div className="text-2xl mb-2">☕</div>
-                <div className="text-sm font-normal mb-1" style={{ color: 'var(--earth)' }}>Espresso</div>
-                <div className="text-xs font-light" style={{ color: 'var(--clay)' }}>Advanced</div>
+          <CardContent>
+            {isEditing ? (
+              <div className="flex flex-wrap gap-3">
+                {['barista', 'chef', 'both'].map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, worker_type: type }))}
+                    className="flex items-center gap-2 px-5 py-3 rounded-xl transition-all font-normal"
+                    style={formData.worker_type === type ? {
+                      backgroundColor: type === 'chef' ? 'var(--sage)' : 'var(--terracotta)',
+                      color: 'white',
+                      border: 'none'
+                    } : {
+                      backgroundColor: 'transparent',
+                      border: '1px solid var(--sand)',
+                      color: 'var(--clay)'
+                    }}
+                  >
+                    {type === 'barista' && <Coffee className="w-5 h-5" />}
+                    {type === 'chef' && <ChefHat className="w-5 h-5" />}
+                    {type === 'both' && <><Coffee className="w-5 h-5" /><ChefHat className="w-5 h-5" /></>}
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </button>
+                ))}
               </div>
-              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
-                <div className="text-2xl mb-2">🎨</div>
-                <div className="text-sm font-normal mb-1" style={{ color: 'var(--earth)' }}>Latte Art</div>
-                <div className="text-xs font-light" style={{ color: 'var(--clay)' }}>Expert</div>
+            ) : (
+              <div className="flex items-center gap-2">
+                {(user.worker_type === 'barista' || user.worker_type === 'both') && <Coffee className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />}
+                {(user.worker_type === 'chef' || user.worker_type === 'both') && <ChefHat className="w-5 h-5" style={{ color: 'var(--sage)' }} />}
+                <span className="font-normal text-lg" style={{ color: 'var(--earth)' }}>
+                  {user.worker_type ? user.worker_type.charAt(0).toUpperCase() + user.worker_type.slice(1) : 'Barista'}
+                </span>
               </div>
-              <div className="p-4 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
-                <div className="text-2xl mb-2">🔬</div>
-                <div className="text-sm font-normal mb-1" style={{ color: 'var(--earth)' }}>Filter Coffee</div>
-                <div className="text-xs font-light" style={{ color: 'var(--clay)' }}>Intermediate</div>
-              </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 
@@ -330,46 +365,95 @@ export default function Profile() {
               </div>
             </div>
 
-            <div>
-              <label className="text-xs tracking-wider mb-3 block font-normal" style={{ color: 'var(--clay)' }}>
-                SKILLS *
-              </label>
-              {isEditing ? (
-                <div className="flex flex-wrap gap-2">
-                  {skillOptions.map(skill => (
-                    <Badge
-                      key={skill}
-                      className="cursor-pointer transition-all duration-200 hover-lift rounded-xl px-3 py-1.5 font-normal tracking-wide"
-                      style={formData.skills.includes(skill) ? { 
-                        backgroundColor: 'var(--terracotta)',
-                        color: 'white',
-                        border: 'none'
-                      } : {
-                        backgroundColor: 'transparent',
-                        border: '1px solid var(--sand)',
-                        color: 'var(--clay)'
-                      }}
-                      onClick={() => toggleSkill(skill)}
-                    >
-                      {skill.replace(/_/g, ' ')}
-                      {formData.skills.includes(skill) && <X className="w-3 h-3 ml-1" />}
-                    </Badge>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {user.skills && user.skills.length > 0 ? (
-                    user.skills.map((skill, idx) => (
-                      <Badge key={idx} className="border-0 font-normal" style={{ backgroundColor: 'var(--sand)', color: 'var(--earth)' }}>
+            {/* Barista Skills */}
+            {(formData.worker_type === 'barista' || formData.worker_type === 'both' || !formData.worker_type) && (
+              <div>
+                <label className="text-xs tracking-wider mb-3 block font-normal flex items-center gap-2" style={{ color: 'var(--clay)' }}>
+                  <Coffee className="w-4 h-4" />
+                  BARISTA SKILLS
+                </label>
+                {isEditing ? (
+                  <div className="flex flex-wrap gap-2">
+                    {baristaSkillOptions.map(skill => (
+                      <Badge
+                        key={skill}
+                        className="cursor-pointer transition-all duration-200 hover-lift rounded-xl px-3 py-1.5 font-normal tracking-wide"
+                        style={formData.barista_skills?.includes(skill) ? { 
+                          backgroundColor: 'var(--terracotta)',
+                          color: 'white',
+                          border: 'none'
+                        } : {
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--sand)',
+                          color: 'var(--clay)'
+                        }}
+                        onClick={() => toggleBaristaSkill(skill)}
+                      >
                         {skill.replace(/_/g, ' ')}
+                        {formData.barista_skills?.includes(skill) && <X className="w-3 h-3 ml-1" />}
                       </Badge>
-                    ))
-                  ) : (
-                    <p className="font-light" style={{ color: 'var(--clay)' }}>No skills added yet</p>
-                  )}
-                </div>
-              )}
-            </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {(user.barista_skills || user.skills) && (user.barista_skills || user.skills).length > 0 ? (
+                      (user.barista_skills || user.skills).map((skill, idx) => (
+                        <Badge key={idx} className="border-0 font-normal" style={{ backgroundColor: 'var(--sand)', color: 'var(--earth)' }}>
+                          {skill.replace(/_/g, ' ')}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="font-light" style={{ color: 'var(--clay)' }}>No barista skills added yet</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Chef Skills */}
+            {(formData.worker_type === 'chef' || formData.worker_type === 'both') && (
+              <div>
+                <label className="text-xs tracking-wider mb-3 block font-normal flex items-center gap-2" style={{ color: 'var(--clay)' }}>
+                  <ChefHat className="w-4 h-4" />
+                  CHEF / KITCHEN SKILLS
+                </label>
+                {isEditing ? (
+                  <div className="flex flex-wrap gap-2">
+                    {chefSkillOptions.map(skill => (
+                      <Badge
+                        key={skill}
+                        className="cursor-pointer transition-all duration-200 hover-lift rounded-xl px-3 py-1.5 font-normal tracking-wide"
+                        style={formData.chef_skills?.includes(skill) ? { 
+                          backgroundColor: 'var(--sage)',
+                          color: 'white',
+                          border: 'none'
+                        } : {
+                          backgroundColor: 'transparent',
+                          border: '1px solid var(--sand)',
+                          color: 'var(--clay)'
+                        }}
+                        onClick={() => toggleChefSkill(skill)}
+                      >
+                        {skill.replace(/_/g, ' ')}
+                        {formData.chef_skills?.includes(skill) && <X className="w-3 h-3 ml-1" />}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {user.chef_skills && user.chef_skills.length > 0 ? (
+                      user.chef_skills.map((skill, idx) => (
+                        <Badge key={idx} className="border-0 font-normal" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>
+                          {skill.replace(/_/g, ' ')}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="font-light" style={{ color: 'var(--clay)' }}>No chef skills added yet</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div>
               <label className="text-xs tracking-wider mb-3 block font-normal" style={{ color: 'var(--clay)' }}>
@@ -430,9 +514,11 @@ export default function Profile() {
                       bio: user.bio || '',
                       location: user.location || '',
                       phone: user.phone || '',
+                      worker_type: user.worker_type || 'barista',
                       visa_status: user.visa_status || '',
                       experience_years: user.experience_years || 0,
-                      skills: user.skills || [],
+                      barista_skills: user.barista_skills || user.skills || [],
+                      chef_skills: user.chef_skills || [],
                       certifications: user.certifications || [],
                       availability: user.availability || []
                     });
