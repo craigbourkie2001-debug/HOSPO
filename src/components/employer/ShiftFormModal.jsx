@@ -5,17 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { X, Coffee, ChefHat } from "lucide-react";
 import { toast } from "sonner";
 
-const skillOptions = [
+const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
   "customer_service", "opening", "closing", "cash_handling"
 ];
 
-export default function ShiftFormModal({ coffeeShop, onClose }) {
+const chefSkillOptions = [
+  "line_cook", "prep_cook", "grill", "saute", "pastry", 
+  "sous_chef", "head_chef", "food_safety", "inventory", 
+  "menu_planning", "plating", "butchery", "seafood", "vegetarian"
+];
+
+export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClose }) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
+    role_type: venueType === 'restaurant' ? 'chef' : 'barista',
     date: '',
     start_time: '',
     end_time: '',
@@ -24,12 +32,16 @@ export default function ShiftFormModal({ coffeeShop, onClose }) {
     skills_required: []
   });
 
+  const skillOptions = formData.role_type === 'chef' ? chefSkillOptions : baristaSkillOptions;
+
   const createShiftMutation = useMutation({
     mutationFn: (data) => base44.entities.Shift.create({
-      coffee_shop_id: coffeeShop.id,
-      coffee_shop_name: coffeeShop.name,
-      location: coffeeShop.location,
+      venue_type: venueType,
+      venue_id: venue.id,
+      venue_name: venue.name,
+      location: venue.location,
       status: 'available',
+      applications_count: 0,
       ...data
     }),
     onSuccess: () => {
@@ -62,18 +74,52 @@ export default function ShiftFormModal({ coffeeShop, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="max-w-2xl w-full rounded-2xl p-8" style={{ backgroundColor: 'var(--warm-white)' }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div className="max-w-2xl w-full rounded-2xl p-8 my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-            Post New Shift
-          </h2>
+          <div className="flex items-center gap-3">
+            {formData.role_type === 'chef' ? (
+              <ChefHat className="w-8 h-8" style={{ color: 'var(--sage)' }} />
+            ) : (
+              <Coffee className="w-8 h-8" style={{ color: 'var(--terracotta)' }} />
+            )}
+            <h2 className="text-3xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              Post New Shift
+            </h2>
+          </div>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100">
             <X className="w-5 h-5" style={{ color: 'var(--clay)' }} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Role Type Selector */}
+          <div>
+            <Label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>ROLE TYPE *</Label>
+            <Select 
+              value={formData.role_type} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, role_type: value, skills_required: [] }))}
+            >
+              <SelectTrigger className="rounded-xl border" style={{ borderColor: 'var(--sand)' }}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="barista">
+                  <div className="flex items-center gap-2">
+                    <Coffee className="w-4 h-4" />
+                    Barista
+                  </div>
+                </SelectItem>
+                <SelectItem value="chef">
+                  <div className="flex items-center gap-2">
+                    <ChefHat className="w-4 h-4" />
+                    Chef / Kitchen
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>DATE *</Label>
@@ -96,7 +142,7 @@ export default function ShiftFormModal({ coffeeShop, onClose }) {
                 onChange={(e) => setFormData(prev => ({ ...prev, hourly_rate: e.target.value }))}
                 className="rounded-xl border"
                 style={{ borderColor: 'var(--sand)' }}
-                placeholder="13.50"
+                placeholder={formData.role_type === 'chef' ? '16.00' : '13.50'}
                 required
               />
             </div>
@@ -139,7 +185,9 @@ export default function ShiftFormModal({ coffeeShop, onClose }) {
           </div>
 
           <div>
-            <Label className="text-xs tracking-wider mb-3 block" style={{ color: 'var(--clay)' }}>REQUIRED SKILLS</Label>
+            <Label className="text-xs tracking-wider mb-3 block" style={{ color: 'var(--clay)' }}>
+              REQUIRED SKILLS ({formData.role_type === 'chef' ? 'Kitchen' : 'Barista'})
+            </Label>
             <div className="flex flex-wrap gap-2">
               {skillOptions.map(skill => (
                 <button
@@ -148,7 +196,7 @@ export default function ShiftFormModal({ coffeeShop, onClose }) {
                   onClick={() => toggleSkill(skill)}
                   className="px-4 py-2 rounded-xl transition-all font-normal"
                   style={formData.skills_required.includes(skill) ? {
-                    backgroundColor: 'var(--terracotta)',
+                    backgroundColor: formData.role_type === 'chef' ? 'var(--sage)' : 'var(--terracotta)',
                     color: 'white',
                     border: 'none'
                   } : {

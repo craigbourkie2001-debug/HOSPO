@@ -2,15 +2,18 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, DollarSign, MapPin, Trash2, User } from "lucide-react";
+import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat } from "lucide-react";
 import { format } from "date-fns";
 
-export default function EmployerShiftCard({ shift, onDelete }) {
+export default function EmployerShiftCard({ shift, onDelete, onViewApplications }) {
+  const isChefRole = shift.role_type === 'chef';
+  
   const getStatusColor = () => {
     switch (shift.status) {
       case 'available': return { bg: 'var(--sage)', text: 'white' };
-      case 'claimed': return { bg: 'var(--terracotta)', text: 'white' };
-      case 'completed': return { bg: 'var(--clay)', text: 'white' };
+      case 'applications_open': return { bg: 'var(--terracotta)', text: 'white' };
+      case 'filled': return { bg: 'var(--clay)', text: 'white' };
+      case 'completed': return { bg: 'var(--earth)', text: 'white' };
       default: return { bg: 'var(--sand)', text: 'var(--earth)' };
     }
   };
@@ -21,9 +24,25 @@ export default function EmployerShiftCard({ shift, onDelete }) {
     <Card className="border rounded-xl hover-lift transition-all" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--cream)' }}>
       <CardContent className="p-5">
         <div className="flex justify-between items-start mb-4">
-          <Badge className="rounded-lg font-normal" style={{ backgroundColor: statusColors.bg, color: statusColors.text }}>
-            {shift.status}
-          </Badge>
+          <div className="flex items-center gap-2">
+            {isChefRole ? (
+              <ChefHat className="w-5 h-5" style={{ color: 'var(--sage)' }} />
+            ) : (
+              <Coffee className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
+            )}
+            <Badge className="rounded-lg font-normal" style={{ backgroundColor: statusColors.bg, color: statusColors.text }}>
+              {shift.status?.replace(/_/g, ' ')}
+            </Badge>
+            <Badge 
+              className="rounded-lg font-normal" 
+              style={{ 
+                backgroundColor: isChefRole ? 'var(--sage)' : 'var(--terracotta)', 
+                color: 'white' 
+              }}
+            >
+              {isChefRole ? 'Chef' : 'Barista'}
+            </Badge>
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -56,12 +75,25 @@ export default function EmployerShiftCard({ shift, onDelete }) {
             </span>
           </div>
 
-          {shift.claimed_by && (
+          {/* Applications Count */}
+          {(shift.applications_count || 0) > 0 && (
+            <Button
+              variant="outline"
+              onClick={onViewApplications}
+              className="w-full rounded-xl font-normal flex items-center gap-2"
+              style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }}
+            >
+              <Users className="w-4 h-4" />
+              View {shift.applications_count} Application{shift.applications_count !== 1 ? 's' : ''}
+            </Button>
+          )}
+
+          {shift.assigned_to && (
             <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: 'var(--sand)' }}>
-              <User className="w-4 h-4" style={{ color: 'var(--clay)' }} />
+              <Users className="w-4 h-4" style={{ color: 'var(--clay)' }} />
               <div>
-                <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>CLAIMED BY</div>
-                <div className="font-normal" style={{ color: 'var(--earth)' }}>{shift.claimed_by}</div>
+                <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>ASSIGNED TO</div>
+                <div className="font-normal" style={{ color: 'var(--earth)' }}>{shift.assigned_to}</div>
               </div>
             </div>
           )}
