@@ -40,7 +40,11 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications 
                 color: 'white' 
               }}
             >
-              {isChefRole ? 'Chef' : 'Barista'}
+              {isChefRole 
+                ? shift.chef_level 
+                  ? shift.chef_level.replace(/_/g, ' ').toUpperCase()
+                  : 'Chef'
+                : 'Barista'}
             </Badge>
           </div>
           <Button

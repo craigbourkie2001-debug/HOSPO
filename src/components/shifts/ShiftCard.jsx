@@ -15,7 +15,7 @@ export default function ShiftCard({ shift, onApply, isLoading }) {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               {isChefRole ? (
-                <ChefHat className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
+                <ChefHat className="w-5 h-5" style={{ color: 'var(--sage)' }} />
               ) : (
                 <Coffee className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
               )}
@@ -27,7 +27,11 @@ export default function ShiftCard({ shift, onApply, isLoading }) {
                   border: 'none'
                 }}
               >
-                {isChefRole ? 'Chef' : 'Barista'}
+                {isChefRole 
+                  ? shift.chef_level 
+                    ? shift.chef_level.replace(/_/g, ' ').toUpperCase()
+                    : 'Chef'
+                  : 'Barista'}
               </Badge>
             </div>
             <h3 className="text-xl font-normal mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
