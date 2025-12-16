@@ -36,21 +36,6 @@ export default function EmployerDashboard() {
         const restaurants = await base44.entities.Restaurant.filter({ id: userData.restaurant_id });
         allVenues.push(...restaurants.map(r => ({ ...r, venue_type: 'restaurant' })));
       }
-
-      // For demo: also check by created_by email
-      const myShops = await base44.entities.CoffeeShop.filter({ created_by: userData.email });
-      const myRestaurants = await base44.entities.Restaurant.filter({ created_by: userData.email });
-      
-      myShops.forEach(s => {
-        if (!allVenues.find(v => v.id === s.id)) {
-          allVenues.push({ ...s, venue_type: 'coffee_shop' });
-        }
-      });
-      myRestaurants.forEach(r => {
-        if (!allVenues.find(v => v.id === r.id)) {
-          allVenues.push({ ...r, venue_type: 'restaurant' });
-        }
-      });
       
       setVenues(allVenues);
       if (allVenues.length > 0) {
