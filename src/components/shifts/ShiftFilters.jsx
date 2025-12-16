@@ -32,6 +32,11 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
     }));
   };
 
+  // Reset skill filters when role filter changes
+  React.useEffect(() => {
+    setFilters(prev => ({ ...prev, skills: [] }));
+  }, [roleFilter]);
+
   return (
     <div className="mb-10 p-8 rounded-2xl border" style={{ backgroundColor: 'var(--warm-white)', borderColor: 'var(--sand)' }}>
       <div className="flex items-center gap-2 mb-6">
