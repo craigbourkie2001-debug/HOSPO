@@ -7,6 +7,7 @@ import Marketplace from './pages/Marketplace';
 import Events from './pages/Events';
 import EmployerDashboard from './pages/EmployerDashboard';
 import Restaurants from './pages/Restaurants';
+import Jobs from './pages/Jobs';
 import __Layout from './Layout.jsx';
 
 
@@ -20,6 +21,7 @@ export const PAGES = {
     "Events": Events,
     "EmployerDashboard": EmployerDashboard,
     "Restaurants": Restaurants,
+    "Jobs": Jobs,
 }
 
 export const pagesConfig = {

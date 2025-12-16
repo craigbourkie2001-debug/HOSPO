@@ -30,6 +30,11 @@ const navigationItems = [
     icon: Clock,
   },
   {
+    title: "Jobs",
+    url: createPageUrl("Jobs"),
+    icon: Briefcase,
+  },
+  {
     title: "Coffee Shops",
     url: createPageUrl("CoffeeShops"),
     icon: Coffee,

@@ -24,6 +24,7 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     role_type: venueType === 'restaurant' ? 'chef' : 'barista',
+    chef_level: '',
     date: '',
     start_time: '',
     end_time: '',
@@ -98,7 +99,7 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
             <Label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>ROLE TYPE *</Label>
             <Select 
               value={formData.role_type} 
-              onValueChange={(value) => setFormData(prev => ({ ...prev, role_type: value, skills_required: [] }))}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, role_type: value, chef_level: '', skills_required: [] }))}
             >
               <SelectTrigger className="rounded-xl border" style={{ borderColor: 'var(--sand)' }}>
                 <SelectValue />
@@ -119,6 +120,27 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
               </SelectContent>
             </Select>
           </div>
+
+          {/* Chef Level Selector (only for chef roles) */}
+          {formData.role_type === 'chef' && (
+            <div>
+              <Label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>CHEF LEVEL *</Label>
+              <Select 
+                value={formData.chef_level} 
+                onValueChange={(value) => setFormData(prev => ({ ...prev, chef_level: value }))}
+              >
+                <SelectTrigger className="rounded-xl border" style={{ borderColor: 'var(--sand)' }}>
+                  <SelectValue placeholder="Select chef level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="commis_chef">Commis Chef</SelectItem>
+                  <SelectItem value="chef_de_partie">Chef de Partie</SelectItem>
+                  <SelectItem value="sous_chef">Sous Chef</SelectItem>
+                  <SelectItem value="head_chef">Head Chef</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
