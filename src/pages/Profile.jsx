@@ -819,6 +819,103 @@ export default function Profile() {
               )}
             </div>
 
+            <div>
+              <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+                PREFERRED SHIFT TIMES
+              </label>
+              {isEditing ? (
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { value: 'early_morning', label: 'Early Morning (5am-9am)' },
+                    { value: 'morning', label: 'Morning (9am-12pm)' },
+                    { value: 'afternoon', label: 'Afternoon (12pm-5pm)' },
+                    { value: 'evening', label: 'Evening (5pm-10pm)' },
+                    { value: 'late_night', label: 'Late Night (10pm+)' }
+                  ].map(time => (
+                    <Badge
+                      key={time.value}
+                      className="cursor-pointer transition-all duration-200 hover-lift rounded-xl px-3 py-1.5 font-normal tracking-wide"
+                      style={formData.preferred_shift_times.includes(time.value) ? { 
+                        backgroundColor: 'var(--olive)',
+                        color: 'white',
+                        border: 'none'
+                      } : {
+                        backgroundColor: 'transparent',
+                        border: '1px solid var(--sand)',
+                        color: 'var(--clay)'
+                      }}
+                      onClick={() => toggleShiftTime(time.value)}
+                    >
+                      {time.label}
+                      {formData.preferred_shift_times.includes(time.value) && <X className="w-3 h-3 ml-1" />}
+                    </Badge>
+                  ))}
+                </div>
+              ) : user.preferred_shift_times && user.preferred_shift_times.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {user.preferred_shift_times.map((time, idx) => (
+                    <Badge key={idx} className="border-0 font-normal" style={{ backgroundColor: 'var(--olive)', color: 'white' }}>
+                      {time.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                    </Badge>
+                  ))}
+                </div>
+              ) : (
+                <p className="font-light" style={{ color: 'var(--clay)' }}>No preferences set</p>
+              )}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+                  DESIRED HOURLY RATE (MIN)
+                </label>
+                {isEditing ? (
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-normal" style={{ color: 'var(--clay)' }}>€</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.50"
+                      value={formData.desired_hourly_rate_min}
+                      onChange={(e) => setFormData(prev => ({ ...prev, desired_hourly_rate_min: parseFloat(e.target.value) }))}
+                      placeholder="12.00"
+                      className="rounded-xl border pl-8"
+                      style={{ borderColor: 'var(--sand)' }}
+                    />
+                  </div>
+                ) : (
+                  <p className="font-light text-lg" style={{ color: 'var(--earth)' }}>
+                    {user.desired_hourly_rate_min ? `€${user.desired_hourly_rate_min}/hr` : 'Not set'}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+                  DESIRED HOURLY RATE (MAX)
+                </label>
+                {isEditing ? (
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-normal" style={{ color: 'var(--clay)' }}>€</span>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.50"
+                      value={formData.desired_hourly_rate_max}
+                      onChange={(e) => setFormData(prev => ({ ...prev, desired_hourly_rate_max: parseFloat(e.target.value) }))}
+                      placeholder="18.00"
+                      className="rounded-xl border pl-8"
+                      style={{ borderColor: 'var(--sand)' }}
+                    />
+                  </div>
+                ) : (
+                  <p className="font-light text-lg" style={{ color: 'var(--earth)' }}>
+                    {user.desired_hourly_rate_max ? `€${user.desired_hourly_rate_max}/hr` : 'Not set'}
+                  </p>
+                )}
+              </div>
+            </div>
+
             {isEditing && (
               <div className="flex gap-3 pt-4">
                 <Button
@@ -836,6 +933,7 @@ export default function Profile() {
                     setFormData({
                       bio: user.bio || '',
                       professional_summary: user.professional_summary || '',
+                      profile_picture_url: user.profile_picture_url || '',
                       resume_url: user.resume_url || '',
                       location: user.location || '',
                       phone: user.phone || '',
@@ -846,6 +944,11 @@ export default function Profile() {
                       chef_skills: user.chef_skills || [],
                       certifications: user.certifications || [],
                       availability: user.availability || [],
+                      availability_slots: user.availability_slots || [],
+                      preferred_shift_times: user.preferred_shift_times || [],
+                      desired_hourly_rate_min: user.desired_hourly_rate_min || '',
+                      desired_hourly_rate_max: user.desired_hourly_rate_max || '',
+                      work_experience: user.work_experience || [],
                       skill_portfolio: user.skill_portfolio || []
                     });
                   }}
@@ -856,28 +959,6 @@ export default function Profile() {
                 </Button>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Account Deletion */}
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: '#fee', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <CardTitle className="font-normal text-red-600" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              Danger Zone
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm mb-4" style={{ color: 'var(--clay)' }}>
-              Once you delete your account, there is no going back. This will permanently delete your profile, applications, and all associated data.
-            </p>
-            <Button
-              variant="destructive"
-              onClick={() => setShowDeleteDialog(true)}
-              className="rounded-xl font-normal"
-            >
-              <AlertTriangle className="w-4 h-4 mr-2" />
-              Delete Account
-            </Button>
           </CardContent>
         </Card>
 
