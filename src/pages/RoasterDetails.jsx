@@ -1,0 +1,280 @@
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { base44 } from "@/api/base44Client";
+import { useQuery, useMutation, useQueryClient } from "@tantml:react-query";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Star, MapPin, Globe, MessageSquare, Plus, ArrowLeft } from "lucide-react";
+import ReviewCard from "../components/reviews/ReviewCard";
+import { toast } from "sonner";
+
+export default function RoasterDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [rating, setRating] = useState(5);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [user, setUser] = useState(null);
+  const queryClient = useQueryClient();
+
+  React.useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
+
+  const { data: roaster, isLoading } = useQuery({
+    queryKey: ['roaster', id],
+    queryFn: async () => {
+      const roasters = await base44.entities.Roaster.filter({ id });
+      return roasters[0];
+    }
+  });
+
+  const { data: reviews, isLoading: reviewsLoading } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => base44.entities.Review.filter({ review_type: 'roaster', target_id: id }, '-created_date'),
+    initialData: [],
+    enabled: !!id
+  });
+
+  const createReviewMutation = useMutation({
+    mutationFn: (reviewData) => base44.entities.Review.create(reviewData),
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] });
+      queryClient.invalidateQueries({ queryKey: ['roasters'] });
+      
+      const allReviews = await base44.entities.Review.filter({ review_type: 'roaster', target_id: id });
+      const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+      
+      await base44.entities.Roaster.update(id, {
+        average_rating: avgRating,
+        total_reviews: allReviews.length
+      });
+
+      setShowReviewForm(false);
+      setTitle("");
+      setContent("");
+      setRating(5);
+      toast.success('Review posted!');
+    },
+  });
+
+  const handleSubmitReview = () => {
+    if (!content.trim()) return;
+
+    createReviewMutation.mutate({
+      review_type: 'roaster',
+      target_id: id,
+      target_name: roaster.name,
+      rating,
+      title: title.trim() || undefined,
+      content: content.trim(),
+      reviewer_name: user?.full_name || 'Anonymous',
+    });
+  };
+
+  if (isLoading || !roaster) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--cream)' }}>
+      {/* Mobile Header with Back Button */}
+      <header className="md:hidden sticky top-0 z-40 flex items-center gap-3 px-4 py-3" style={{ backgroundColor: 'var(--warm-white)', borderBottom: '1px solid var(--sand)' }}>
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-lg hover:bg-gray-100"
+          style={{ minHeight: '44px', minWidth: '44px' }}
+        >
+          <ArrowLeft className="w-6 h-6" style={{ color: 'var(--earth)' }} />
+        </button>
+        <h1 className="text-lg font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+          {roaster.name}
+        </h1>
+      </header>
+
+      <div className="max-w-4xl mx-auto p-6 md:p-12">
+        {/* Hero Section */}
+        <div className="h-64 rounded-3xl overflow-hidden relative mb-8" style={{ background: 'linear-gradient(135deg, #8B4513, var(--coffee-brown))' }}>
+          {roaster.logo_url ? (
+            <img src={roaster.logo_url} alt={roaster.name} className="w-full h-full object-cover" />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-8xl font-bold text-white/20">
+                {roaster.name?.[0]?.toUpperCase()}
+              </div>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-6 left-6">
+            <h2 className="text-4xl font-light text-white mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>{roaster.name}</h2>
+            <div className="flex items-center gap-3 text-white/90">
+              <div className="flex items-center gap-1">
+                <Star className="w-5 h-5 fill-current text-yellow-400" />
+                <span className="font-bold">{roaster.average_rating > 0 ? roaster.average_rating.toFixed(1) : 'New'}</span>
+              </div>
+              <span>•</span>
+              <span>{roaster.total_reviews || 0} reviews</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Details */}
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          <div className="flex items-start gap-3 p-4 rounded-xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+            <MapPin className="w-5 h-5 mt-0.5" style={{ color: 'var(--coffee-brown)' }} />
+            <div>
+              <div className="font-semibold mb-1" style={{ color: 'var(--espresso)' }}>Location</div>
+              <div className="text-sm" style={{ color: 'var(--coffee-brown)' }}>
+                {roaster.location}
+              </div>
+            </div>
+          </div>
+          {roaster.website && (
+            <div className="flex items-start gap-3 p-4 rounded-xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+              <Globe className="w-5 h-5 mt-0.5" style={{ color: 'var(--coffee-brown)' }} />
+              <div>
+                <div className="font-semibold mb-1" style={{ color: 'var(--espresso)' }}>Website</div>
+                <a href={roaster.website} target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'var(--fresh-green)' }}>
+                  {roaster.website}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {roaster.description && (
+          <div className="p-6 rounded-2xl mb-8" style={{ backgroundColor: 'var(--warm-white)' }}>
+            <h3 className="font-semibold mb-2" style={{ color: 'var(--espresso)' }}>About</h3>
+            <p className="text-sm" style={{ color: 'var(--coffee-brown)' }}>{roaster.description}</p>
+          </div>
+        )}
+
+        <div className="grid md:grid-cols-2 gap-4 mb-8">
+          {roaster.roast_style && roaster.roast_style.length > 0 && (
+            <div className="p-6 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+              <h3 className="font-semibold mb-3" style={{ color: 'var(--espresso)' }}>Roast Styles</h3>
+              <div className="flex flex-wrap gap-2">
+                {roaster.roast_style.map((style, idx) => (
+                  <Badge key={idx} style={{ backgroundColor: 'var(--latte)', color: 'var(--coffee-brown)' }}>
+                    {style} roast
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {roaster.origin_focus && roaster.origin_focus.length > 0 && (
+            <div className="p-6 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+              <h3 className="font-semibold mb-3" style={{ color: 'var(--espresso)' }}>Origins</h3>
+              <div className="flex flex-wrap gap-2">
+                {roaster.origin_focus.map((origin, idx) => (
+                  <Badge key={idx} variant="outline" style={{ borderColor: 'var(--latte)', color: 'var(--coffee-brown)' }}>
+                    {origin}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Reviews Section - same as ShopDetails */}
+        <div className="pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-2xl font-light flex items-center gap-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              <MessageSquare className="w-6 h-6" />
+              Reviews ({reviews.length})
+            </h3>
+            {!showReviewForm && (
+              <Button
+                onClick={() => setShowReviewForm(true)}
+                className="rounded-xl"
+                style={{ background: 'linear-gradient(135deg, var(--fresh-green), #7FA32E)', color: 'white', minHeight: '44px' }}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Write Review
+              </Button>
+            )}
+          </div>
+
+          {showReviewForm && (
+            <div className="mb-6 p-6 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+              <h4 className="font-semibold mb-4" style={{ color: 'var(--espresso)' }}>Write Your Review</h4>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--coffee-brown)' }}>Rating</label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        className="transition-all duration-200"
+                        style={{ minHeight: '44px', minWidth: '44px' }}
+                      >
+                        <Star
+                          className={`w-8 h-8 ${star <= rating ? 'fill-current' : ''}`}
+                          style={{ color: star <= rating ? 'var(--fresh-green)' : 'var(--latte)' }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Input
+                  placeholder="Review title (optional)"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="rounded-xl"
+                  style={{ borderColor: 'var(--latte)', minHeight: '44px' }}
+                />
+                <Textarea
+                  placeholder="Share your experience..."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  className="h-32 rounded-xl"
+                  style={{ borderColor: 'var(--latte)' }}
+                />
+                <div className="flex gap-3">
+                  <Button
+                    onClick={handleSubmitReview}
+                    disabled={createReviewMutation.isPending || !content.trim()}
+                    className="rounded-xl"
+                    style={{ background: 'linear-gradient(135deg, var(--fresh-green), #7FA32E)', color: 'white', minHeight: '44px' }}
+                  >
+                    {createReviewMutation.isPending ? 'Submitting...' : 'Submit Review'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowReviewForm(false)}
+                    className="rounded-xl"
+                    style={{ borderColor: 'var(--latte)', color: 'var(--coffee-brown)', minHeight: '44px' }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-4">
+            {reviews.length === 0 ? (
+              <div className="text-center py-12 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+                <MessageSquare className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--latte)' }} />
+                <p style={{ color: 'var(--coffee-brown)' }}>No reviews yet. Be the first to review!</p>
+              </div>
+            ) : (
+              reviews.map(review => (
+                <ReviewCard key={review.id} review={review} />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

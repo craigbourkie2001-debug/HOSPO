@@ -20,6 +20,17 @@ export default function ApplicationsModal({ shift, onClose }) {
 
   const updateApplicationMutation = useMutation({
     mutationFn: async ({ applicationId, status, applicantEmail, applicantName }) => {
+      // Optimistic: Update UI immediately
+      queryClient.setQueryData(['applications', shift.id], (old) =>
+        old?.map(a => a.id === applicationId ? { ...a, status } : a) || old
+      );
+
+      if (status === 'accepted') {
+        queryClient.setQueryData(['employerShifts'], (old) =>
+          old?.map(s => s.id === shift.id ? { ...s, status: 'filled', assigned_to: applicantEmail } : s) || old
+        );
+      }
+
       await base44.entities.ShiftApplication.update(applicationId, { status });
       
       if (status === 'accepted') {

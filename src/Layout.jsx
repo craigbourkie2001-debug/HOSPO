@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
@@ -162,6 +163,10 @@ export default function Layout({ children }) {
           color: var(--terracotta);
         }
 
+        .mobile-nav-item {
+          font-size: 12px;
+        }
+
         .mobile-content-padding {
           padding-bottom: 80px;
         }
@@ -170,6 +175,10 @@ export default function Layout({ children }) {
           .mobile-content-padding {
             padding-bottom: 0;
           }
+        }
+
+        input, select, textarea, button {
+          min-height: 44px;
         }
       `}</style>
       
@@ -287,7 +296,17 @@ export default function Layout({ children }) {
           </header>
 
           <div className="flex-1 overflow-auto mobile-content-padding">
-            {children}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ x: 10, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -10, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </main>
 

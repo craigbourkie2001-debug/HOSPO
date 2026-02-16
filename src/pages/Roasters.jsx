@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Search, Award, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import RoasterCard from "../components/roasters/RoasterCard";
-import RoasterModal from "../components/roasters/RoasterModal";
+import { useNavigate } from "react-router-dom";
 
 export default function Roasters() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedRoaster, setSelectedRoaster] = useState(null);
+  const navigate = useNavigate();
 
   const { data: roasters, isLoading } = useQuery({
     queryKey: ['roasters'],

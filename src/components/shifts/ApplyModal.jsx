@@ -23,6 +23,11 @@ export default function ApplyModal({ shift, onClose }) {
 
   const applyMutation = useMutation({
     mutationFn: async () => {
+      // Optimistic: Mark shift as applied locally
+      queryClient.setQueryData(['shifts'], (old) => 
+        old?.map(s => s.id === shift.id ? { ...s, hasApplied: true } : s) || old
+      );
+
       // Create application
       await base44.entities.ShiftApplication.create({
         shift_id: shift.id,

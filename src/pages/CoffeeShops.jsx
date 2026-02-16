@@ -5,11 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Search, Store, Star } from "lucide-react";
 import { motion } from "framer-motion";
 import CoffeeShopCard from "../components/shops/CoffeeShopCard";
-import CoffeeShopModal from "../components/shops/CoffeeShopModal";
+import { useNavigate } from "react-router-dom";
 
 export default function CoffeeShops() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedShop, setSelectedShop] = useState(null);
+  const navigate = useNavigate();
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['coffeeShops'],

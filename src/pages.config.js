@@ -58,6 +58,8 @@ import MyShifts from './pages/MyShifts';
 import Profile from './pages/Profile';
 import Restaurants from './pages/Restaurants';
 import Roasters from './pages/Roasters';
+import ShopDetails from './pages/ShopDetails';
+import RoasterDetails from './pages/RoasterDetails';
 import __Layout from './Layout.jsx';
 
 
@@ -73,6 +75,8 @@ export const PAGES = {
     "Profile": Profile,
     "Restaurants": Restaurants,
     "Roasters": Roasters,
+    "ShopDetails": ShopDetails,
+    "RoasterDetails": RoasterDetails,
 }
 
 export const pagesConfig = {
