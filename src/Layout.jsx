@@ -154,17 +154,13 @@ export default function Layout({ children }) {
           padding: 8px 12px;
           color: var(--clay);
           text-decoration: none;
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 500;
           user-select: none;
         }
 
         .mobile-nav-item.active {
           color: var(--terracotta);
-        }
-
-        .mobile-nav-item {
-          font-size: 12px;
         }
 
         .mobile-content-padding {

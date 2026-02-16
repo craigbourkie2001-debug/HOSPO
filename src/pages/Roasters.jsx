@@ -116,14 +116,10 @@ export default function Roasters() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <RoasterCard roaster={roaster} onClick={() => setSelectedRoaster(roaster)} />
+                <RoasterCard roaster={roaster} onClick={() => navigate(`/roasters/${roaster.id}`)} />
               </motion.div>
             ))}
           </div>
-        )}
-
-        {selectedRoaster && (
-          <RoasterModal roaster={selectedRoaster} onClose={() => setSelectedRoaster(null)} />
         )}
       </div>
     </div>
