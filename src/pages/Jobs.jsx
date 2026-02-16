@@ -6,10 +6,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Briefcase, Coffee, ChefHat, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import JobCard from "../components/jobs/JobCard";
+import ApplyJobModal from "../components/jobs/ApplyJobModal";
 
 export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [employmentFilter, setEmploymentFilter] = useState("all");
+  const [selectedJob, setSelectedJob] = useState(null);
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ['jobs'],
@@ -173,11 +175,15 @@ export default function Jobs() {
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <JobCard job={job} />
+                  <JobCard job={job} onApply={setSelectedJob} />
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
+        )}
+
+        {selectedJob && (
+          <ApplyJobModal job={selectedJob} onClose={() => setSelectedJob(null)} />
         )}
       </div>
     </div>

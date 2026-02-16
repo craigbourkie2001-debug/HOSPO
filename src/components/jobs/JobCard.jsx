@@ -12,7 +12,7 @@ const roleIcons = {
   manager: User
 };
 
-export default function JobCard({ job }) {
+export default function JobCard({ job, onApply }) {
   const RoleIcon = roleIcons[job.role_type] || User;
   
   return (
@@ -110,6 +110,7 @@ export default function JobCard({ job }) {
         )}
 
         <Button
+          onClick={() => onApply && onApply(job)}
           className="w-full rounded-xl font-normal tracking-wide"
           style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
         >
