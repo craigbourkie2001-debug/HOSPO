@@ -84,6 +84,9 @@ export default function BrowseShifts() {
     return matchesSearch && matchesLocation && matchesDate && matchesSkills && matchesRole;
   });
 
+  const displayedShifts = isMobile ? filteredShifts.slice(0, mobileDisplayCount) : filteredShifts;
+  const hasMore = isMobile && filteredShifts.length > mobileDisplayCount;
+
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
   const baristaCount = shifts.filter(s => s.role_type !== 'chef').length;
   const chefCount = shifts.filter(s => s.role_type === 'chef').length;
