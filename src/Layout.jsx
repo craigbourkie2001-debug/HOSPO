@@ -20,7 +20,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 
-const navigationItems = [
+const workerNavItems = [
   {
     title: "Browse Shifts",
     url: createPageUrl("BrowseShifts"),
@@ -47,6 +47,14 @@ const navigationItems = [
     icon: ChefHat,
   },
   {
+    title: "My Profile",
+    url: createPageUrl("Profile"),
+    icon: User,
+  },
+];
+
+const employerNavItems = [
+  {
     title: "Employer Dashboard",
     url: createPageUrl("EmployerDashboard"),
     icon: LayoutDashboard,
@@ -56,11 +64,9 @@ const navigationItems = [
     url: createPageUrl("EmployerSettings"),
     icon: Settings,
   },
-  {
-    title: "My Profile",
-    url: createPageUrl("Profile"),
-    icon: User,
-  },
+];
+
+const generalNavItems = [
   {
     title: "Hospo+ Premium",
     url: createPageUrl("Premium"),
@@ -220,10 +226,83 @@ export default function Layout({ children }) {
           </SidebarHeader>
           
           <SidebarContent className="p-4">
+            {/* Worker Section */}
             <SidebarGroup>
+              <div className="px-4 py-2 text-xs tracking-widest font-normal" style={{ color: 'var(--clay)' }}>
+                FOR WORKERS
+              </div>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {navigationItems.map((item) => {
+                  {workerNavItems.map((item) => {
+                    const isActive = location.pathname === item.url;
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton 
+                          asChild 
+                          className="rounded-lg mb-1 transition-all duration-300 hover-lift"
+                        >
+                          <Link 
+                            to={item.url} 
+                            className="flex items-center gap-3 px-4 py-3"
+                            style={{
+                              backgroundColor: isActive ? 'var(--sand)' : 'transparent',
+                              color: isActive ? 'var(--earth)' : 'var(--clay)'
+                            }}
+                          >
+                            <item.icon className="w-5 h-5" style={{ strokeWidth: 1.5 }} />
+                            <span className="font-normal tracking-wide text-sm">
+                              {item.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            {/* Employer Section */}
+            <SidebarGroup className="mt-4">
+              <div className="px-4 py-2 text-xs tracking-widest font-normal" style={{ color: 'var(--clay)' }}>
+                FOR EMPLOYERS
+              </div>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {employerNavItems.map((item) => {
+                    const isActive = location.pathname === item.url;
+                    return (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton 
+                          asChild 
+                          className="rounded-lg mb-1 transition-all duration-300 hover-lift"
+                        >
+                          <Link 
+                            to={item.url} 
+                            className="flex items-center gap-3 px-4 py-3"
+                            style={{
+                              backgroundColor: isActive ? 'var(--sand)' : 'transparent',
+                              color: isActive ? 'var(--earth)' : 'var(--clay)'
+                            }}
+                          >
+                            <item.icon className="w-5 h-5" style={{ strokeWidth: 1.5 }} />
+                            <span className="font-normal tracking-wide text-sm">
+                              {item.title}
+                            </span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    );
+                  })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+
+            {/* General Section */}
+            <SidebarGroup className="mt-4">
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  {generalNavItems.map((item) => {
                     const isActive = location.pathname === item.url;
                     return (
                       <SidebarMenuItem key={item.title}>
