@@ -116,14 +116,10 @@ export default function CoffeeShops() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <CoffeeShopCard shop={shop} onClick={() => setSelectedShop(shop)} />
+                <CoffeeShopCard shop={shop} onClick={() => navigate(`/shops/${shop.id}`)} />
               </motion.div>
             ))}
           </div>
-        )}
-
-        {selectedShop && (
-          <CoffeeShopModal shop={selectedShop} onClose={() => setSelectedShop(null)} />
         )}
       </div>
     </div>
