@@ -133,7 +133,7 @@ Hospo Team
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2" style={{ color: 'var(--clay)' }}>
               <Calendar className="w-4 h-4" />
-              {format(new Date(shift.date), 'EEE, MMM d, yyyy')}
+              {shift.date ? format(new Date(shift.date), 'EEE, MMM d, yyyy') : 'Date not set'}
             </div>
             <div className="flex items-center gap-2" style={{ color: 'var(--clay)' }}>
               <Clock className="w-4 h-4" />
