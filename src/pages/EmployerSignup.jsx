@@ -11,17 +11,30 @@ export default function EmployerSignup() {
       try {
         const user = await base44.auth.me();
         
-        // Set role to employer if not already
-        if (user.role !== 'employer') {
+        // Check if already has venue setup
+        if (user.coffee_shop_id || user.restaurant_id) {
+          window.location.href = createPageUrl("EmployerDashboard");
+          return;
+        }
+        
+        // Mark onboarding as incomplete (role change only if not owner)
+        if (user.role === 'admin') {
+          // Admin users can't change their role, just set onboarding flag
+          await base44.auth.updateMe({ onboarding_completed: false });
+        } else if (user.role !== 'employer') {
           await base44.auth.updateMe({ 
             role: 'employer',
             onboarding_completed: false
           });
+        } else {
+          // Already employer, just ensure onboarding flag is set
+          await base44.auth.updateMe({ onboarding_completed: false });
         }
         
         // Redirect to dashboard - onboarding will trigger from Layout
         window.location.href = createPageUrl("EmployerDashboard");
       } catch (error) {
+        console.error('Setup error:', error);
         // Not logged in, redirect to login and come back here
         base44.auth.redirectToLogin(createPageUrl("EmployerSignup"));
       }
