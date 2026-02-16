@@ -455,7 +455,10 @@ export default function Layout({ children }) {
             user={user} 
             onComplete={() => {
               setShowOnboarding(false);
-              base44.auth.me().then(setUser).catch(() => {});
+              base44.auth.me().then(userData => {
+                setUser(userData);
+                window.location.reload(); // Refresh to load venue data
+              }).catch(() => {});
             }} 
           />
         )}

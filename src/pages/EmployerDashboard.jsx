@@ -93,6 +93,20 @@ export default function EmployerDashboard() {
     );
   }
 
+  // If onboarding not completed, show loading state (onboarding modal will appear from Layout)
+  if (!user.onboarding_completed || (!user.coffee_shop_id && !user.restaurant_id)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-2 mx-auto mb-4" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+          <p className="text-lg font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            Setting up your employer account...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (venues.length === 0) {
     return (
       <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
