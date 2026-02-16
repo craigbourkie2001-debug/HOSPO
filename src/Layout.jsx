@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
-import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat } from "lucide-react";
+import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
 import { base44 } from "@/api/base44Client";
 import {
@@ -54,6 +54,16 @@ const navigationItems = [
     title: "My Profile",
     url: createPageUrl("Profile"),
     icon: User,
+  },
+  {
+    title: "Hospo+ Premium",
+    url: createPageUrl("Premium"),
+    icon: Crown,
+  },
+  {
+    title: "Support Chat",
+    url: createPageUrl("SupportChat"),
+    icon: MessageCircle,
   },
 ];
 

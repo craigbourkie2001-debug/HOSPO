@@ -60,6 +60,8 @@ import Restaurants from './pages/Restaurants';
 import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
 import RoasterDetails from './pages/RoasterDetails';
+import SupportChat from './pages/SupportChat';
+import Premium from './pages/Premium';
 import __Layout from './Layout.jsx';
 
 
@@ -77,6 +79,8 @@ export const PAGES = {
     "Roasters": Roasters,
     "ShopDetails": ShopDetails,
     "RoasterDetails": RoasterDetails,
+    "SupportChat": SupportChat,
+    "Premium": Premium,
 }
 
 export const pagesConfig = {
