@@ -11,6 +11,7 @@ import ShiftFormModal from "../components/employer/ShiftFormModal";
 import EmployerShiftCard from "../components/employer/EmployerShiftCard";
 import ApplicationsModal from "../components/employer/ApplicationsModal";
 import RecommendedCandidates from "../components/matching/RecommendedCandidates";
+import LeaveReviewModal from "../components/employer/LeaveReviewModal";
 
 export default function EmployerDashboard() {
   const [user, setUser] = useState(null);
@@ -19,6 +20,7 @@ export default function EmployerDashboard() {
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [selectedVenueType, setSelectedVenueType] = useState('coffee_shop');
   const [viewingApplicationsFor, setViewingApplicationsFor] = useState(null);
+  const [reviewShift, setReviewShift] = useState(null);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -237,6 +239,7 @@ export default function EmployerDashboard() {
                     shift={shift}
                     onDelete={() => deleteShiftMutation.mutate(shift.id)}
                     onViewApplications={() => setViewingApplicationsFor(shift)}
+                    onLeaveReview={setReviewShift}
                   />
                 ))}
               </div>
@@ -257,6 +260,13 @@ export default function EmployerDashboard() {
         <ApplicationsModal
           shift={viewingApplicationsFor}
           onClose={() => setViewingApplicationsFor(null)}
+        />
+      )}
+
+      {reviewShift && (
+        <LeaveReviewModal
+          shift={reviewShift}
+          onClose={() => setReviewShift(null)}
         />
       )}
     </div>

@@ -2,10 +2,10 @@ import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat } from "lucide-react";
+import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat, Star } from "lucide-react";
 import { format } from "date-fns";
 
-export default function EmployerShiftCard({ shift, onDelete, onViewApplications }) {
+export default function EmployerShiftCard({ shift, onDelete, onViewApplications, onLeaveReview }) {
   const isChefRole = shift.role_type === 'chef';
   
   const getStatusColor = () => {
@@ -80,7 +80,7 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications 
           </div>
 
           {/* Applications Count */}
-          {(shift.applications_count || 0) > 0 && (
+          {(shift.applications_count || 0) > 0 && shift.status !== 'completed' && (
             <Button
               variant="outline"
               onClick={onViewApplications}
@@ -89,6 +89,18 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications 
             >
               <Users className="w-4 h-4" />
               View {shift.applications_count} Application{shift.applications_count !== 1 ? 's' : ''}
+            </Button>
+          )}
+
+          {/* Leave Review Button */}
+          {shift.status === 'completed' && !shift.reviewed && shift.assigned_to && onLeaveReview && (
+            <Button
+              onClick={() => onLeaveReview(shift)}
+              className="w-full rounded-xl font-normal flex items-center gap-2"
+              style={{ backgroundColor: 'var(--sage)', color: 'white' }}
+            >
+              <Star className="w-4 h-4" />
+              Leave Review for {shift.assigned_to_name || 'Worker'}
             </Button>
           )}
 
