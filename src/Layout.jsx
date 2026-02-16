@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
+import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
 import { base44 } from "@/api/base44Client";
 import {
   Sidebar,
@@ -70,9 +71,17 @@ const navigationItems = [
 export default function Layout({ children }) {
   const location = useLocation();
   const [user, setUser] = React.useState(null);
+  const [showOnboarding, setShowOnboarding] = React.useState(false);
 
   React.useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(userData => {
+      setUser(userData);
+      
+      // Show onboarding if user hasn't completed it and doesn't have basic profile info
+      const needsOnboarding = !userData.onboarding_completed && 
+                             (!userData.location || !userData.phone || !userData.visa_status);
+      setShowOnboarding(needsOnboarding);
+    }).catch(() => {});
   }, []);
 
   const mobileNavItems = [
