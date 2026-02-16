@@ -736,6 +736,28 @@ export default function Profile() {
           </CardContent>
         </Card>
 
+        {/* Account Deletion */}
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: '#fee', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <CardTitle className="font-normal text-red-600" style={{ fontFamily: 'Crimson Pro, serif' }}>
+              Danger Zone
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm mb-4" style={{ color: 'var(--clay)' }}>
+              Once you delete your account, there is no going back. This will permanently delete your profile, applications, and all associated data.
+            </p>
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
+              className="rounded-xl font-normal"
+            >
+              <AlertTriangle className="w-4 h-4 mr-2" />
+              Delete Account
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Certifications */}
         <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Coffee, ChefHat } from "lucide-react";
@@ -39,6 +39,8 @@ export default function BrowseShifts() {
     }
   };
 
+  const queryClient = useQueryClient();
+
   const handlePullEnd = async () => {
     if (pullDistance > 60) {
       setIsRefreshing(true);
@@ -76,8 +78,6 @@ export default function BrowseShifts() {
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
   const baristaCount = shifts.filter(s => s.role_type !== 'chef').length;
   const chefCount = shifts.filter(s => s.role_type === 'chef').length;
-
-  const queryClient = useQueryClient();
 
   return (
     <div 
