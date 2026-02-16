@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Coffee, ChefHat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,6 +20,14 @@ export default function BrowseShifts() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullStart, setPullStart] = useState(0);
   const [pullDistance, setPullDistance] = useState(0);
+  const [mobileDisplayCount, setMobileDisplayCount] = useState(12);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  React.useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   React.useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
