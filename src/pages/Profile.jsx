@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat } from "lucide-react";
+import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat, Sparkles, FileText, Camera, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 const baristaSkillOptions = [
@@ -37,6 +37,9 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [uploadingResume, setUploadingResume] = useState(false);
+  const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -44,6 +47,8 @@ export default function Profile() {
       setUser(userData);
       setFormData({
         bio: userData.bio || '',
+        professional_summary: userData.professional_summary || '',
+        resume_url: userData.resume_url || '',
         location: userData.location || '',
         phone: userData.phone || '',
         worker_type: userData.worker_type || 'barista',
@@ -105,6 +110,106 @@ export default function Profile() {
       availability: prev.availability.includes(day)
         ? prev.availability.filter(d => d !== day)
         : [...prev.availability, day]
+    }));
+  };
+
+  const generateProfessionalSummary = async () => {
+    setIsGeneratingAI(true);
+    try {
+      const skills = formData.worker_type === 'chef' ? formData.chef_skills : 
+                     formData.worker_type === 'both' ? [...formData.barista_skills, ...formData.chef_skills] :
+                     formData.barista_skills;
+      
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `Generate a professional summary for a ${formData.worker_type} with ${formData.experience_years} years of experience in Irish hospitality. Skills: ${skills.join(', ')}. Location: ${formData.location}. Make it 2-3 sentences, professional but warm, highlighting key strengths. Don't use clichés.`,
+      });
+      
+      setFormData(prev => ({ ...prev, professional_summary: result }));
+      toast.success('Professional summary generated!');
+    } catch (error) {
+      toast.error('Failed to generate summary');
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  };
+
+  const handleResumeUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploadingResume(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, resume_url: file_url }));
+      toast.success('Resume uploaded!');
+    } catch (error) {
+      toast.error('Failed to upload resume');
+    } finally {
+      setUploadingResume(false);
+    }
+  };
+
+  const handlePortfolioUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploadingPortfolio(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const newItem = {
+        title: 'Portfolio Item',
+        description: '',
+        image_url: file_url,
+        date: new Date().toISOString().split('T')[0]
+      };
+      setFormData(prev => ({ 
+        ...prev, 
+        skill_portfolio: [...prev.skill_portfolio, newItem]
+      }));
+      toast.success('Portfolio image added!');
+    } catch (error) {
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingPortfolio(false);
+    }
+  };
+
+  const removePortfolioItem = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      skill_portfolio: prev.skill_portfolio.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updatePortfolioItem = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      skill_portfolio: prev.skill_portfolio.map((item, i) => 
+        i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+
+  const addCertification = () => {
+    setFormData(prev => ({
+      ...prev,
+      certifications: [...prev.certifications, { name: '', issuer: '', date_obtained: '' }]
+    }));
+  };
+
+  const removeCertification = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      certifications: prev.certifications.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateCertification = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      certifications: prev.certifications.map((cert, i) => 
+        i === index ? { ...cert, [field]: value } : cert
+      )
     }));
   };
 
@@ -280,11 +385,104 @@ export default function Profile() {
           </CardContent>
         </Card>
 
+        {/* Professional Summary & Resume */}
         <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Profile Details</CardTitle>
+            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Professional Profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs tracking-wider font-normal" style={{ color: 'var(--clay)' }}>
+                  PROFESSIONAL SUMMARY
+                </label>
+                {isEditing && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={generateProfessionalSummary}
+                    disabled={isGeneratingAI}
+                    className="rounded-xl text-xs"
+                    style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }}
+                  >
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    {isGeneratingAI ? 'Generating...' : 'Generate with AI'}
+                  </Button>
+                )}
+              </div>
+              {isEditing ? (
+                <Textarea
+                  value={formData.professional_summary}
+                  onChange={(e) => setFormData(prev => ({ ...prev, professional_summary: e.target.value }))}
+                  placeholder="A compelling professional summary that highlights your expertise..."
+                  className="rounded-xl border font-light"
+                  style={{ borderColor: 'var(--sand)' }}
+                  rows={3}
+                />
+              ) : (
+                <p className="font-light text-lg" style={{ color: 'var(--earth)' }}>
+                  {user.professional_summary || 'No professional summary yet'}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+                RESUME / CV
+              </label>
+              {isEditing ? (
+                <div className="space-y-2">
+                  {formData.resume_url && (
+                    <div className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4" style={{ color: 'var(--clay)' }} />
+                        <span className="text-sm" style={{ color: 'var(--earth)' }}>Resume uploaded</span>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setFormData(prev => ({ ...prev, resume_url: '' }))}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                  <label className="block">
+                    <input
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={handleResumeUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="rounded-xl font-normal w-full"
+                      style={{ borderColor: 'var(--sand)' }}
+                      disabled={uploadingResume}
+                      onClick={(e) => e.currentTarget.previousElementSibling.click()}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploadingResume ? 'Uploading...' : formData.resume_url ? 'Replace Resume' : 'Upload Resume'}
+                    </Button>
+                  </label>
+                </div>
+              ) : user.resume_url ? (
+                <a 
+                  href={user.resume_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 p-3 rounded-xl hover-lift"
+                  style={{ backgroundColor: 'var(--sand)', color: 'var(--earth)' }}
+                >
+                  <FileText className="w-4 h-4" />
+                  View Resume
+                </a>
+              ) : (
+                <p className="font-light" style={{ color: 'var(--clay)' }}>No resume uploaded</p>
+              )}
+            </div>
+
             <div>
               <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
                 BIO
@@ -293,9 +491,10 @@ export default function Profile() {
                 <Textarea
                   value={formData.bio}
                   onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  placeholder="Tell us about your barista journey..."
+                  placeholder="Tell us about yourself..."
                   className="rounded-xl border font-light"
                   style={{ borderColor: 'var(--sand)' }}
+                  rows={3}
                 />
               ) : (
                 <p className="font-light" style={{ color: 'var(--earth)' }}>
@@ -512,6 +711,8 @@ export default function Profile() {
                     setIsEditing(false);
                     setFormData({
                       bio: user.bio || '',
+                      professional_summary: user.professional_summary || '',
+                      resume_url: user.resume_url || '',
                       location: user.location || '',
                       phone: user.phone || '',
                       worker_type: user.worker_type || 'barista',
@@ -520,7 +721,8 @@ export default function Profile() {
                       barista_skills: user.barista_skills || user.skills || [],
                       chef_skills: user.chef_skills || [],
                       certifications: user.certifications || [],
-                      availability: user.availability || []
+                      availability: user.availability || [],
+                      skill_portfolio: user.skill_portfolio || []
                     });
                   }}
                   className="rounded-xl font-normal tracking-wide"
@@ -529,6 +731,196 @@ export default function Profile() {
                   Cancel
                 </Button>
               </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Certifications */}
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Certifications
+              </CardTitle>
+              {isEditing && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={addCertification}
+                  className="rounded-xl"
+                  style={{ borderColor: 'var(--sand)' }}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isEditing ? (
+              formData.certifications.length > 0 ? (
+                formData.certifications.map((cert, idx) => (
+                  <div key={idx} className="p-4 rounded-xl space-y-3" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--sand)' }}>
+                    <div className="flex justify-end">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeCertification(idx)}
+                      >
+                        <Trash2 className="w-4 h-4" style={{ color: 'var(--clay)' }} />
+                      </Button>
+                    </div>
+                    <Input
+                      placeholder="Certification name (e.g., Food Safety Level 2)"
+                      value={cert.name || ''}
+                      onChange={(e) => updateCertification(idx, 'name', e.target.value)}
+                      className="rounded-xl border"
+                      style={{ borderColor: 'var(--sand)' }}
+                    />
+                    <Input
+                      placeholder="Issuing organization"
+                      value={cert.issuer || ''}
+                      onChange={(e) => updateCertification(idx, 'issuer', e.target.value)}
+                      className="rounded-xl border"
+                      style={{ borderColor: 'var(--sand)' }}
+                    />
+                    <Input
+                      type="date"
+                      placeholder="Date obtained"
+                      value={cert.date_obtained || ''}
+                      onChange={(e) => updateCertification(idx, 'date_obtained', e.target.value)}
+                      className="rounded-xl border"
+                      style={{ borderColor: 'var(--sand)' }}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm font-light text-center py-8" style={{ color: 'var(--clay)' }}>
+                  No certifications added yet. Click "Add" to get started.
+                </p>
+              )
+            ) : user.certifications && user.certifications.length > 0 ? (
+              user.certifications.map((cert, idx) => (
+                <div key={idx} className="p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                  <div className="flex items-start gap-3">
+                    <Award className="w-5 h-5 mt-1" style={{ color: 'var(--terracotta)' }} />
+                    <div className="flex-1">
+                      <h4 className="font-normal text-lg" style={{ color: 'var(--earth)' }}>{cert.name}</h4>
+                      {cert.issuer && (
+                        <p className="text-sm" style={{ color: 'var(--clay)' }}>{cert.issuer}</p>
+                      )}
+                      {cert.date_obtained && (
+                        <p className="text-xs mt-1" style={{ color: 'var(--clay)' }}>
+                          Obtained: {new Date(cert.date_obtained).toLocaleDateString('en-IE', { month: 'long', year: 'numeric' })}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="font-light text-center py-8" style={{ color: 'var(--clay)' }}>
+                No certifications added yet
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Portfolio */}
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Portfolio {user.worker_type === 'chef' ? '(Plated Dishes)' : user.worker_type === 'barista' ? '(Latte Art & Coffee)' : ''}
+              </CardTitle>
+              {isEditing && (
+                <label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePortfolioUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="rounded-xl"
+                    style={{ borderColor: 'var(--sand)' }}
+                    disabled={uploadingPortfolio}
+                    onClick={(e) => e.currentTarget.previousElementSibling.click()}
+                  >
+                    <Camera className="w-4 h-4 mr-1" />
+                    {uploadingPortfolio ? 'Uploading...' : 'Add Photo'}
+                  </Button>
+                </label>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              formData.skill_portfolio.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {formData.skill_portfolio.map((item, idx) => (
+                    <div key={idx} className="relative group">
+                      <img 
+                        src={item.image_url} 
+                        alt={item.title}
+                        className="w-full aspect-square object-cover rounded-xl"
+                      />
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                        onClick={() => removePortfolioItem(idx)}
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </Button>
+                      <Input
+                        placeholder="Title"
+                        value={item.title || ''}
+                        onChange={(e) => updatePortfolioItem(idx, 'title', e.target.value)}
+                        className="mt-2 rounded-xl border"
+                        style={{ borderColor: 'var(--sand)' }}
+                      />
+                      <Textarea
+                        placeholder="Description (optional)"
+                        value={item.description || ''}
+                        onChange={(e) => updatePortfolioItem(idx, 'description', e.target.value)}
+                        className="mt-2 rounded-xl border"
+                        style={{ borderColor: 'var(--sand)' }}
+                        rows={2}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm font-light text-center py-12" style={{ color: 'var(--clay)' }}>
+                  No portfolio items yet. Click "Add Photo" to showcase your work.
+                </p>
+              )
+            ) : user.skill_portfolio && user.skill_portfolio.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {user.skill_portfolio.map((item, idx) => (
+                  <div key={idx} className="group cursor-pointer">
+                    <img 
+                      src={item.image_url} 
+                      alt={item.title}
+                      className="w-full aspect-square object-cover rounded-xl hover-lift"
+                    />
+                    {item.title && (
+                      <h5 className="mt-2 font-normal" style={{ color: 'var(--earth)' }}>{item.title}</h5>
+                    )}
+                    {item.description && (
+                      <p className="text-sm font-light mt-1" style={{ color: 'var(--clay)' }}>{item.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="font-light text-center py-12" style={{ color: 'var(--clay)' }}>
+                No portfolio items yet
+              </p>
             )}
           </CardContent>
         </Card>
