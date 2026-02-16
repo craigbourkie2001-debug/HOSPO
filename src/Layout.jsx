@@ -56,6 +56,11 @@ const workerNavItems = [
 
 const employerNavItems = [
   {
+    title: "Employer Sign In",
+    url: createPageUrl("EmployerLogin"),
+    icon: LayoutDashboard,
+  },
+  {
     title: "Employer Dashboard",
     url: createPageUrl("EmployerDashboard"),
     icon: LayoutDashboard,

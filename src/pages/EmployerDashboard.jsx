@@ -5,13 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Plus, Users, Clock, TrendingUp, Calendar, Coffee, ChefHat, Store } from "lucide-react";
+import { Briefcase, Plus, Users, Clock, TrendingUp, Calendar, Coffee, ChefHat, Store, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import ShiftFormModal from "../components/employer/ShiftFormModal";
 import EmployerShiftCard from "../components/employer/EmployerShiftCard";
 import ApplicationsModal from "../components/employer/ApplicationsModal";
 import RecommendedCandidates from "../components/matching/RecommendedCandidates";
 import LeaveReviewModal from "../components/employer/LeaveReviewModal";
+import AnalyticsDashboard from "../components/employer/AnalyticsDashboard";
+import JobManagement from "../components/employer/JobManagement";
 
 export default function EmployerDashboard() {
   const [user, setUser] = useState(null);
@@ -46,6 +48,24 @@ export default function EmployerDashboard() {
     queryKey: ['employerShifts', selectedVenue?.id],
     queryFn: () => base44.entities.Shift.filter({ venue_id: selectedVenue.id }, '-created_date'),
     initialData: [],
+    enabled: !!selectedVenue?.id
+  });
+
+  const { data: allApplications = [] } = useQuery({
+    queryKey: ['all-applications', selectedVenue?.id],
+    queryFn: () => base44.entities.ShiftApplication.filter({ venue_id: selectedVenue.id }),
+    enabled: !!selectedVenue?.id
+  });
+
+  const { data: jobs = [] } = useQuery({
+    queryKey: ['employer-jobs', selectedVenue?.id],
+    queryFn: () => base44.entities.Job.filter({ venue_id: selectedVenue.id }),
+    enabled: !!selectedVenue?.id
+  });
+
+  const { data: jobApplications = [] } = useQuery({
+    queryKey: ['job-applications', selectedVenue?.id],
+    queryFn: () => base44.entities.JobApplication.filter({ venue_id: selectedVenue.id }),
     enabled: !!selectedVenue?.id
   });
 
@@ -194,19 +214,35 @@ export default function EmployerDashboard() {
           </motion.div>
         </div>
 
-        {/* AI Recommended Candidates for Open Shifts */}
-        {availableShifts.length > 0 && (
-          <RecommendedCandidates shift={availableShifts[0]} />
-        )}
+        {/* Tabs */}
+        <Tabs defaultValue="shifts" className="space-y-8">
+          <TabsList className="grid w-full grid-cols-3 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
+            <TabsTrigger value="shifts" className="rounded-lg font-normal">
+              Shift Management
+            </TabsTrigger>
+            <TabsTrigger value="jobs" className="rounded-lg font-normal">
+              Job Postings
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="rounded-lg font-normal">
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Analytics
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Shifts */}
-        <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              Your Shifts
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <TabsContent value="shifts" className="space-y-8">
+            {/* AI Recommended Candidates for Open Shifts */}
+            {availableShifts.length > 0 && (
+              <RecommendedCandidates shift={availableShifts[0]} />
+            )}
+
+            {/* Shifts */}
+            <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+              <CardHeader>
+                <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                  Your Shifts
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
             {isLoading ? (
               <div className="grid md:grid-cols-2 gap-4">
                 {[...Array(4)].map((_, i) => (
@@ -244,8 +280,26 @@ export default function EmployerDashboard() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="jobs">
+            <JobManagement 
+              venueId={selectedVenue?.id} 
+              venueType={selectedVenueType} 
+            />
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <AnalyticsDashboard 
+              shifts={shifts}
+              applications={allApplications}
+              jobs={jobs}
+              jobApplications={jobApplications}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
 
       {showShiftForm && selectedVenue && (
