@@ -2,7 +2,8 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, Filter } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { X, Filter, DollarSign } from "lucide-react";
 
 const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "customer_service", "opening", "closing", "cash_handling"
@@ -84,6 +85,83 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
         </div>
       </div>
 
+      {/* Pay Rate Range */}
+      <div className="mb-6">
+        <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+          PAY RATE (€/HOUR)
+        </label>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--clay)' }} />
+            <Input
+              type="number"
+              placeholder="Min"
+              value={filters.payRate.min === 0 ? '' : filters.payRate.min}
+              onChange={(e) => setFilters(prev => ({ 
+                ...prev, 
+                payRate: { ...prev.payRate, min: parseFloat(e.target.value) || 0 }
+              }))}
+              className="pl-10 rounded-xl h-11"
+              style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}
+            />
+          </div>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--clay)' }} />
+            <Input
+              type="number"
+              placeholder="Max"
+              value={filters.payRate.max === 999 ? '' : filters.payRate.max}
+              onChange={(e) => setFilters(prev => ({ 
+                ...prev, 
+                payRate: { ...prev.payRate, max: parseFloat(e.target.value) || 999 }
+              }))}
+              className="pl-10 rounded-xl h-11"
+              style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Shift Time */}
+      <div className="grid md:grid-cols-2 gap-5 mb-6">
+        <div>
+          <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+            SHIFT TIME
+          </label>
+          <Select value={filters.shiftTime} onValueChange={(value) => setFilters(prev => ({ ...prev, shiftTime: value }))}>
+            <SelectTrigger className="rounded-xl h-11 border" style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}>
+              <SelectValue placeholder="All times" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All times</SelectItem>
+              <SelectItem value="morning">Morning (5am - 12pm)</SelectItem>
+              <SelectItem value="afternoon">Afternoon (12pm - 5pm)</SelectItem>
+              <SelectItem value="evening">Evening (5pm+)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {roleFilter === 'chef' && (
+          <div>
+            <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
+              CHEF LEVEL
+            </label>
+            <Select value={filters.chefLevel} onValueChange={(value) => setFilters(prev => ({ ...prev, chefLevel: value }))}>
+              <SelectTrigger className="rounded-xl h-11 border" style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}>
+                <SelectValue placeholder="All levels" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All levels</SelectItem>
+                <SelectItem value="commis_chef">Commis Chef</SelectItem>
+                <SelectItem value="chef_de_partie">Chef de Partie</SelectItem>
+                <SelectItem value="sous_chef">Sous Chef</SelectItem>
+                <SelectItem value="head_chef">Head Chef</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+
       <div>
         <label className="text-xs tracking-wider mb-3 block font-normal" style={{ color: 'var(--clay)' }}>
           SKILLS
@@ -115,10 +193,19 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
         </div>
       </div>
 
-      {(filters.location !== "all" || filters.date !== "all" || filters.skills.length > 0) && (
+      {(filters.location !== "all" || filters.date !== "all" || filters.skills.length > 0 || 
+        filters.payRate.min > 0 || filters.payRate.max < 999 || filters.shiftTime !== "all" || 
+        filters.chefLevel !== "all") && (
         <Button
           variant="ghost"
-          onClick={() => setFilters({ location: "all", date: "all", skills: [] })}
+          onClick={() => setFilters({ 
+            location: "all", 
+            date: "all", 
+            skills: [], 
+            payRate: { min: 0, max: 999 },
+            shiftTime: "all",
+            chefLevel: "all"
+          })}
           className="mt-6 rounded-xl font-normal"
           style={{ color: 'var(--clay)' }}
         >

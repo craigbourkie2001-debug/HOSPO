@@ -15,7 +15,14 @@ export default function BrowseShifts() {
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
-  const [filters, setFilters] = useState({ location: "all", date: "all", skills: [] });
+  const [filters, setFilters] = useState({ 
+    location: "all", 
+    date: "all", 
+    skills: [], 
+    payRate: { min: 0, max: 999 },
+    shiftTime: "all",
+    chefLevel: "all"
+  });
   const [selectedShift, setSelectedShift] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [pullStart, setPullStart] = useState(0);
@@ -80,8 +87,24 @@ export default function BrowseShifts() {
     const matchesSkills = filters.skills.length === 0 || 
                          filters.skills.some(skill => shift.skills_required?.includes(skill));
     const matchesRole = roleFilter === "all" || shift.role_type === roleFilter;
+    const matchesPayRate = shift.hourly_rate >= filters.payRate.min && shift.hourly_rate <= filters.payRate.max;
     
-    return matchesSearch && matchesLocation && matchesDate && matchesSkills && matchesRole;
+    // Shift time filter (morning, afternoon, evening)
+    const matchesShiftTime = filters.shiftTime === "all" || (() => {
+      const startHour = parseInt(shift.start_time?.split(':')[0] || '0');
+      if (filters.shiftTime === "morning") return startHour >= 5 && startHour < 12;
+      if (filters.shiftTime === "afternoon") return startHour >= 12 && startHour < 17;
+      if (filters.shiftTime === "evening") return startHour >= 17;
+      return true;
+    })();
+    
+    // Chef level filter
+    const matchesChefLevel = filters.chefLevel === "all" || 
+                            shift.chef_level === filters.chefLevel ||
+                            shift.role_type !== 'chef';
+    
+    return matchesSearch && matchesLocation && matchesDate && matchesSkills && matchesRole && 
+           matchesPayRate && matchesShiftTime && matchesChefLevel;
   });
 
   const displayedShifts = isMobile ? filteredShifts.slice(0, mobileDisplayCount) : filteredShifts;
