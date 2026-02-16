@@ -8,6 +8,7 @@ import { Sparkles, Star, Briefcase, Mail, Phone, Award, User } from "lucide-reac
 
 export default function RecommendedCandidates({ shift }) {
   const [recommendations, setRecommendations] = useState([]);
+  const [matchInsights, setMatchInsights] = useState({});
   const [isAnalyzing, setIsAnalyzing] = useState(true);
 
   const { data: allUsers } = useQuery({
@@ -55,35 +56,70 @@ ${JSON.stringify(candidates.map(u => ({
   barista_skills: u.barista_skills,
   chef_skills: u.chef_skills,
   rating: u.rating,
-  shifts_completed: u.shifts_completed
+  shifts_completed: u.shifts_completed,
+  availability: u.availability,
+  preferred_shift_times: u.preferred_shift_times,
+  desired_hourly_rate_min: u.desired_hourly_rate_min,
+  desired_hourly_rate_max: u.desired_hourly_rate_max
 })), null, 2)}
 
-Return the top 5 best matching candidate emails ranked by fit. Consider:
-1. Skills match with requirements (most important)
-2. Experience level (more is better)
-3. Location proximity
-4. Worker rating
-5. Track record (shifts completed)
+Return the top 5 best matching candidates with detailed analysis. For each candidate provide:
+1. Match score (0-100)
+2. Key strengths (2-3 bullet points)
+3. Why they're a good fit (1-2 sentences)
+4. Any potential concerns
 
-Return ONLY a JSON array of candidate emails in ranked order, nothing else.`,
+Rank by:
+1. Skills match (40% weight) - exact matches are critical
+2. Experience level (20% weight)
+3. Rating & past performance (20% weight)
+4. Location match (10% weight)
+5. Availability & pay expectations (10% weight)`,
           response_json_schema: {
             type: "object",
             properties: {
-              recommended_emails: {
+              candidates: {
                 type: "array",
-                items: { type: "string" }
+                items: {
+                  type: "object",
+                  properties: {
+                    email: { type: "string" },
+                    match_score: { type: "number" },
+                    strengths: {
+                      type: "array",
+                      items: { type: "string" }
+                    },
+                    reason: { type: "string" },
+                    concerns: { type: "string" }
+                  }
+                }
               }
             }
           }
         });
 
-        const topEmails = result.recommended_emails || [];
+        const rankedCandidates = result.candidates || [];
+        const insights = {};
+        rankedCandidates.forEach(c => {
+          insights[c.email] = {
+            match_score: c.match_score,
+            strengths: c.strengths,
+            reason: c.reason,
+            concerns: c.concerns
+          };
+        });
+
         const matched = allUsers
-          .filter(u => topEmails.includes(u.email))
-          .sort((a, b) => topEmails.indexOf(a.email) - topEmails.indexOf(b.email))
+          .filter(u => rankedCandidates.some(c => c.email === u.email))
+          .sort((a, b) => {
+            const aIndex = rankedCandidates.findIndex(c => c.email === a.email);
+            const bIndex = rankedCandidates.findIndex(c => c.email === b.email);
+            return aIndex - bIndex;
+          })
           .slice(0, 5);
 
         setRecommendations(matched);
+        setMatchInsights(insights);
       } catch (error) {
         console.error('Failed to generate candidate recommendations:', error);
         const fallback = allUsers
@@ -124,6 +160,7 @@ Return ONLY a JSON array of candidate emails in ranked order, nothing else.`,
           {recommendations.map((candidate, index) => {
             const candidateSkills = isChefShift ? (candidate.chef_skills || []) : (candidate.barista_skills || []);
             const matchingSkills = candidateSkills.filter(s => shift.skills_required?.includes(s));
+            const insights = matchInsights[candidate.email] || {};
             
             return (
               <Card 
@@ -141,17 +178,25 @@ Return ONLY a JSON array of candidate emails in ranked order, nothing else.`,
                 )}
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4 mb-4">
-                    <div 
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-light text-white"
-                      style={{ backgroundColor: 'var(--terracotta)' }}
-                    >
-                      {candidate.full_name?.[0]?.toUpperCase() || 'U'}
-                    </div>
+                    {candidate.profile_picture_url ? (
+                      <img 
+                        src={candidate.profile_picture_url} 
+                        alt={candidate.full_name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div 
+                        className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-light text-white"
+                        style={{ backgroundColor: 'var(--terracotta)' }}
+                      >
+                        {candidate.full_name?.[0]?.toUpperCase() || 'U'}
+                      </div>
+                    )}
                     <div className="flex-1">
                       <h4 className="font-normal text-lg" style={{ color: 'var(--earth)' }}>
                         {candidate.full_name}
                       </h4>
-                      <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--clay)' }}>
+                      <div className="flex items-center gap-3 text-sm flex-wrap" style={{ color: 'var(--clay)' }}>
                         <span className="flex items-center gap-1">
                           <Briefcase className="w-3 h-3" />
                           {candidate.experience_years || 0} yrs
@@ -162,11 +207,50 @@ Return ONLY a JSON array of candidate emails in ranked order, nothing else.`,
                             {candidate.rating.toFixed(1)}
                           </span>
                         )}
+                        {insights.match_score && (
+                          <Badge 
+                            className="text-xs font-normal"
+                            style={{ 
+                              backgroundColor: insights.match_score >= 80 ? 'var(--sage)' : 
+                                              insights.match_score >= 60 ? 'var(--olive)' : 'var(--clay)',
+                              color: 'white'
+                            }}
+                          >
+                            {insights.match_score}% Match
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-3">
+                    {insights.reason && (
+                      <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--sand)' }}>
+                        <div className="text-xs tracking-wider mb-1" style={{ color: 'var(--clay)' }}>
+                          WHY RECOMMENDED
+                        </div>
+                        <p className="text-sm font-light" style={{ color: 'var(--earth)' }}>
+                          {insights.reason}
+                        </p>
+                      </div>
+                    )}
+
+                    {insights.strengths && insights.strengths.length > 0 && (
+                      <div>
+                        <div className="text-xs tracking-wider mb-2" style={{ color: 'var(--clay)' }}>
+                          KEY STRENGTHS
+                        </div>
+                        <ul className="space-y-1">
+                          {insights.strengths.map((strength, idx) => (
+                            <li key={idx} className="text-xs flex items-start gap-2" style={{ color: 'var(--earth)' }}>
+                              <span style={{ color: 'var(--sage)' }}>✓</span>
+                              {strength}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     <div className="text-xs" style={{ color: 'var(--clay)' }}>
                       <div className="flex items-center gap-1 mb-1">
                         <Mail className="w-3 h-3" />
@@ -188,10 +272,10 @@ Return ONLY a JSON array of candidate emails in ranked order, nothing else.`,
                       <div>
                         <div className="text-xs tracking-wider mb-2 flex items-center gap-1" style={{ color: 'var(--clay)' }}>
                           <Award className="w-3 h-3" />
-                          SKILLS MATCH ({matchingSkills.length}/{shift.skills_required?.length || 0})
+                          SKILLS ({matchingSkills.length}/{shift.skills_required?.length || 0} match required)
                         </div>
                         <div className="flex flex-wrap gap-1">
-                          {candidateSkills.slice(0, 6).map((skill, idx) => (
+                          {candidateSkills.slice(0, 8).map((skill, idx) => (
                             <Badge
                               key={idx}
                               className="text-xs font-normal"
@@ -209,6 +293,12 @@ Return ONLY a JSON array of candidate emails in ranked order, nothing else.`,
                             </Badge>
                           ))}
                         </div>
+                      </div>
+                    )}
+
+                    {insights.concerns && (
+                      <div className="text-xs p-2 rounded" style={{ backgroundColor: '#fff3cd', color: '#856404' }}>
+                        ⚠️ {insights.concerns}
                       </div>
                     )}
 
