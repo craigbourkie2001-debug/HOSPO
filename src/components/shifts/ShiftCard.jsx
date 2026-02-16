@@ -2,15 +2,25 @@ import React from 'react';
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Clock, Award, Coffee, ChefHat, Users } from "lucide-react";
+import { MapPin, Calendar, Clock, Award, Coffee, ChefHat, Users, Crown } from "lucide-react";
 import { format } from "date-fns";
 
-export default function ShiftCard({ shift, onApply, isLoading }) {
+export default function ShiftCard({ shift, onApply, isLoading, featured = false }) {
   const isChefRole = shift.role_type === 'chef';
   
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:-translate-y-1 border rounded-2xl hover-lift" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+    <Card className="overflow-hidden transition-all duration-300 hover:-translate-y-1 border rounded-2xl hover-lift" style={{ 
+      borderColor: featured ? 'var(--terracotta)' : 'var(--sand)', 
+      backgroundColor: featured ? 'var(--terracotta)05' : 'var(--warm-white)',
+      borderWidth: featured ? '2px' : '1px'
+    }}>
       <CardHeader className="pb-4">
+        {featured && (
+          <div className="mb-3 flex items-center gap-2 px-3 py-1.5 rounded-full w-fit" style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}>
+            <Crown className="w-3.5 h-3.5" />
+            <span className="text-xs font-normal tracking-wide">FEATURED</span>
+          </div>
+        )}
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
