@@ -34,7 +34,36 @@ Deno.serve(async (req) => {
     // Handle the event
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const { payment_id, shift_id, worker_email } = session.metadata;
+      const { payment_id, shift_id, worker_email, subscription_type, user_email } = session.metadata;
+
+      // Handle premium subscription
+      if (subscription_type === 'employer_premium' && user_email) {
+        console.log('Premium subscription completed:', { user_email, subscription_id: session.subscription });
+
+        // Update user to premium status
+        const users = await base44.asServiceRole.entities.User.filter({ email: user_email });
+        if (users.length > 0) {
+          await base44.asServiceRole.entities.User.update(users[0].id, {
+            employer_premium: true,
+            stripe_subscription_id: session.subscription,
+            premium_activated_at: new Date().toISOString()
+          });
+
+          // Send confirmation email
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: user_email,
+            subject: 'Welcome to Hospo+ Premium!',
+            body: `Congratulations! Your Hospo+ Premium subscription is now active.\n\nYou now have access to:\n- Featured placement for all shifts\n- Featured placement for all job postings\n- Premium badge on your venue profile\n- Priority support\n- Advanced analytics\n\nAll your future shift and job postings will automatically be featured.\n\nThank you for choosing Hospo+ Premium!`
+          });
+
+          console.log('Premium subscription activated for:', user_email);
+        }
+        
+        return Response.json({ received: true });
+      }
+
+      // Handle shift payment
+      if (payment_id && shift_id) {
 
       console.log('Payment completed:', { payment_id, shift_id });
 
@@ -65,6 +94,33 @@ Deno.serve(async (req) => {
       }
 
       console.log('Payment processed successfully:', payment_id);
+      }
+    }
+
+    // Handle subscription cancellation
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object;
+      
+      // Find user by subscription ID
+      const users = await base44.asServiceRole.entities.User.filter({ 
+        stripe_subscription_id: subscription.id 
+      });
+      
+      if (users.length > 0) {
+        await base44.asServiceRole.entities.User.update(users[0].id, {
+          employer_premium: false,
+          stripe_subscription_id: null,
+          premium_cancelled_at: new Date().toISOString()
+        });
+
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: users[0].email,
+          subject: 'Hospo+ Premium Subscription Cancelled',
+          body: `Your Hospo+ Premium subscription has been cancelled.\n\nYou'll continue to have access to premium features until the end of your billing period.\n\nIf you'd like to reactivate your subscription, you can do so anytime from your dashboard.\n\nThank you for being a premium member!`
+        });
+
+        console.log('Premium subscription cancelled for:', users[0].email);
+      }
     }
 
     return Response.json({ received: true });
