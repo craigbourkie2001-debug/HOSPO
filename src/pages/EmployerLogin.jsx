@@ -10,6 +10,10 @@ export default function EmployerLogin() {
     base44.auth.redirectToLogin(createPageUrl("EmployerDashboard"));
   };
 
+  const handleCreateAccount = () => {
+    window.location.href = createPageUrl("EmployerSignup");
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: 'var(--cream)' }}>
       <div className="max-w-6xl w-full grid md:grid-cols-2 gap-12 items-center">
@@ -79,7 +83,7 @@ export default function EmployerLogin() {
                   New to Hospo?
                 </p>
                 <Button
-                  onClick={handleSignIn}
+                  onClick={handleCreateAccount}
                   variant="outline"
                   className="rounded-xl font-normal"
                   style={{ borderColor: 'var(--sand)' }}
