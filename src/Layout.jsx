@@ -70,6 +70,11 @@ const employerNavItems = [
     url: createPageUrl("EmployerSettings"),
     icon: Settings,
   },
+  {
+    title: "Upgrade to Premium",
+    url: createPageUrl("EmployerPremium"),
+    icon: Crown,
+  },
 ];
 
 const generalNavItems = [

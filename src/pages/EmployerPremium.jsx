@@ -31,7 +31,7 @@ export default function EmployerPremium() {
     setProcessing(true);
     try {
       const { data } = await base44.functions.invoke('createPremiumSubscription', {
-        price_id: 'price_1Qp2kHLe7rLu5fZFy9fgzJwX' // This will be the actual price ID
+        price_id: 'price_1T1YWjE2QjaxHD8fiGW64eFV'
       });
 
       if (data.sessionUrl) {
