@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
-import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown } from "lucide-react";
+import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown, Settings } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
 import { base44 } from "@/api/base44Client";
@@ -50,6 +50,11 @@ const navigationItems = [
     title: "Employer Dashboard",
     url: createPageUrl("EmployerDashboard"),
     icon: LayoutDashboard,
+  },
+  {
+    title: "Employer Settings",
+    url: createPageUrl("EmployerSettings"),
+    icon: Settings,
   },
   {
     title: "My Profile",

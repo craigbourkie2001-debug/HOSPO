@@ -1,0 +1,446 @@
+import React, { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Settings, Save, Upload, Building2, DollarSign, Bell } from "lucide-react";
+import { toast } from "sonner";
+
+export default function EmployerSettings() {
+  const [user, setUser] = useState(null);
+  const [venue, setVenue] = useState(null);
+  const [venueType, setVenueType] = useState('restaurant');
+  const [venueForm, setVenueForm] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    new_applications: true,
+    shift_filled: true,
+    shift_cancelled: false,
+    payment_updates: true
+  });
+  const [defaultRates, setDefaultRates] = useState({
+    barista_rate: 14,
+    commis_chef_rate: 16,
+    chef_de_partie_rate: 18,
+    sous_chef_rate: 22,
+    head_chef_rate: 26
+  });
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    base44.auth.me().then(async (userData) => {
+      setUser(userData);
+      
+      // Load venue
+      if (userData.restaurant_id) {
+        const restaurants = await base44.entities.Restaurant.filter({ id: userData.restaurant_id });
+        if (restaurants.length > 0) {
+          setVenue(restaurants[0]);
+          setVenueType('restaurant');
+          setVenueForm(restaurants[0]);
+        }
+      } else if (userData.coffee_shop_id) {
+        const shops = await base44.entities.CoffeeShop.filter({ id: userData.coffee_shop_id });
+        if (shops.length > 0) {
+          setVenue(shops[0]);
+          setVenueType('coffee_shop');
+          setVenueForm(shops[0]);
+        }
+      }
+
+      // Load notification preferences
+      if (userData.notification_preferences) {
+        setNotificationPrefs({ ...notificationPrefs, ...userData.notification_preferences });
+      }
+
+      // Load default rates
+      if (userData.default_pay_rates) {
+        setDefaultRates({ ...defaultRates, ...userData.default_pay_rates });
+      }
+    }).catch(() => {});
+  }, []);
+
+  const updateVenueMutation = useMutation({
+    mutationFn: async (data) => {
+      if (venueType === 'restaurant') {
+        return base44.entities.Restaurant.update(venue.id, data);
+      } else {
+        return base44.entities.CoffeeShop.update(venue.id, data);
+      }
+    },
+    onSuccess: () => {
+      toast.success('Venue details updated');
+      queryClient.invalidateQueries();
+    },
+  });
+
+  const updateUserPrefsMutation = useMutation({
+    mutationFn: (data) => base44.auth.updateMe(data),
+    onSuccess: () => {
+      toast.success('Preferences saved');
+    },
+  });
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setVenueForm({ ...venueForm, logo_url: file_url });
+      toast.success('Logo uploaded');
+    } catch (error) {
+      toast.error('Failed to upload logo');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveVenue = () => {
+    const { id, created_date, updated_date, created_by, ...data } = venueForm;
+    updateVenueMutation.mutate(data);
+  };
+
+  const handleSavePreferences = () => {
+    updateUserPrefsMutation.mutate({
+      notification_preferences: notificationPrefs,
+      default_pay_rates: defaultRates
+    });
+  };
+
+  if (!user || !venue) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Settings className="w-8 h-8" style={{ color: 'var(--terracotta)', strokeWidth: 1.5 }} />
+            <h1 className="text-5xl font-light tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              Employer Settings
+            </h1>
+          </div>
+          <p className="font-light" style={{ color: 'var(--clay)' }}>
+            Manage your venue details and preferences
+          </p>
+        </div>
+
+        <div className="space-y-6">
+          {/* Venue Details */}
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                <Building2 className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
+                Venue Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Logo
+                </Label>
+                <div className="flex items-center gap-4">
+                  {venueForm.logo_url && (
+                    <img 
+                      src={venueForm.logo_url} 
+                      alt="Venue logo" 
+                      className="w-20 h-20 rounded-lg object-cover"
+                      style={{ border: '2px solid var(--sand)' }}
+                    />
+                  )}
+                  <div>
+                    <input
+                      type="file"
+                      id="logo-upload"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="hidden"
+                    />
+                    <Button
+                      onClick={() => document.getElementById('logo-upload').click()}
+                      variant="outline"
+                      disabled={uploading}
+                      className="rounded-xl font-normal"
+                      style={{ borderColor: 'var(--sand)' }}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploading ? 'Uploading...' : 'Upload Logo'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Venue Name
+                </Label>
+                <Input
+                  value={venueForm.name || ''}
+                  onChange={(e) => setVenueForm({ ...venueForm, name: e.target.value })}
+                  className="rounded-xl"
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Location
+                </Label>
+                <Input
+                  value={venueForm.location || ''}
+                  onChange={(e) => setVenueForm({ ...venueForm, location: e.target.value })}
+                  className="rounded-xl"
+                  placeholder="e.g., Dublin, Cork"
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Address
+                </Label>
+                <Input
+                  value={venueForm.address || ''}
+                  onChange={(e) => setVenueForm({ ...venueForm, address: e.target.value })}
+                  className="rounded-xl"
+                  placeholder="Full address"
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Description
+                </Label>
+                <Textarea
+                  value={venueForm.description || ''}
+                  onChange={(e) => setVenueForm({ ...venueForm, description: e.target.value })}
+                  className="rounded-xl min-h-24"
+                  placeholder="Tell workers about your venue"
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Contact Email
+                </Label>
+                <Input
+                  type="email"
+                  value={venueForm.contact_email || ''}
+                  onChange={(e) => setVenueForm({ ...venueForm, contact_email: e.target.value })}
+                  className="rounded-xl"
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Contact Phone
+                </Label>
+                <Input
+                  type="tel"
+                  value={venueForm.contact_phone || ''}
+                  onChange={(e) => setVenueForm({ ...venueForm, contact_phone: e.target.value })}
+                  className="rounded-xl"
+                />
+              </div>
+
+              <Button
+                onClick={handleSaveVenue}
+                disabled={updateVenueMutation.isPending}
+                className="rounded-xl font-normal w-full"
+                style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updateVenueMutation.isPending ? 'Saving...' : 'Save Venue Details'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Default Pay Rates */}
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                <DollarSign className="w-5 h-5" style={{ color: 'var(--sage)' }} />
+                Default Pay Rates
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm font-light mb-4" style={{ color: 'var(--clay)' }}>
+                Set default hourly rates for quick shift posting
+              </p>
+
+              {venueType === 'coffee_shop' ? (
+                <div>
+                  <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                    Barista Rate (€/hour)
+                  </Label>
+                  <Input
+                    type="number"
+                    value={defaultRates.barista_rate}
+                    onChange={(e) => setDefaultRates({ ...defaultRates, barista_rate: parseFloat(e.target.value) })}
+                    className="rounded-xl"
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                      Commis Chef (€/hour)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={defaultRates.commis_chef_rate}
+                      onChange={(e) => setDefaultRates({ ...defaultRates, commis_chef_rate: parseFloat(e.target.value) })}
+                      className="rounded-xl"
+                      min="0"
+                      step="0.5"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                      Chef de Partie (€/hour)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={defaultRates.chef_de_partie_rate}
+                      onChange={(e) => setDefaultRates({ ...defaultRates, chef_de_partie_rate: parseFloat(e.target.value) })}
+                      className="rounded-xl"
+                      min="0"
+                      step="0.5"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                      Sous Chef (€/hour)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={defaultRates.sous_chef_rate}
+                      onChange={(e) => setDefaultRates({ ...defaultRates, sous_chef_rate: parseFloat(e.target.value) })}
+                      className="rounded-xl"
+                      min="0"
+                      step="0.5"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                      Head Chef (€/hour)
+                    </Label>
+                    <Input
+                      type="number"
+                      value={defaultRates.head_chef_rate}
+                      onChange={(e) => setDefaultRates({ ...defaultRates, head_chef_rate: parseFloat(e.target.value) })}
+                      className="rounded-xl"
+                      min="0"
+                      step="0.5"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <Button
+                onClick={handleSavePreferences}
+                disabled={updateUserPrefsMutation.isPending}
+                className="rounded-xl font-normal w-full"
+                style={{ backgroundColor: 'var(--sage)', color: 'white' }}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updateUserPrefsMutation.isPending ? 'Saving...' : 'Save Preferences'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Notification Preferences */}
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                <Bell className="w-5 h-5" style={{ color: 'var(--olive)' }} />
+                Notification Preferences
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm font-light mb-4" style={{ color: 'var(--clay)' }}>
+                Choose which notifications you'd like to receive
+              </p>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                  <div>
+                    <div className="font-normal" style={{ color: 'var(--earth)' }}>New Applications</div>
+                    <p className="text-xs font-light" style={{ color: 'var(--clay)' }}>
+                      Get notified when workers apply for your shifts
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationPrefs.new_applications}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, new_applications: checked })}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                  <div>
+                    <div className="font-normal" style={{ color: 'var(--earth)' }}>Shift Filled</div>
+                    <p className="text-xs font-light" style={{ color: 'var(--clay)' }}>
+                      Notify when a shift has been successfully filled
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationPrefs.shift_filled}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, shift_filled: checked })}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                  <div>
+                    <div className="font-normal" style={{ color: 'var(--earth)' }}>Shift Cancelled</div>
+                    <p className="text-xs font-light" style={{ color: 'var(--clay)' }}>
+                      Get notified if a worker cancels a shift
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationPrefs.shift_cancelled}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, shift_cancelled: checked })}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                  <div>
+                    <div className="font-normal" style={{ color: 'var(--earth)' }}>Payment Updates</div>
+                    <p className="text-xs font-light" style={{ color: 'var(--clay)' }}>
+                      Receive updates about payments and transactions
+                    </p>
+                  </div>
+                  <Switch
+                    checked={notificationPrefs.payment_updates}
+                    onCheckedChange={(checked) => setNotificationPrefs({ ...notificationPrefs, payment_updates: checked })}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={handleSavePreferences}
+                disabled={updateUserPrefsMutation.isPending}
+                className="rounded-xl font-normal w-full"
+                style={{ backgroundColor: 'var(--olive)', color: 'white' }}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updateUserPrefsMutation.isPending ? 'Saving...' : 'Save Notification Preferences'}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
