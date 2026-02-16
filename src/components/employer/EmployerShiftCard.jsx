@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat, Star } from "lucide-react";
+import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat, Star, CreditCard } from "lucide-react";
 import { format } from "date-fns";
+import PayShiftModal from "./PayShiftModal";
 
 export default function EmployerShiftCard({ shift, onDelete, onViewApplications, onLeaveReview }) {
   const [showPayment, setShowPayment] = useState(false);
@@ -103,16 +106,39 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
             </Button>
           )}
 
-          {/* Leave Review Button */}
-          {shift.status === 'completed' && !shift.reviewed && shift.assigned_to && onLeaveReview && (
-            <Button
-              onClick={() => onLeaveReview(shift)}
-              className="w-full rounded-xl font-normal flex items-center gap-2"
-              style={{ backgroundColor: 'var(--sage)', color: 'white' }}
-            >
-              <Star className="w-4 h-4" />
-              Leave Review for {shift.assigned_to_name || 'Worker'}
-            </Button>
+          {/* Payment and Review Buttons for Completed Shifts */}
+          {shift.status === 'completed' && shift.assigned_to && (
+            <div className="space-y-2">
+              {isPaid ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: '#8A9B8E20' }}>
+                  <CreditCard className="w-4 h-4" style={{ color: '#8A9B8E' }} />
+                  <span className="text-sm font-normal" style={{ color: '#8A9B8E' }}>
+                    Payment Completed
+                  </span>
+                </div>
+              ) : (
+                <Button
+                  onClick={() => setShowPayment(true)}
+                  className="w-full rounded-xl font-normal flex items-center gap-2"
+                  style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+                >
+                  <CreditCard className="w-4 h-4" />
+                  Pay Worker
+                </Button>
+              )}
+              
+              {!shift.reviewed && onLeaveReview && (
+                <Button
+                  onClick={() => onLeaveReview(shift)}
+                  variant="outline"
+                  className="w-full rounded-xl font-normal flex items-center gap-2"
+                  style={{ borderColor: 'var(--sand)' }}
+                >
+                  <Star className="w-4 h-4" />
+                  Leave Review
+                </Button>
+              )}
+            </div>
           )}
 
           {shift.assigned_to && (
@@ -142,6 +168,10 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
           )}
         </div>
       </CardContent>
+      
+      {showPayment && (
+        <PayShiftModal shift={shift} onClose={() => setShowPayment(false)} />
+      )}
     </Card>
   );
 }
