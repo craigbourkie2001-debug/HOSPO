@@ -6,6 +6,17 @@ import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat, Star } fro
 import { format } from "date-fns";
 
 export default function EmployerShiftCard({ shift, onDelete, onViewApplications, onLeaveReview }) {
+  const [showPayment, setShowPayment] = useState(false);
+
+  // Check payment status
+  const { data: payments = [] } = useQuery({
+    queryKey: ['shift-payment', shift.id],
+    queryFn: () => base44.entities.Payment.filter({ shift_id: shift.id }),
+    enabled: shift.status === 'completed'
+  });
+
+  const payment = payments[0];
+  const isPaid = payment?.status === 'completed';
   const isChefRole = shift.role_type === 'chef';
   
   const getStatusColor = () => {
