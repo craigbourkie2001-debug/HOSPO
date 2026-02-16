@@ -341,6 +341,17 @@ export default function Layout({ children }) {
             );
           })}
         </div>
+
+        {/* Onboarding Modal */}
+        {showOnboarding && user && (
+          <WorkerOnboarding 
+            user={user} 
+            onComplete={() => {
+              setShowOnboarding(false);
+              base44.auth.me().then(setUser).catch(() => {});
+            }} 
+          />
+        )}
       </div>
     </SidebarProvider>
   );
