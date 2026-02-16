@@ -265,25 +265,39 @@ export default function BrowseShifts() {
             </p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatePresence mode="wait">
-              {filteredShifts.map((shift, index) => (
-                <motion.div
-                  key={shift.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <ShiftCard 
-                    shift={shift} 
-                    onApply={() => setSelectedShift(shift)}
-                  />
-                </motion.div>
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AnimatePresence mode="wait">
+                {displayedShifts.map((shift, index) => (
+                  <motion.div
+                    key={shift.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ delay: index * 0.05 }}
+                  >
+                    <ShiftCard 
+                      shift={shift} 
+                      onApply={() => setSelectedShift(shift)}
+                    />
+                  </motion.div>
                 ))}
-                </AnimatePresence>
-                </div>
-                )}
+              </AnimatePresence>
+            </div>
+            
+            {hasMore && (
+              <div className="mt-8 flex justify-center">
+                <Button
+                  onClick={() => setMobileDisplayCount(prev => prev + 12)}
+                  className="rounded-xl font-normal tracking-wide px-8"
+                  style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+                >
+                  Load More ({filteredShifts.length - mobileDisplayCount} remaining)
+                </Button>
+              </div>
+            )}
+          </>
+        )}
 
                 {selectedShift && (
                 <ApplyModal 
