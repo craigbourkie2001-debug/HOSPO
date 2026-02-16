@@ -88,6 +88,8 @@ Hospo Team
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shifts'] });
       queryClient.invalidateQueries({ queryKey: ['applications'] });
+      queryClient.invalidateQueries({ queryKey: ['myApplications'] });
+      queryClient.invalidateQueries({ queryKey: ['employerShifts'] });
       toast.success('Application submitted successfully!');
       onClose();
     },
