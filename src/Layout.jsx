@@ -64,6 +64,13 @@ export default function Layout({ children }) {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  const mobileNavItems = [
+    { title: "Shifts", url: createPageUrl("BrowseShifts"), icon: Briefcase },
+    { title: "My Shifts", url: createPageUrl("MyShifts"), icon: Clock },
+    { title: "Dashboard", url: createPageUrl("EmployerDashboard"), icon: LayoutDashboard },
+    { title: "Profile", url: createPageUrl("Profile"), icon: User },
+  ];
+
   return (
     <SidebarProvider>
       <style>{`
@@ -79,9 +86,25 @@ export default function Layout({ children }) {
           --olive: #6B7565;
           --warm-white: #FFFCF7;
         }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --cream: #1a1a1a;
+            --sand: #2a2a2a;
+            --terracotta: #C89F8C;
+            --clay: #d4b5a8;
+            --earth: #e8d5cc;
+            --sage: #a8bfb0;
+            --olive: #8a9b8e;
+            --warm-white: #0f0f0f;
+          }
+        }
         
         body {
           font-family: 'Inter', sans-serif;
+          overscroll-behavior: none;
+          padding-top: env(safe-area-inset-top);
+          padding-bottom: env(safe-area-inset-bottom);
         }
         
         h1, h2, h3, h4, h5, h6 {
@@ -95,6 +118,58 @@ export default function Layout({ children }) {
         
         .hover-lift:hover {
           transform: translateY(-2px);
+        }
+
+        button, [role="tab"], [role="button"], .sidebar-item {
+          user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none;
+        }
+
+        .mobile-bottom-nav {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: var(--warm-white);
+          border-top: 1px solid var(--sand);
+          display: flex;
+          justify-content: space-around;
+          padding: env(safe-area-inset-bottom, 12px) 0 12px 0;
+          z-index: 50;
+        }
+
+        @media (min-width: 768px) {
+          .mobile-bottom-nav {
+            display: none;
+          }
+        }
+
+        .mobile-nav-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          padding: 8px 12px;
+          color: var(--clay);
+          text-decoration: none;
+          font-size: 11px;
+          font-weight: 500;
+          user-select: none;
+        }
+
+        .mobile-nav-item.active {
+          color: var(--terracotta);
+        }
+
+        .mobile-content-padding {
+          padding-bottom: 80px;
+        }
+
+        @media (min-width: 768px) {
+          .mobile-content-padding {
+            padding-bottom: 0;
+          }
         }
       `}</style>
       
@@ -211,10 +286,27 @@ export default function Layout({ children }) {
             </div>
           </header>
 
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto mobile-content-padding">
             {children}
           </div>
         </main>
+
+        {/* Mobile Bottom Navigation */}
+        <div className="mobile-bottom-nav">
+          {mobileNavItems.map((item) => {
+            const isActive = location.pathname === item.url;
+            return (
+              <Link 
+                key={item.title}
+                to={item.url} 
+                className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+              >
+                <item.icon className="w-6 h-6" style={{ strokeWidth: 1.5 }} />
+                <span>{item.title}</span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </SidebarProvider>
   );

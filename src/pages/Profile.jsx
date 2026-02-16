@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat, Sparkles, FileText, Camera, Trash2, Plus } from "lucide-react";
+import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat, Sparkles, FileText, Camera, Trash2, Plus, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 const baristaSkillOptions = [
@@ -40,6 +40,7 @@ export default function Profile() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
   const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -974,6 +975,47 @@ export default function Profile() {
           </Card>
         )}
       </div>
+
+      {/* Delete Account Confirmation Dialog */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="max-w-md w-full rounded-2xl p-6" style={{ backgroundColor: 'var(--warm-white)' }}>
+            <div className="flex items-center gap-3 mb-4">
+              <AlertTriangle className="w-8 h-8 text-red-500" />
+              <h3 className="text-2xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Delete Account?
+              </h3>
+            </div>
+            <p className="mb-6" style={{ color: 'var(--clay)' }}>
+              This action cannot be undone. Your profile, shift history, applications, and all data will be permanently deleted.
+            </p>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowDeleteDialog(false)}
+                className="flex-1 rounded-xl font-normal"
+                style={{ borderColor: 'var(--sand)' }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  try {
+                    await base44.auth.updateMe({ is_deleted: true });
+                    await base44.auth.logout();
+                  } catch (error) {
+                    toast.error('Failed to delete account');
+                  }
+                }}
+                className="flex-1 rounded-xl font-normal"
+              >
+                Delete Forever
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CheckCircle, Clock, FileText, Coffee, ChefHat } from "lucide-react";
@@ -33,7 +33,35 @@ export default function MyShifts() {
   const pendingApplications = applications.filter(a => a.status === 'pending');
 
   return (
-    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
+    <div 
+      className="min-h-screen p-6 md:p-12" 
+      style={{ backgroundColor: 'var(--cream)' }}
+      onTouchStart={handlePullStart}
+      onTouchMove={handlePullMove}
+      onTouchEnd={handlePullEnd}
+    >
+      {/* Pull to Refresh Indicator */}
+      {pullDistance > 0 && (
+        <div 
+          className="fixed top-0 left-0 right-0 flex items-center justify-center transition-all z-50"
+          style={{ 
+            height: pullDistance,
+            opacity: pullDistance / 60,
+            backgroundColor: 'var(--warm-white)'
+          }}
+        >
+          <div 
+            className={`${isRefreshing ? 'animate-spin' : ''}`}
+            style={{ 
+              width: 24, 
+              height: 24, 
+              border: '2px solid var(--sand)', 
+              borderTopColor: 'var(--terracotta)',
+              borderRadius: '50%'
+            }}
+          />
+        </div>
+      )}
       <div className="max-w-6xl mx-auto">
         <div className="mb-12">
           <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
