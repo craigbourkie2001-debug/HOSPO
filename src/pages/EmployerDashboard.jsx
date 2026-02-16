@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import ShiftFormModal from "../components/employer/ShiftFormModal";
 import EmployerShiftCard from "../components/employer/EmployerShiftCard";
 import ApplicationsModal from "../components/employer/ApplicationsModal";
+import RecommendedCandidates from "../components/matching/RecommendedCandidates";
 
 export default function EmployerDashboard() {
   const [user, setUser] = useState(null);
@@ -190,6 +191,11 @@ export default function EmployerDashboard() {
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>COMPLETED</div>
           </motion.div>
         </div>
+
+        {/* AI Recommended Candidates for Open Shifts */}
+        {availableShifts.length > 0 && (
+          <RecommendedCandidates shift={availableShifts[0]} />
+        )}
 
         {/* Shifts */}
         <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>

@@ -8,12 +8,18 @@ import { motion, AnimatePresence } from "framer-motion";
 import ShiftCard from "../components/shifts/ShiftCard";
 import ShiftFilters from "../components/shifts/ShiftFilters";
 import ApplyModal from "../components/shifts/ApplyModal";
+import RecommendedShifts from "../components/matching/RecommendedShifts";
 
 export default function BrowseShifts() {
+  const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [filters, setFilters] = useState({ location: "all", date: "all", skills: [] });
   const [selectedShift, setSelectedShift] = useState(null);
+
+  React.useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
 
   const { data: shifts, isLoading } = useQuery({
     queryKey: ['shifts'],
@@ -83,6 +89,9 @@ export default function BrowseShifts() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        {/* AI Recommendations */}
+        <RecommendedShifts user={user} onApply={setSelectedShift} />
 
         {/* Search Bar */}
         <div className="mb-8">
