@@ -100,9 +100,20 @@ export default function ShopDetails() {
       </header>
 
       <div className="max-w-4xl mx-auto p-6 md:p-12">
-        {/* Hero Section */}
-        <div className="h-64 rounded-3xl overflow-hidden relative mb-8" style={{ background: 'linear-gradient(135deg, var(--cream), var(--latte))' }}>
-          {shop.logo_url ? (
+        {/* Hero Section with Custom Colors */}
+        <div 
+          className="h-64 rounded-3xl overflow-hidden relative mb-8" 
+          style={{ 
+            background: shop.hero_image_url 
+              ? 'transparent' 
+              : shop.custom_colors?.primary 
+                ? `linear-gradient(135deg, ${shop.custom_colors.primary}, ${shop.custom_colors.secondary || shop.custom_colors.primary})` 
+                : 'linear-gradient(135deg, var(--cream), var(--latte))'
+          }}
+        >
+          {shop.hero_image_url ? (
+            <img src={shop.hero_image_url} alt={shop.name} className="w-full h-full object-cover" />
+          ) : shop.logo_url ? (
             <img src={shop.logo_url} alt={shop.name} className="w-full h-full object-cover" />
           ) : (
             <div className="flex items-center justify-center h-full">
@@ -124,6 +135,26 @@ export default function ShopDetails() {
             </div>
           </div>
         </div>
+
+        {/* Gallery */}
+        {shop.gallery && shop.gallery.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              Gallery
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {shop.gallery.map((url, idx) => (
+                <img 
+                  key={idx}
+                  src={url} 
+                  alt={`${shop.name} photo ${idx + 1}`} 
+                  className="w-full h-48 rounded-2xl object-cover hover-lift cursor-pointer"
+                  onClick={() => window.open(url, '_blank')}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Details */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">

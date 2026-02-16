@@ -5,6 +5,7 @@ import { createPageUrl } from "@/utils";
 import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown, Settings } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
+import EmployerOnboarding from "./components/onboarding/EmployerOnboarding";
 import { base44 } from "@/api/base44Client";
 import {
   Sidebar,
@@ -88,10 +89,13 @@ export default function Layout({ children }) {
     base44.auth.me().then(userData => {
       setUser(userData);
       
-      // Show onboarding if user hasn't completed it and doesn't have basic profile info
-      const needsOnboarding = !userData.onboarding_completed && 
-                             (!userData.location || !userData.phone || !userData.visa_status);
-      setShowOnboarding(needsOnboarding);
+      // Show onboarding based on role
+      if (userData.role === 'employer' && !userData.onboarding_completed) {
+        setShowOnboarding('employer');
+      } else if (userData.role === 'user' && !userData.onboarding_completed && 
+                 (!userData.location || !userData.phone || !userData.visa_status)) {
+        setShowOnboarding('worker');
+      }
     }).catch(() => {});
   }, []);
 
@@ -426,9 +430,18 @@ export default function Layout({ children }) {
           })}
         </div>
 
-        {/* Onboarding Modal */}
-        {showOnboarding && user && (
+        {/* Onboarding Modals */}
+        {showOnboarding === 'worker' && user && (
           <WorkerOnboarding 
+            user={user} 
+            onComplete={() => {
+              setShowOnboarding(false);
+              base44.auth.me().then(setUser).catch(() => {});
+            }} 
+          />
+        )}
+        {showOnboarding === 'employer' && user && (
+          <EmployerOnboarding 
             user={user} 
             onComplete={() => {
               setShowOnboarding(false);

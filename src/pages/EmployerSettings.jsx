@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Save, Upload, Building2, DollarSign, Bell } from "lucide-react";
+import { Settings, Save, Upload, Building2, DollarSign, Bell, Image, Palette, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function EmployerSettings() {
@@ -16,6 +16,12 @@ export default function EmployerSettings() {
   const [venueType, setVenueType] = useState('restaurant');
   const [venueForm, setVenueForm] = useState({});
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const [customColors, setCustomColors] = useState({
+    primary: '#C89F8C',
+    secondary: '#8A9B8E',
+    accent: '#705D56'
+  });
   const [notificationPrefs, setNotificationPrefs] = useState({
     new_applications: true,
     shift_filled: true,
@@ -43,6 +49,9 @@ export default function EmployerSettings() {
           setVenue(restaurants[0]);
           setVenueType('restaurant');
           setVenueForm(restaurants[0]);
+          if (restaurants[0].custom_colors) {
+            setCustomColors(restaurants[0].custom_colors);
+          }
         }
       } else if (userData.coffee_shop_id) {
         const shops = await base44.entities.CoffeeShop.filter({ id: userData.coffee_shop_id });
@@ -50,6 +59,9 @@ export default function EmployerSettings() {
           setVenue(shops[0]);
           setVenueType('coffee_shop');
           setVenueForm(shops[0]);
+          if (shops[0].custom_colors) {
+            setCustomColors(shops[0].custom_colors);
+          }
         }
       }
 
@@ -102,9 +114,48 @@ export default function EmployerSettings() {
     }
   };
 
+  const handleHeroUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setVenueForm({ ...venueForm, hero_image_url: file_url });
+      toast.success('Hero image uploaded');
+    } catch (error) {
+      toast.error('Failed to upload image');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleGalleryUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingGallery(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const currentGallery = venueForm.gallery || [];
+      setVenueForm({ ...venueForm, gallery: [...currentGallery, file_url] });
+      toast.success('Image added to gallery');
+    } catch (error) {
+      toast.error('Failed to upload image');
+    } finally {
+      setUploadingGallery(false);
+    }
+  };
+
+  const removeFromGallery = (index) => {
+    const newGallery = [...(venueForm.gallery || [])];
+    newGallery.splice(index, 1);
+    setVenueForm({ ...venueForm, gallery: newGallery });
+  };
+
   const handleSaveVenue = () => {
     const { id, created_date, updated_date, created_by, ...data } = venueForm;
-    updateVenueMutation.mutate(data);
+    updateVenueMutation.mutate({ ...data, custom_colors: customColors });
   };
 
   const handleSavePreferences = () => {
@@ -261,6 +312,170 @@ export default function EmployerSettings() {
               >
                 <Save className="w-4 h-4 mr-2" />
                 {updateVenueMutation.isPending ? 'Saving...' : 'Save Venue Details'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Venue Appearance */}
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                <Palette className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
+                Venue Appearance
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Hero Image */}
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Hero Banner Image
+                </Label>
+                <p className="text-xs mb-3" style={{ color: 'var(--clay)' }}>
+                  Large banner image displayed at the top of your venue page
+                </p>
+                {venueForm.hero_image_url && (
+                  <img 
+                    src={venueForm.hero_image_url} 
+                    alt="Hero" 
+                    className="w-full h-40 rounded-xl object-cover mb-3"
+                  />
+                )}
+                <input
+                  type="file"
+                  id="hero-upload"
+                  accept="image/*"
+                  onChange={handleHeroUpload}
+                  className="hidden"
+                />
+                <Button
+                  onClick={() => document.getElementById('hero-upload').click()}
+                  variant="outline"
+                  disabled={uploading}
+                  className="rounded-xl font-normal"
+                  style={{ borderColor: 'var(--sand)' }}
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {uploading ? 'Uploading...' : 'Upload Hero Image'}
+                </Button>
+              </div>
+
+              {/* Gallery */}
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Photo Gallery
+                </Label>
+                <p className="text-xs mb-3" style={{ color: 'var(--clay)' }}>
+                  Showcase your venue with multiple photos
+                </p>
+                {venueForm.gallery && venueForm.gallery.length > 0 && (
+                  <div className="grid grid-cols-3 gap-3 mb-3">
+                    {venueForm.gallery.map((url, idx) => (
+                      <div key={idx} className="relative group">
+                        <img 
+                          src={url} 
+                          alt={`Gallery ${idx + 1}`} 
+                          className="w-full h-24 rounded-lg object-cover"
+                        />
+                        <button
+                          onClick={() => removeFromGallery(idx)}
+                          className="absolute top-1 right-1 w-6 h-6 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <input
+                  type="file"
+                  id="gallery-upload"
+                  accept="image/*"
+                  onChange={handleGalleryUpload}
+                  className="hidden"
+                />
+                <Button
+                  onClick={() => document.getElementById('gallery-upload').click()}
+                  variant="outline"
+                  disabled={uploadingGallery}
+                  className="rounded-xl font-normal"
+                  style={{ borderColor: 'var(--sand)' }}
+                >
+                  <Image className="w-4 h-4 mr-2" />
+                  {uploadingGallery ? 'Uploading...' : 'Add to Gallery'}
+                </Button>
+              </div>
+
+              {/* Custom Colors */}
+              <div>
+                <Label className="text-sm font-normal mb-3 block" style={{ color: 'var(--earth)' }}>
+                  Brand Colors
+                </Label>
+                <p className="text-xs mb-3" style={{ color: 'var(--clay)' }}>
+                  Customize your venue page with your brand colors
+                </p>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs mb-2 block" style={{ color: 'var(--clay)' }}>Primary</Label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={customColors.primary}
+                        onChange={(e) => setCustomColors({ ...customColors, primary: e.target.value })}
+                        className="w-12 h-12 rounded-lg cursor-pointer"
+                      />
+                      <Input
+                        value={customColors.primary}
+                        onChange={(e) => setCustomColors({ ...customColors, primary: e.target.value })}
+                        className="rounded-lg flex-1"
+                        placeholder="#C89F8C"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs mb-2 block" style={{ color: 'var(--clay)' }}>Secondary</Label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={customColors.secondary}
+                        onChange={(e) => setCustomColors({ ...customColors, secondary: e.target.value })}
+                        className="w-12 h-12 rounded-lg cursor-pointer"
+                      />
+                      <Input
+                        value={customColors.secondary}
+                        onChange={(e) => setCustomColors({ ...customColors, secondary: e.target.value })}
+                        className="rounded-lg flex-1"
+                        placeholder="#8A9B8E"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs mb-2 block" style={{ color: 'var(--clay)' }}>Accent</Label>
+                    <div className="flex gap-2">
+                      <input
+                        type="color"
+                        value={customColors.accent}
+                        onChange={(e) => setCustomColors({ ...customColors, accent: e.target.value })}
+                        className="w-12 h-12 rounded-lg cursor-pointer"
+                      />
+                      <Input
+                        value={customColors.accent}
+                        onChange={(e) => setCustomColors({ ...customColors, accent: e.target.value })}
+                        className="rounded-lg flex-1"
+                        placeholder="#705D56"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleSaveVenue}
+                disabled={updateVenueMutation.isPending}
+                className="rounded-xl font-normal w-full"
+                style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+              >
+                <Save className="w-4 h-4 mr-2" />
+                {updateVenueMutation.isPending ? 'Saving...' : 'Save Appearance'}
               </Button>
             </CardContent>
           </Card>
