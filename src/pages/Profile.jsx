@@ -40,7 +40,9 @@ export default function Profile() {
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [uploadingResume, setUploadingResume] = useState(false);
   const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
+  const [uploadingProfilePic, setUploadingProfilePic] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [extractingCV, setExtractingCV] = useState(false);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -49,6 +51,7 @@ export default function Profile() {
       setFormData({
         bio: userData.bio || '',
         professional_summary: userData.professional_summary || '',
+        profile_picture_url: userData.profile_picture_url || '',
         resume_url: userData.resume_url || '',
         location: userData.location || '',
         phone: userData.phone || '',
@@ -59,6 +62,11 @@ export default function Profile() {
         chef_skills: userData.chef_skills || [],
         certifications: userData.certifications || [],
         availability: userData.availability || [],
+        availability_slots: userData.availability_slots || [],
+        preferred_shift_times: userData.preferred_shift_times || [],
+        desired_hourly_rate_min: userData.desired_hourly_rate_min || '',
+        desired_hourly_rate_max: userData.desired_hourly_rate_max || '',
+        work_experience: userData.work_experience || [],
         skill_portfolio: userData.skill_portfolio || []
       });
     }).catch(() => {});
@@ -114,6 +122,46 @@ export default function Profile() {
     }));
   };
 
+  const toggleShiftTime = (time) => {
+    setFormData(prev => ({
+      ...prev,
+      preferred_shift_times: prev.preferred_shift_times.includes(time)
+        ? prev.preferred_shift_times.filter(t => t !== time)
+        : [...prev.preferred_shift_times, time]
+    }));
+  };
+
+  const addWorkExperience = () => {
+    setFormData(prev => ({
+      ...prev,
+      work_experience: [...prev.work_experience, {
+        job_title: '',
+        company: '',
+        location: '',
+        start_date: '',
+        end_date: '',
+        current: false,
+        description: ''
+      }]
+    }));
+  };
+
+  const removeWorkExperience = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      work_experience: prev.work_experience.filter((_, i) => i !== index)
+    }));
+  };
+
+  const updateWorkExperience = (index, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      work_experience: prev.work_experience.map((exp, i) => 
+        i === index ? { ...exp, [field]: value } : exp
+      )
+    }));
+  };
+
   const generateProfessionalSummary = async () => {
     setIsGeneratingAI(true);
     try {
@@ -134,19 +182,71 @@ export default function Profile() {
     }
   };
 
+  const handleProfilePictureUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploadingProfilePic(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, profile_picture_url: file_url }));
+      toast.success('Profile picture updated!');
+    } catch (error) {
+      toast.error('Failed to upload profile picture');
+    } finally {
+      setUploadingProfilePic(false);
+    }
+  };
+
   const handleResumeUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
     setUploadingResume(true);
+    setExtractingCV(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData(prev => ({ ...prev, resume_url: file_url }));
       toast.success('Resume uploaded!');
+      
+      // Extract work experience from CV
+      try {
+        const result = await base44.integrations.Core.ExtractDataFromUploadedFile({
+          file_url: file_url,
+          json_schema: {
+            type: "object",
+            properties: {
+              work_experience: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    job_title: { type: "string" },
+                    company: { type: "string" },
+                    location: { type: "string" },
+                    start_date: { type: "string" },
+                    end_date: { type: "string" },
+                    current: { type: "boolean" },
+                    description: { type: "string" }
+                  }
+                }
+              }
+            }
+          }
+        });
+        
+        if (result.status === 'success' && result.output?.work_experience) {
+          setFormData(prev => ({ ...prev, work_experience: result.output.work_experience }));
+          toast.success('Work experience extracted from CV!');
+        }
+      } catch (extractError) {
+        console.error('Failed to extract CV data:', extractError);
+      }
     } catch (error) {
       toast.error('Failed to upload resume');
     } finally {
       setUploadingResume(false);
+      setExtractingCV(false);
     }
   };
 
@@ -233,8 +333,31 @@ export default function Profile() {
           <div className="h-32" style={{ backgroundColor: 'var(--sand)' }} />
           <CardContent className="pt-0">
             <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16 md:-mt-12">
-              <div className="w-24 h-24 rounded-full border-4 flex items-center justify-center text-3xl font-light text-white" style={{ backgroundColor: 'var(--terracotta)', borderColor: 'var(--warm-white)', fontFamily: 'Crimson Pro, serif' }}>
-                {user.full_name?.[0]?.toUpperCase() || 'U'}
+              <div className="relative group">
+                {isEditing && (
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePictureUpload}
+                      className="hidden"
+                      disabled={uploadingProfilePic}
+                    />
+                    <Camera className="w-8 h-8 text-white" />
+                  </label>
+                )}
+                {formData.profile_picture_url || user.profile_picture_url ? (
+                  <img 
+                    src={formData.profile_picture_url || user.profile_picture_url} 
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full border-4 object-cover" 
+                    style={{ borderColor: 'var(--warm-white)' }}
+                  />
+                ) : (
+                  <div className="w-24 h-24 rounded-full border-4 flex items-center justify-center text-3xl font-light text-white" style={{ backgroundColor: 'var(--terracotta)', borderColor: 'var(--warm-white)', fontFamily: 'Crimson Pro, serif' }}>
+                    {user.full_name?.[0]?.toUpperCase() || 'U'}
+                  </div>
+                )}
               </div>
               <div className="flex-1 text-center md:text-left mb-4 md:mb-0">
                 <h1 className="text-3xl font-normal mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
@@ -755,6 +878,150 @@ export default function Profile() {
               <AlertTriangle className="w-4 h-4 mr-2" />
               Delete Account
             </Button>
+          </CardContent>
+        </Card>
+
+        {/* Work Experience */}
+        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Work Experience
+              </CardTitle>
+              {isEditing && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={addWorkExperience}
+                  className="rounded-xl"
+                  style={{ borderColor: 'var(--sand)' }}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add
+                </Button>
+              )}
+            </div>
+            {extractingCV && (
+              <p className="text-sm mt-2" style={{ color: 'var(--clay)' }}>
+                <Sparkles className="w-4 h-4 inline mr-1" />
+                Extracting experience from CV...
+              </p>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isEditing ? (
+              formData.work_experience.length > 0 ? (
+                formData.work_experience.map((exp, idx) => (
+                  <div key={idx} className="p-4 rounded-xl space-y-3" style={{ backgroundColor: 'var(--cream)', border: '1px solid var(--sand)' }}>
+                    <div className="flex justify-end">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => removeWorkExperience(idx)}
+                      >
+                        <Trash2 className="w-4 h-4" style={{ color: 'var(--clay)' }} />
+                      </Button>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <Input
+                        placeholder="Job title"
+                        value={exp.job_title || ''}
+                        onChange={(e) => updateWorkExperience(idx, 'job_title', e.target.value)}
+                        className="rounded-xl border"
+                        style={{ borderColor: 'var(--sand)' }}
+                      />
+                      <Input
+                        placeholder="Company name"
+                        value={exp.company || ''}
+                        onChange={(e) => updateWorkExperience(idx, 'company', e.target.value)}
+                        className="rounded-xl border"
+                        style={{ borderColor: 'var(--sand)' }}
+                      />
+                    </div>
+                    <Input
+                      placeholder="Location"
+                      value={exp.location || ''}
+                      onChange={(e) => updateWorkExperience(idx, 'location', e.target.value)}
+                      className="rounded-xl border"
+                      style={{ borderColor: 'var(--sand)' }}
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input
+                        type="month"
+                        placeholder="Start date"
+                        value={exp.start_date || ''}
+                        onChange={(e) => updateWorkExperience(idx, 'start_date', e.target.value)}
+                        className="rounded-xl border"
+                        style={{ borderColor: 'var(--sand)' }}
+                      />
+                      {!exp.current && (
+                        <Input
+                          type="month"
+                          placeholder="End date"
+                          value={exp.end_date || ''}
+                          onChange={(e) => updateWorkExperience(idx, 'end_date', e.target.value)}
+                          className="rounded-xl border"
+                          style={{ borderColor: 'var(--sand)' }}
+                        />
+                      )}
+                    </div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={exp.current || false}
+                        onChange={(e) => updateWorkExperience(idx, 'current', e.target.checked)}
+                        className="rounded"
+                      />
+                      <span className="text-sm" style={{ color: 'var(--clay)' }}>I currently work here</span>
+                    </label>
+                    <Textarea
+                      placeholder="Job description and achievements"
+                      value={exp.description || ''}
+                      onChange={(e) => updateWorkExperience(idx, 'description', e.target.value)}
+                      className="rounded-xl border"
+                      style={{ borderColor: 'var(--sand)' }}
+                      rows={3}
+                    />
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm font-light text-center py-8" style={{ color: 'var(--clay)' }}>
+                  No work experience added yet. Upload a CV to auto-extract or add manually.
+                </p>
+              )
+            ) : user.work_experience && user.work_experience.length > 0 ? (
+              user.work_experience.map((exp, idx) => (
+                <div key={idx} className="p-4 rounded-xl border-l-4" style={{ backgroundColor: 'var(--cream)', borderColor: 'var(--terracotta)' }}>
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h4 className="font-normal text-lg" style={{ color: 'var(--earth)' }}>{exp.job_title}</h4>
+                      <p className="text-sm font-light" style={{ color: 'var(--clay)' }}>{exp.company}</p>
+                    </div>
+                    {exp.current && (
+                      <Badge className="border-0" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>Current</Badge>
+                    )}
+                  </div>
+                  {exp.location && (
+                    <p className="text-sm mb-1" style={{ color: 'var(--clay)' }}>
+                      <MapPin className="w-3 h-3 inline mr-1" />
+                      {exp.location}
+                    </p>
+                  )}
+                  {exp.start_date && (
+                    <p className="text-xs mb-2" style={{ color: 'var(--clay)' }}>
+                      {exp.start_date} - {exp.current ? 'Present' : exp.end_date || 'N/A'}
+                    </p>
+                  )}
+                  {exp.description && (
+                    <p className="text-sm font-light mt-2" style={{ color: 'var(--earth)' }}>{exp.description}</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="font-light text-center py-8" style={{ color: 'var(--clay)' }}>
+                No work experience added yet
+              </p>
+            )}
           </CardContent>
         </Card>
 
