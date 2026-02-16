@@ -165,10 +165,35 @@ export default function EmployerSettings() {
     });
   };
 
-  if (!user || !venue) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="animate-spin rounded-full h-12 w-12 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+      </div>
+    );
+  }
+
+  if (!venue) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-lg text-center">
+          <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+            <Building2 className="w-10 h-10" style={{ color: 'var(--terracotta)' }} />
+          </div>
+          <h2 className="text-3xl font-light mb-3" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            No Venue Connected
+          </h2>
+          <p className="mb-6" style={{ color: 'var(--clay)' }}>
+            You need to complete the employer onboarding process to set up your venue before accessing settings.
+          </p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="rounded-xl"
+            style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+          >
+            Refresh Page
+          </Button>
+        </div>
       </div>
     );
   }
