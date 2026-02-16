@@ -9,10 +9,40 @@ import MyShiftCard from "../components/shifts/MyShiftCard";
 
 export default function MyShifts() {
   const [user, setUser] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [pullStart, setPullStart] = useState(0);
+  const [pullDistance, setPullDistance] = useState(0);
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
+
+  const handlePullStart = (e) => {
+    if (window.scrollY === 0) {
+      setPullStart(e.touches[0].clientY);
+    }
+  };
+
+  const handlePullMove = (e) => {
+    if (pullStart > 0) {
+      const distance = e.touches[0].clientY - pullStart;
+      if (distance > 0) {
+        setPullDistance(Math.min(distance, 80));
+      }
+    }
+  };
+
+  const handlePullEnd = async () => {
+    if (pullDistance > 60) {
+      setIsRefreshing(true);
+      await queryClient.invalidateQueries({ queryKey: ['myShifts'] });
+      await queryClient.invalidateQueries({ queryKey: ['myApplications'] });
+      setTimeout(() => setIsRefreshing(false), 500);
+    }
+    setPullStart(0);
+    setPullDistance(0);
+  };
 
   const { data: shifts, isLoading } = useQuery({
     queryKey: ['myShifts', user?.email],

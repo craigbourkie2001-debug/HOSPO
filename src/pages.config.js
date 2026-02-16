@@ -55,13 +55,13 @@ import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import Marketplace from './pages/Marketplace';
 import MyShifts from './pages/MyShifts';
+import Premium from './pages/Premium';
 import Profile from './pages/Profile';
 import Restaurants from './pages/Restaurants';
+import RoasterDetails from './pages/RoasterDetails';
 import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
-import RoasterDetails from './pages/RoasterDetails';
 import SupportChat from './pages/SupportChat';
-import Premium from './pages/Premium';
 import __Layout from './Layout.jsx';
 
 
@@ -74,13 +74,13 @@ export const PAGES = {
     "Jobs": Jobs,
     "Marketplace": Marketplace,
     "MyShifts": MyShifts,
+    "Premium": Premium,
     "Profile": Profile,
     "Restaurants": Restaurants,
+    "RoasterDetails": RoasterDetails,
     "Roasters": Roasters,
     "ShopDetails": ShopDetails,
-    "RoasterDetails": RoasterDetails,
     "SupportChat": SupportChat,
-    "Premium": Premium,
 }
 
 export const pagesConfig = {
