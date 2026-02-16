@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ const chefSkillOptions = [
 
 export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClose }) {
   const queryClient = useQueryClient();
+  const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     role_type: venueType === 'restaurant' ? 'chef' : 'barista',
     chef_level: '',
@@ -33,18 +34,26 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
     skills_required: []
   });
 
+  React.useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
+
   const skillOptions = formData.role_type === 'chef' ? chefSkillOptions : baristaSkillOptions;
 
   const createShiftMutation = useMutation({
-    mutationFn: (data) => base44.entities.Shift.create({
-      venue_type: venueType,
-      venue_id: venue.id,
-      venue_name: venue.name,
-      location: venue.location,
-      status: 'available',
-      applications_count: 0,
-      ...data
-    }),
+    mutationFn: (data) => {
+      const isPremium = user?.employer_premium === true;
+      return base44.entities.Shift.create({
+        venue_type: venueType,
+        venue_id: venue.id,
+        venue_name: venue.name,
+        location: venue.location,
+        status: 'available',
+        applications_count: 0,
+        is_premium_featured: isPremium,
+        ...data
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerShifts'] });
       queryClient.invalidateQueries({ queryKey: ['shifts'] });

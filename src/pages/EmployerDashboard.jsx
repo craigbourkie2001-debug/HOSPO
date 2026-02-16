@@ -30,7 +30,11 @@ export default function EmployerDashboard() {
       setUser(userData);
       const allVenues = [];
       
-      // Only fetch Rye River Cafe for this user
+      // Fetch associated venues
+      if (userData.coffee_shop_id) {
+        const shops = await base44.entities.CoffeeShop.filter({ id: userData.coffee_shop_id });
+        allVenues.push(...shops.map(s => ({ ...s, venue_type: 'coffee_shop' })));
+      }
       if (userData.restaurant_id) {
         const restaurants = await base44.entities.Restaurant.filter({ id: userData.restaurant_id });
         allVenues.push(...restaurants.map(r => ({ ...r, venue_type: 'restaurant' })));
@@ -41,7 +45,7 @@ export default function EmployerDashboard() {
         setSelectedVenue(allVenues[0]);
         setSelectedVenueType(allVenues[0].venue_type);
       }
-    }).catch(() => {});
+    }).catch(() => base44.auth.redirectToLogin());
   }, []);
 
   const { data: shifts, isLoading } = useQuery({

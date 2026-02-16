@@ -99,8 +99,8 @@ export default function Layout({ children }) {
     base44.auth.me().then(userData => {
       setUser(userData);
       
-      // Show onboarding based on role
-      if (userData.role === 'employer' && !userData.onboarding_completed) {
+      // Show onboarding based on role and check if venue is set up
+      if (userData.role === 'employer' && (!userData.onboarding_completed || (!userData.coffee_shop_id && !userData.restaurant_id))) {
         setShowOnboarding('employer');
       } else if (userData.role === 'user' && !userData.onboarding_completed && 
                  (!userData.location || !userData.phone || !userData.visa_status)) {
