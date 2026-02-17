@@ -14,7 +14,7 @@ export default function Welcome() {
   }, []);
 
   const handleSignIn = () => {
-    base44.auth.redirectToLogin(createPageUrl('BrowseShifts'));
+    base44.auth.redirectToLogin(window.location.origin + createPageUrl('BrowseShifts'));
   };
 
   return (
