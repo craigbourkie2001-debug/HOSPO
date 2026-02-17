@@ -155,6 +155,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
 
   const canProceed = () => {
     switch (step) {
+      case 0: return true;
       case 1: return formData.worker_type && formData.visa_status;
       case 2: return formData.location && formData.phone && formData.experience_years >= 0;
       case 3: 
