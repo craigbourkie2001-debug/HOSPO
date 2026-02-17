@@ -13,8 +13,16 @@ export default function Welcome() {
     });
   }, []);
 
-  const handleSignIn = () => {
-    base44.auth.redirectToLogin();
+  const handleSignIn = async () => {
+    // Check if already authenticated and redirect
+    const isAuth = await base44.auth.isAuthenticated();
+    if (isAuth) {
+      window.location.href = createPageUrl('BrowseShifts');
+    } else {
+      // Redirect to login with return URL
+      const returnUrl = window.location.origin + createPageUrl('BrowseShifts');
+      base44.auth.redirectToLogin(returnUrl);
+    }
   };
 
   return (
