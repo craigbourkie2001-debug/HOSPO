@@ -2,16 +2,53 @@ import React from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Briefcase, Coffee, ChefHat, Clock, MapPin, Users, ArrowRight } from "lucide-react";
+import { createPageUrl } from "@/utils";
 
 export default function Welcome() {
+  React.useEffect(() => {
+    base44.auth.isAuthenticated().then(isAuth => {
+      if (isAuth) {
+        window.location.href = createPageUrl('BrowseShifts');
+      }
+    });
+  }, []);
+
   const handleSignIn = () => {
-    base44.auth.redirectToLogin(window.location.origin + '/browse-shifts');
+    base44.auth.redirectToLogin(createPageUrl('BrowseShifts'));
   };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--cream)' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+        
+        :root {
+          --cream: #FAF8F5;
+          --sand: #E8E3DC;
+          --terracotta: #C89F8C;
+          --clay: #A67C6D;
+          --earth: #705D56;
+          --sage: #8A9B8E;
+          --olive: #6B7565;
+          --warm-white: #FFFCF7;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :root {
+            --cream: #1a1a1a;
+            --sand: #2a2a2a;
+            --terracotta: #C89F8C;
+            --clay: #d4b5a8;
+            --earth: #e8d5cc;
+            --sage: #a8bfb0;
+            --olive: #8a9b8e;
+            --warm-white: #0f0f0f;
+          }
+        }
+      `}</style>
+      
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-6 py-20">
+      <div className="max-w-6xl mx-auto px-6 py-12 md:py-20">
         <div className="text-center mb-16">
           <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: 'var(--terracotta)' }}>
             <Briefcase className="w-10 h-10 text-white" />

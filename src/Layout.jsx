@@ -95,17 +95,19 @@ const generalNavItems = [
   },
 ];
 
-export default function Layout({ children, currentPageName }) {
+export default function Layout({ children }) {
   const location = useLocation();
   const [user, setUser] = React.useState(null);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
 
   // Don't show layout on Welcome page
-  if (currentPageName === 'Welcome') {
+  if (location.pathname.includes('/welcome')) {
     return children;
   }
 
   React.useEffect(() => {
+    if (location.pathname.includes('/welcome')) return;
+    
     base44.auth.me().then(userData => {
       setUser(userData);
       
@@ -116,13 +118,8 @@ export default function Layout({ children, currentPageName }) {
                  (!userData.location || !userData.phone || !userData.visa_status)) {
         setShowOnboarding('worker');
       }
-    }).catch(() => {
-      // Not authenticated - redirect to welcome page
-      if (!window.location.pathname.includes('/welcome')) {
-        window.location.href = createPageUrl('Welcome');
-      }
-    });
-  }, []);
+    }).catch(() => {});
+  }, [location.pathname]);
 
   const mobileNavItems = [
     { title: "Shifts", url: createPageUrl("BrowseShifts"), icon: Briefcase },
@@ -407,7 +404,10 @@ export default function Layout({ children, currentPageName }) {
                   </div>
                 </div>
                 <button
-                  onClick={() => base44.auth.logout()}
+                  onClick={() => {
+                    base44.auth.logout();
+                    window.location.href = createPageUrl('Welcome');
+                  }}
                   className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-normal tracking-wide transition-all duration-300 hover-lift"
                   style={{ backgroundColor: 'var(--earth)', color: 'white' }}
                 >
