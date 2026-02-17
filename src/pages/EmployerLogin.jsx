@@ -1,11 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Briefcase, TrendingUp, Users, CheckCircle } from "lucide-react";
+import { Building2, Briefcase, TrendingUp, Users, CheckCircle, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { createPageUrl } from "@/utils";
 
 export default function EmployerLogin() {
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    // Check if user is already logged in
+    base44.auth.me()
+      .then(user => {
+        // User is logged in - check if they have a venue setup
+        if (user.coffee_shop_id || user.restaurant_id) {
+          // Already has venue, go to dashboard
+          window.location.href = createPageUrl("EmployerDashboard");
+        } else {
+          // Logged in but no venue - go to signup/onboarding
+          window.location.href = createPageUrl("EmployerSignup");
+        }
+      })
+      .catch(() => {
+        // Not logged in, show login page
+        setChecking(false);
+      });
+  }, []);
+
   const handleSignIn = () => {
     base44.auth.redirectToLogin(createPageUrl("EmployerDashboard"));
   };
@@ -13,6 +34,14 @@ export default function EmployerLogin() {
   const handleCreateAccount = () => {
     window.location.href = createPageUrl("EmployerSignup");
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'var(--terracotta)' }} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6" style={{ backgroundColor: 'var(--cream)' }}>
