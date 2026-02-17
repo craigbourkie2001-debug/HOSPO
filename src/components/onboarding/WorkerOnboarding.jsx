@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import MobileSelect from "../mobile/MobileSelect";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X } from "lucide-react";
+import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 
 const baristaSkillOptions = [
