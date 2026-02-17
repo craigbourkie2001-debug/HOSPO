@@ -214,6 +214,42 @@ export default function EmployerSettings() {
         </div>
 
         <div className="space-y-6">
+          {/* Company Profile */}
+          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                <Building2 className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
+                Company Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Company Name
+                </Label>
+                <Input
+                  value={user?.company_name || ''}
+                  disabled
+                  className="rounded-xl bg-gray-50"
+                />
+              </div>
+
+              <div>
+                <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>
+                  Company Registration Number
+                </Label>
+                <Input
+                  value={user?.company_registration_number || ''}
+                  disabled
+                  className="rounded-xl bg-gray-50"
+                />
+                <p className="text-xs mt-1" style={{ color: 'var(--sage)' }}>
+                  ✓ Business Verified
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Venue Details */}
           <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
             <CardHeader>

@@ -135,19 +135,22 @@ export default function EmployerOnboarding({ user, onComplete }) {
 
             <div>
               <Label className="text-sm mb-2 block" style={{ color: 'var(--earth)' }}>
-                Company Registration Number (Optional)
+                Company Registration Number *
               </Label>
               <Input
                 value={formData.company_registration_number}
                 onChange={(e) => setFormData({ ...formData, company_registration_number: e.target.value })}
-                placeholder="CRO number"
+                placeholder="CRO number (e.g., 123456)"
                 className="rounded-xl h-12"
               />
+              <p className="text-xs mt-2" style={{ color: 'var(--clay)' }}>
+                Required for business verification
+              </p>
             </div>
 
             <Button
               onClick={() => setStep(2)}
-              disabled={!formData.company_name}
+              disabled={!formData.company_name || !formData.company_registration_number}
               className="w-full rounded-xl h-12"
               style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
             >

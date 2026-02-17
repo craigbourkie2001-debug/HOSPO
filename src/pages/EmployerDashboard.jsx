@@ -14,6 +14,7 @@ import RecommendedCandidates from "../components/matching/RecommendedCandidates"
 import LeaveReviewModal from "../components/employer/LeaveReviewModal";
 import AnalyticsDashboard from "../components/employer/AnalyticsDashboard";
 import JobManagement from "../components/employer/JobManagement";
+import WorkerProfileModal from "../components/employer/WorkerProfileModal";
 import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function EmployerDashboard() {
@@ -24,6 +25,7 @@ export default function EmployerDashboard() {
   const [selectedVenueType, setSelectedVenueType] = useState('coffee_shop');
   const [viewingApplicationsFor, setViewingApplicationsFor] = useState(null);
   const [reviewShift, setReviewShift] = useState(null);
+  const [viewingWorkerProfile, setViewingWorkerProfile] = useState(null);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
@@ -343,7 +345,14 @@ export default function EmployerDashboard() {
           shift={reviewShift}
           onClose={() => setReviewShift(null)}
         />
-        )}
+      )}
+
+      {viewingWorkerProfile && (
+        <WorkerProfileModal
+          workerEmail={viewingWorkerProfile}
+          onClose={() => setViewingWorkerProfile(null)}
+        />
+      )}
       </div>
     </>
   );
