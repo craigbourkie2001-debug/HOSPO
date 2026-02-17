@@ -34,7 +34,7 @@ const visaHoursLimits = {
 };
 
 export default function WorkerOnboarding({ user, onComplete }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     worker_type: 'barista',
     visa_status: '',
@@ -56,7 +56,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const [uploadingCV, setUploadingCV] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
 
-  const totalSteps = 6;
+  const totalSteps = 7;
 
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
