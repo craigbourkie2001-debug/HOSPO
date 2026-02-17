@@ -22,24 +22,15 @@ export default function ShiftChatButton({ shift, className, size = "default", va
       let recipientEmail, recipientName;
 
       if (isWorker) {
-        const venue = shift.venue_type === 'coffee_shop'
-          ? await base44.entities.CoffeeShop.filter({ id: shift.venue_id })
-          : await base44.entities.Restaurant.filter({ id: shift.venue_id });
-
-        if (!venue || venue.length === 0) {
-          toast.error('Could not find venue information');
-          return;
-        }
-
-        recipientEmail = venue[0].created_by || '';
-        recipientName = shift.venue_name || venue[0].name || 'Employer';
+        recipientEmail = shift.created_by;
+        recipientName = shift.venue_name || 'Employer';
       } else {
-        recipientEmail = shift.assigned_to || '';
+        recipientEmail = shift.assigned_to;
         recipientName = shift.assigned_to_name || 'Worker';
       }
 
       if (!recipientEmail) {
-        toast.error('Could not find recipient information');
+        toast.error('Unable to start chat');
         return;
       }
 
