@@ -208,6 +208,68 @@ export default function WorkerOnboarding({ user, onComplete }) {
 
         {/* Step Content */}
         <div className="mb-8 min-h-[400px]">
+          {/* Step 0: Welcome & Mission */}
+          {step === 0 && (
+            <div className="space-y-8 text-center">
+              <div className="flex justify-center">
+                <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--terracotta)' }}>
+                  <Briefcase className="w-10 h-10 text-white" />
+                </div>
+              </div>
+              
+              <div>
+                <h2 className="text-4xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                  Welcome to Hospo
+                </h2>
+                <p className="text-xl mb-6" style={{ color: 'var(--clay)' }}>
+                  Ireland's Premier Hospitality Marketplace
+                </p>
+              </div>
+
+              <div className="text-left max-w-xl mx-auto space-y-6">
+                <div className="flex gap-4 items-start">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--sand)' }}>
+                    <Coffee className="w-6 h-6" style={{ color: 'var(--terracotta)' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-normal mb-1" style={{ color: 'var(--earth)' }}>Find Your Next Shift</h3>
+                    <p className="text-sm" style={{ color: 'var(--clay)' }}>
+                      Connect with top cafés and restaurants across Ireland. Browse shifts that match your skills and schedule.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 items-start">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--sand)' }}>
+                    <DollarSign className="w-6 h-6" style={{ color: 'var(--sage)' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-normal mb-1" style={{ color: 'var(--earth)' }}>Fair Pay, Guaranteed</h3>
+                    <p className="text-sm" style={{ color: 'var(--clay)' }}>
+                      Transparent rates, secure payments, and opportunities to grow your hospitality career.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 items-start">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--sand)' }}>
+                    <CheckCircle2 className="w-6 h-6" style={{ color: 'var(--olive)' }} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-normal mb-1" style={{ color: 'var(--earth)' }}>Build Your Reputation</h3>
+                    <p className="text-sm" style={{ color: 'var(--clay)' }}>
+                      Earn reviews, showcase your skills, and unlock better opportunities with every shift.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm italic" style={{ color: 'var(--clay)' }}>
+                Let's get you set up in just a few quick steps.
+              </p>
+            </div>
+          )}
+
           {/* Step 1: Role & Visa */}
           {step === 1 && (
             <div className="space-y-6">
