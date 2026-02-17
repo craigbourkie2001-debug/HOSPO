@@ -674,7 +674,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
 
         {/* Navigation */}
         <div className="flex gap-3">
-          {step > 1 && (
+          {step > 0 && (
             <Button
               variant="outline"
               onClick={() => setStep(step - 1)}
@@ -684,14 +684,14 @@ export default function WorkerOnboarding({ user, onComplete }) {
               Back
             </Button>
           )}
-          {step < totalSteps ? (
+          {step < totalSteps - 1 ? (
             <Button
               onClick={() => setStep(step + 1)}
               disabled={!canProceed()}
               className="flex-1 rounded-xl font-normal"
               style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
             >
-              Continue
+              {step === 0 ? "Let's Get Started" : 'Continue'}
             </Button>
           ) : (
             <Button
