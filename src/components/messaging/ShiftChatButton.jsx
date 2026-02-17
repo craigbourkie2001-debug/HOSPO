@@ -19,9 +19,29 @@ export default function ShiftChatButton({ shift, className, size = "default", va
       }
 
       // Determine the other person in the conversation
-      const isEmployer = user.email === shift.created_by;
-      const recipientEmail = isEmployer ? shift.assigned_to : shift.created_by;
-      const recipientName = isEmployer ? shift.assigned_to_name : shift.venue_name;
+      // Worker is chatting with venue/employer
+      const isWorker = user.email === shift.assigned_to;
+      
+      let recipientEmail, recipientName;
+      
+      if (isWorker) {
+        // Worker chatting with employer - need to get venue owner's email
+        const venue = shift.venue_type === 'coffee_shop' 
+          ? await base44.entities.CoffeeShop.filter({ id: shift.venue_id })
+          : await base44.entities.Restaurant.filter({ id: shift.venue_id });
+        
+        if (!venue || venue.length === 0) {
+          toast.error('Could not find venue information');
+          return;
+        }
+        
+        recipientEmail = venue[0].created_by;
+        recipientName = shift.venue_name;
+      } else {
+        // Employer chatting with worker
+        recipientEmail = shift.assigned_to;
+        recipientName = shift.assigned_to_name;
+      }
       
       // Create a conversation ID (sorted emails for consistency)
       const emails = [user.email, recipientEmail].sort();
