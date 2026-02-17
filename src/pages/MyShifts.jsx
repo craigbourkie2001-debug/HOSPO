@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, CheckCircle, Clock, FileText, Coffee, ChefHat } from "lucide-react";
 import { motion } from "framer-motion";
 import MyShiftCard from "../components/shifts/MyShiftCard";
+import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function MyShifts() {
   const [user, setUser] = useState(null);
@@ -63,13 +64,15 @@ export default function MyShifts() {
   const pendingApplications = applications.filter(a => a.status === 'pending');
 
   return (
-    <div 
-      className="min-h-screen p-6 md:p-12" 
-      style={{ backgroundColor: 'var(--cream)' }}
-      onTouchStart={handlePullStart}
-      onTouchMove={handlePullMove}
-      onTouchEnd={handlePullEnd}
-    >
+    <>
+      <MobileHeader title="My Shifts" icon={Clock} />
+      <div 
+        className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" 
+        style={{ backgroundColor: 'var(--cream)' }}
+        onTouchStart={handlePullStart}
+        onTouchMove={handlePullMove}
+        onTouchEnd={handlePullEnd}
+      >
       {/* Pull to Refresh Indicator */}
       {pullDistance > 0 && (
         <div 
@@ -278,8 +281,8 @@ export default function MyShifts() {
             )}
           </TabsContent>
         </Tabs>
-        </div>
       </div>
+    </div>
     </>
   );
 }
