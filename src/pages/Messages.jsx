@@ -20,11 +20,38 @@ export default function Messages() {
   }, []);
 
   // Fetch all conversations
-  const { data: allMessages = [] } = useQuery({
+  const { data: allMessages = [], refetch } = useQuery({
     queryKey: ['messages'],
     queryFn: () => base44.entities.Message.list('-created_date', 500),
     enabled: !!user,
+    refetchInterval: 3000, // Poll every 3 seconds for new messages
   });
+
+  // Real-time subscription for new messages
+  useEffect(() => {
+    if (!user) return;
+    
+    const unsubscribe = base44.entities.Message.subscribe((event) => {
+      // Refetch messages when a new message is created or updated
+      if (event.type === 'create' || event.type === 'update') {
+        refetch();
+        
+        // Auto-scroll to bottom if we're in the conversation
+        if (selectedConversation && event.data) {
+          const isRelevantMessage = 
+            event.data.conversation_id === selectedConversation.id ||
+            (event.data.sender_email === user.email && event.data.recipient_email === selectedConversation.otherUser.email) ||
+            (event.data.recipient_email === user.email && event.data.sender_email === selectedConversation.otherUser.email);
+          
+          if (isRelevantMessage) {
+            setTimeout(() => scrollRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+          }
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user, selectedConversation?.id, refetch]);
 
   // Group messages into conversations
   const conversations = React.useMemo(() => {
@@ -174,11 +201,18 @@ export default function Messages() {
                           )}
                         </div>
                         <p className="text-sm truncate" style={{ color: 'var(--clay)' }}>
-                          {conv.lastMessage.content}
+                         {conv.lastMessage.sender_email === user.email ? 'You: ' : ''}{conv.lastMessage.content}
                         </p>
-                        <p className="text-xs mt-1" style={{ color: 'var(--clay)' }}>
-                          {format(new Date(conv.lastMessage.created_date), 'MMM d, h:mm a')}
-                        </p>
+                        <div className="flex items-center justify-between mt-1">
+                         <p className="text-xs" style={{ color: 'var(--clay)' }}>
+                           {format(new Date(conv.lastMessage.created_date), 'MMM d, h:mm a')}
+                         </p>
+                         {conv.lastMessage.related_shift_id && (
+                           <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--sand)', color: 'var(--clay)' }}>
+                             About a shift
+                           </span>
+                         )}
+                        </div>
                       </div>
                     </div>
                   </button>
@@ -207,12 +241,17 @@ export default function Messages() {
                       {selectedConversation.otherUser.name[0].toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium" style={{ color: 'var(--earth)' }}>
-                        {selectedConversation.otherUser.name}
-                      </p>
-                      <p className="text-sm" style={{ color: 'var(--clay)' }}>
-                        {selectedConversation.otherUser.email}
-                      </p>
+                     <p className="font-medium" style={{ color: 'var(--earth)' }}>
+                       {selectedConversation.otherUser.name}
+                     </p>
+                     <p className="text-sm" style={{ color: 'var(--clay)' }}>
+                       {selectedConversation.otherUser.email}
+                     </p>
+                     {selectedConversation.lastMessage.related_shift_id && (
+                       <p className="text-xs mt-1 px-2 py-0.5 rounded-full inline-block" style={{ backgroundColor: 'var(--sand)', color: 'var(--clay)' }}>
+                         About a shift
+                       </p>
+                     )}
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -264,16 +303,22 @@ export default function Messages() {
                       return (
                         <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
                           <div
-                            className="max-w-[70%] rounded-2xl px-4 py-2"
-                            style={{
-                              backgroundColor: isOwn ? 'var(--terracotta)' : 'var(--warm-white)',
-                              color: isOwn ? 'white' : 'var(--earth)',
-                            }}
+                           className="max-w-[70%] rounded-2xl px-4 py-2"
+                           style={{
+                             backgroundColor: isOwn ? 'var(--terracotta)' : 'var(--warm-white)',
+                             color: isOwn ? 'white' : 'var(--earth)',
+                             border: msg.related_shift_id && !isOwn ? '1px solid var(--sand)' : 'none',
+                           }}
                           >
-                            <p className="text-sm">{msg.content}</p>
-                            <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : ''}`} style={{ color: isOwn ? 'inherit' : 'var(--clay)' }}>
-                              {format(new Date(msg.created_date), 'h:mm a')}
-                            </p>
+                           {msg.related_shift_id && (
+                             <div className="text-xs mb-2 pb-2 border-b" style={{ borderColor: isOwn ? 'rgba(255,255,255,0.3)' : 'var(--sand)', color: isOwn ? 'rgba(255,255,255,0.8)' : 'var(--clay)' }}>
+                               📅 About a shift
+                             </div>
+                           )}
+                           <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                           <p className={`text-xs mt-1 ${isOwn ? 'text-white/70' : ''}`} style={{ color: isOwn ? 'inherit' : 'var(--clay)' }}>
+                             {format(new Date(msg.created_date), 'h:mm a')}
+                           </p>
                           </div>
                         </div>
                       );
