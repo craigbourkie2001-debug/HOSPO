@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, Send, Phone, Mail, ArrowLeft, Loader2 } from "lucide-react";
 import { format } from "date-fns";
+import { useLocation } from "react-router-dom";
 
 export default function Messages() {
   const [user, setUser] = useState(null);
@@ -14,6 +15,7 @@ export default function Messages() {
   const [messageText, setMessageText] = useState("");
   const scrollRef = useRef(null);
   const queryClient = useQueryClient();
+  const location = useLocation();
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
@@ -89,6 +91,18 @@ export default function Messages() {
       new Date(b.lastMessage.created_date) - new Date(a.lastMessage.created_date)
     );
   }, [allMessages, user]);
+
+  // Auto-select conversation from navigation state
+  useEffect(() => {
+    if (location.state?.conversationId && conversations.length > 0) {
+      const targetConv = conversations.find(c => c.id === location.state.conversationId);
+      if (targetConv && !selectedConversation) {
+        setSelectedConversation(targetConv);
+        // Clear the state after using it
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state, conversations, selectedConversation]);
 
   // Send message mutation
   const sendMutation = useMutation({
