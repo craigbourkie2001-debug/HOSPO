@@ -166,56 +166,45 @@ export default function BrowseShifts() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-2xl hover-lift"
+          <div 
+            className="p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {filteredShifts.length}
             </div>
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>AVAILABLE SHIFTS</div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="p-6 rounded-2xl hover-lift"
+          <div 
+            className="p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
           >
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               €{Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}
             </div>
             <div className="text-xs tracking-wider opacity-90">AVG. HOURLY RATE</div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="p-6 rounded-2xl hover-lift"
+          <div 
+            className="p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {availableLocations.length}
             </div>
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>LOCATIONS</div>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="p-6 rounded-2xl hover-lift"
+          <div 
+            className="p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--sage)', color: 'white' }}
           >
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {[...new Set(shifts.map(s => s.coffee_shop_id))].length}
             </div>
             <div className="text-xs tracking-wider opacity-90">COFFEE SHOPS</div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Shifts Grid */}
@@ -240,22 +229,13 @@ export default function BrowseShifts() {
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence mode="wait">
-                {displayedShifts.map((shift, index) => (
-                  <motion.div
-                    key={shift.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <ShiftCard 
-                      shift={shift} 
-                      onApply={() => setSelectedShift(shift)}
-                    />
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              {displayedShifts.map((shift) => (
+                <ShiftCard 
+                  key={shift.id}
+                  shift={shift} 
+                  onApply={() => setSelectedShift(shift)}
+                />
+              ))}
             </div>
             
             {hasMore && (
