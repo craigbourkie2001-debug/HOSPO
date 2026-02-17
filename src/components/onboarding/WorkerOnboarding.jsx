@@ -39,7 +39,6 @@ export default function WorkerOnboarding({ user, onComplete }) {
     legal_first_name: '',
     legal_last_name: '',
     pps_number: '',
-    referred_by_code: '',
     worker_type: 'barista',
     visa_status: '',
     location: '',
@@ -60,7 +59,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const [uploadingCV, setUploadingCV] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
 
-  const totalSteps = 8;
+  const totalSteps = 7;
 
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
@@ -118,38 +117,13 @@ export default function WorkerOnboarding({ user, onComplete }) {
     mutationFn: async () => {
       const weeklyLimit = visaHoursLimits[formData.visa_status];
       
-      // Generate unique referral code
-      const referralCode = `HOSPO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-      
       const updateData = {
         ...formData,
         weekly_hours_limit: weeklyLimit,
-        referral_code: referralCode,
         onboarding_completed: true
       };
       
       await base44.auth.updateMe(updateData);
-      
-      // If user used a referral code, create referral record
-      if (formData.referred_by_code) {
-        try {
-          // Find the referrer
-          const referrers = await base44.entities.User.filter({ referral_code: formData.referred_by_code });
-          if (referrers.length > 0) {
-            const referrer = referrers[0];
-            await base44.entities.Referral.create({
-              referrer_email: referrer.email,
-              referrer_name: referrer.full_name,
-              referred_email: user.email,
-              referred_name: user.full_name,
-              referral_code: formData.referred_by_code,
-              status: 'onboarded'
-            });
-          }
-        } catch (error) {
-          console.error('Failed to create referral record:', error);
-        }
-      }
     },
     onSuccess: () => {
       toast.success('Profile setup complete!');
@@ -359,21 +333,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
                 </p>
               </div>
 
-              <div>
-                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>
-                  Referral Code (Optional)
-                </label>
-                <Input
-                  value={formData.referred_by_code}
-                  onChange={(e) => setFormData(prev => ({ ...prev, referred_by_code: e.target.value.toUpperCase() }))}
-                  placeholder="HOSPOXXXXXX"
-                  className="rounded-xl border h-12"
-                  style={{ borderColor: 'var(--sand)' }}
-                />
-                <p className="text-xs mt-2" style={{ color: 'var(--clay)' }}>
-                  If a friend referred you, enter their code here
-                </p>
-              </div>
+
             </div>
           )}
 

@@ -53,11 +53,6 @@ const workerNavItems = [
     icon: ChefHat,
   },
   {
-    title: "Referrals",
-    url: createPageUrl("Referrals"),
-    icon: User,
-  },
-  {
     title: "My Profile",
     url: createPageUrl("Profile"),
     icon: User,
