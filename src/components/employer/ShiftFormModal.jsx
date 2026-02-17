@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import MobileSelect from "../mobile/MobileSelect";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { X, Coffee, ChefHat } from "lucide-react";
 import { toast } from "sonner";
 
@@ -106,7 +107,7 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
           {/* Role Type Selector */}
           <div>
             <Label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>ROLE TYPE *</Label>
-            <Select 
+            <MobileSelect 
               value={formData.role_type} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, role_type: value, chef_level: '', skills_required: [] }))}
             >
@@ -127,14 +128,14 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
                   </div>
                 </SelectItem>
               </SelectContent>
-            </Select>
+            </MobileSelect>
           </div>
 
           {/* Chef Level Selector (only for chef roles) */}
           {formData.role_type === 'chef' && (
             <div>
               <Label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>CHEF LEVEL *</Label>
-              <Select 
+              <MobileSelect 
                 value={formData.chef_level} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, chef_level: value }))}
               >
@@ -147,7 +148,7 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
                   <SelectItem value="sous_chef">Sous Chef</SelectItem>
                   <SelectItem value="head_chef">Head Chef</SelectItem>
                 </SelectContent>
-              </Select>
+              </MobileSelect>
             </div>
           )}
 

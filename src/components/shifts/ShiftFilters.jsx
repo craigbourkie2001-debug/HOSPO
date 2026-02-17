@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import MobileSelect from "../mobile/MobileSelect";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { X, Filter, DollarSign } from "lucide-react";
@@ -52,7 +53,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
           <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
             LOCATION
           </label>
-          <Select value={filters.location} onValueChange={(value) => setFilters(prev => ({ ...prev, location: value }))}>
+          <MobileSelect value={filters.location} onValueChange={(value) => setFilters(prev => ({ ...prev, location: value }))}>
             <SelectTrigger className="rounded-xl h-11 border" style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}>
               <SelectValue placeholder="All locations" />
             </SelectTrigger>
@@ -62,14 +63,14 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
                 <SelectItem key={loc} value={loc}>{loc}</SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </MobileSelect>
         </div>
 
         <div>
           <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
             DATE
           </label>
-          <Select value={filters.date} onValueChange={(value) => setFilters(prev => ({ ...prev, date: value }))}>
+          <MobileSelect value={filters.date} onValueChange={(value) => setFilters(prev => ({ ...prev, date: value }))}>
             <SelectTrigger className="rounded-xl h-11 border" style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}>
               <SelectValue placeholder="All dates" />
             </SelectTrigger>
@@ -81,7 +82,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </MobileSelect>
         </div>
       </div>
 
@@ -128,7 +129,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
           <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
             SHIFT TIME
           </label>
-          <Select value={filters.shiftTime} onValueChange={(value) => setFilters(prev => ({ ...prev, shiftTime: value }))}>
+          <MobileSelect value={filters.shiftTime} onValueChange={(value) => setFilters(prev => ({ ...prev, shiftTime: value }))}>
             <SelectTrigger className="rounded-xl h-11 border" style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}>
               <SelectValue placeholder="All times" />
             </SelectTrigger>
@@ -138,7 +139,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
               <SelectItem value="afternoon">Afternoon (12pm - 5pm)</SelectItem>
               <SelectItem value="evening">Evening (5pm+)</SelectItem>
             </SelectContent>
-          </Select>
+          </MobileSelect>
         </div>
 
         {roleFilter === 'chef' && (
@@ -146,7 +147,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
             <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>
               CHEF LEVEL
             </label>
-            <Select value={filters.chefLevel} onValueChange={(value) => setFilters(prev => ({ ...prev, chefLevel: value }))}>
+            <MobileSelect value={filters.chefLevel} onValueChange={(value) => setFilters(prev => ({ ...prev, chefLevel: value }))}>
               <SelectTrigger className="rounded-xl h-11 border" style={{ borderColor: 'var(--sand)', backgroundColor: 'white' }}>
                 <SelectValue placeholder="All levels" />
               </SelectTrigger>
@@ -157,7 +158,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
                 <SelectItem value="sous_chef">Sous Chef</SelectItem>
                 <SelectItem value="head_chef">Head Chef</SelectItem>
               </SelectContent>
-            </Select>
+            </MobileSelect>
           </div>
         )}
       </div>

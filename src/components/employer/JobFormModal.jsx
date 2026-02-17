@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import MobileSelect from "../mobile/MobileSelect";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -111,7 +112,7 @@ export default function JobFormModal({ job, venueId, venueType, onClose }) {
 
             <div>
               <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>Role Type</Label>
-              <Select value={formData.role_type} onValueChange={(val) => setFormData({ ...formData, role_type: val })}>
+              <MobileSelect value={formData.role_type} onValueChange={(val) => setFormData({ ...formData, role_type: val })}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
@@ -123,12 +124,12 @@ export default function JobFormModal({ job, venueId, venueType, onClose }) {
                   <SelectItem value="manager">Manager</SelectItem>
                   <SelectItem value="kitchen_porter">Kitchen Porter</SelectItem>
                 </SelectContent>
-              </Select>
+              </MobileSelect>
             </div>
 
             <div>
               <Label className="text-sm font-normal mb-2 block" style={{ color: 'var(--earth)' }}>Employment Type</Label>
-              <Select value={formData.employment_type} onValueChange={(val) => setFormData({ ...formData, employment_type: val })}>
+              <MobileSelect value={formData.employment_type} onValueChange={(val) => setFormData({ ...formData, employment_type: val })}>
                 <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
@@ -136,7 +137,7 @@ export default function JobFormModal({ job, venueId, venueType, onClose }) {
                   <SelectItem value="full_time">Full Time</SelectItem>
                   <SelectItem value="part_time">Part Time</SelectItem>
                 </SelectContent>
-              </Select>
+              </MobileSelect>
             </div>
 
             <div>

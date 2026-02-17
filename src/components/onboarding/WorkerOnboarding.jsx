@@ -4,7 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import MobileSelect from "../mobile/MobileSelect";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
@@ -246,7 +247,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
                   <Shield className="w-4 h-4" />
                   Work Authorization Status
                 </label>
-                <Select value={formData.visa_status} onValueChange={(value) => setFormData(prev => ({ ...prev, visa_status: value }))}>
+                <MobileSelect value={formData.visa_status} onValueChange={(value) => setFormData(prev => ({ ...prev, visa_status: value }))}>
                   <SelectTrigger className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }}>
                     <SelectValue placeholder="Select your status" />
                   </SelectTrigger>
@@ -259,7 +260,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
                     <SelectItem value="stamp_4">Stamp 4 (No restrictions)</SelectItem>
                     <SelectItem value="student_visa">Student Visa (20h/week limit)</SelectItem>
                   </SelectContent>
-                </Select>
+                </MobileSelect>
               </div>
             </div>
           )}

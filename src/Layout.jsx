@@ -170,7 +170,9 @@ export default function Layout({ children }) {
           transform: translateY(-2px);
         }
 
-        button, [role="tab"], [role="button"], .sidebar-item {
+        button, [role="tab"], [role="button"], .sidebar-item, 
+        .mobile-nav-item, [role="tablist"], .badge, .filter-badge,
+        .no-select {
           user-select: none;
           -webkit-user-select: none;
           -webkit-touch-callout: none;
