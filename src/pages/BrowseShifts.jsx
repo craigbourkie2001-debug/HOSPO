@@ -10,6 +10,7 @@ import ShiftCard from "../components/shifts/ShiftCard";
 import ShiftFilters from "../components/shifts/ShiftFilters";
 import ApplyModal from "../components/shifts/ApplyModal";
 import RecommendedShifts from "../components/matching/RecommendedShifts";
+import PullToRefresh from "../components/mobile/PullToRefresh";
 
 export default function BrowseShifts() {
   const [user, setUser] = useState(null);
@@ -24,11 +25,10 @@ export default function BrowseShifts() {
     chefLevel: "all"
   });
   const [selectedShift, setSelectedShift] = useState(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullStart, setPullStart] = useState(0);
-  const [pullDistance, setPullDistance] = useState(0);
   const [mobileDisplayCount, setMobileDisplayCount] = useState(12);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  const queryClient = useQueryClient();
 
   React.useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -40,32 +40,9 @@ export default function BrowseShifts() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
-  const handlePullStart = (e) => {
-    if (window.scrollY === 0) {
-      setPullStart(e.touches[0].clientY);
-    }
-  };
-
-  const handlePullMove = (e) => {
-    if (pullStart > 0) {
-      const distance = e.touches[0].clientY - pullStart;
-      if (distance > 0) {
-        setPullDistance(Math.min(distance, 80));
-      }
-    }
-  };
-
-  const queryClient = useQueryClient();
-
-  const handlePullEnd = async () => {
-    if (pullDistance > 60) {
-      setIsRefreshing(true);
-      await queryClient.invalidateQueries({ queryKey: ['shifts'] });
-      await queryClient.invalidateQueries({ queryKey: ['availableShiftsForMatching'] });
-      setTimeout(() => setIsRefreshing(false), 500);
-    }
-    setPullStart(0);
-    setPullDistance(0);
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['shifts'] });
+    await queryClient.invalidateQueries({ queryKey: ['availableShiftsForMatching'] });
   };
 
   const { data: shifts, isLoading } = useQuery({
@@ -115,36 +92,9 @@ export default function BrowseShifts() {
   const chefCount = shifts.filter(s => s.role_type === 'chef').length;
 
   return (
-    <div 
-      className="min-h-screen p-6 md:p-12" 
-      style={{ backgroundColor: 'var(--cream)' }}
-      onTouchStart={handlePullStart}
-      onTouchMove={handlePullMove}
-      onTouchEnd={handlePullEnd}
-    >
-      {/* Pull to Refresh Indicator */}
-      {pullDistance > 0 && (
-        <div 
-          className="fixed top-0 left-0 right-0 flex items-center justify-center transition-all z-50"
-          style={{ 
-            height: pullDistance,
-            opacity: pullDistance / 60,
-            backgroundColor: 'var(--warm-white)'
-          }}
-        >
-          <div 
-            className={`${isRefreshing ? 'animate-spin' : ''}`}
-            style={{ 
-              width: 24, 
-              height: 24, 
-              border: '2px solid var(--sand)', 
-              borderTopColor: 'var(--terracotta)',
-              borderRadius: '50%'
-            }}
-          />
-        </div>
-      )}
-      <div className="max-w-7xl mx-auto">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
@@ -322,13 +272,14 @@ export default function BrowseShifts() {
           </>
         )}
 
-                {selectedShift && (
-                <ApplyModal 
-                shift={selectedShift} 
-                onClose={() => setSelectedShift(null)} 
-                />
-                )}
-                </div>
-                </div>
-                );
+        {selectedShift && (
+          <ApplyModal 
+            shift={selectedShift} 
+            onClose={() => setSelectedShift(null)} 
+          />
+        )}
+        </div>
+      </div>
+    </PullToRefresh>
+  );
 }

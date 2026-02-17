@@ -7,42 +7,19 @@ import { Calendar, CheckCircle, Clock, FileText, Coffee, ChefHat } from "lucide-
 import { motion } from "framer-motion";
 import MyShiftCard from "../components/shifts/MyShiftCard";
 import MobileHeader from "../components/mobile/MobileHeader";
+import PullToRefresh from "../components/mobile/PullToRefresh";
 
 export default function MyShifts() {
   const [user, setUser] = useState(null);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [pullStart, setPullStart] = useState(0);
-  const [pullDistance, setPullDistance] = useState(0);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
-  const handlePullStart = (e) => {
-    if (window.scrollY === 0) {
-      setPullStart(e.touches[0].clientY);
-    }
-  };
-
-  const handlePullMove = (e) => {
-    if (pullStart > 0) {
-      const distance = e.touches[0].clientY - pullStart;
-      if (distance > 0) {
-        setPullDistance(Math.min(distance, 80));
-      }
-    }
-  };
-
-  const handlePullEnd = async () => {
-    if (pullDistance > 60) {
-      setIsRefreshing(true);
-      await queryClient.invalidateQueries({ queryKey: ['myShifts'] });
-      await queryClient.invalidateQueries({ queryKey: ['myApplications'] });
-      setTimeout(() => setIsRefreshing(false), 500);
-    }
-    setPullStart(0);
-    setPullDistance(0);
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['myShifts'] });
+    await queryClient.invalidateQueries({ queryKey: ['myApplications'] });
   };
 
   const { data: shifts, isLoading } = useQuery({
@@ -64,38 +41,10 @@ export default function MyShifts() {
   const pendingApplications = applications.filter(a => a.status === 'pending');
 
   return (
-    <>
+    <PullToRefresh onRefresh={handleRefresh}>
       <MobileHeader title="My Shifts" icon={Clock} />
-      <div 
-        className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" 
-        style={{ backgroundColor: 'var(--cream)' }}
-        onTouchStart={handlePullStart}
-        onTouchMove={handlePullMove}
-        onTouchEnd={handlePullEnd}
-      >
-      {/* Pull to Refresh Indicator */}
-      {pullDistance > 0 && (
-        <div 
-          className="fixed top-0 left-0 right-0 flex items-center justify-center transition-all z-50"
-          style={{ 
-            height: pullDistance,
-            opacity: pullDistance / 60,
-            backgroundColor: 'var(--warm-white)'
-          }}
-        >
-          <div 
-            className={`${isRefreshing ? 'animate-spin' : ''}`}
-            style={{ 
-              width: 24, 
-              height: 24, 
-              border: '2px solid var(--sand)', 
-              borderTopColor: 'var(--terracotta)',
-              borderRadius: '50%'
-            }}
-          />
-        </div>
-      )}
-      <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-6xl mx-auto">
         <div className="mb-12">
           <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
             My Shifts
@@ -281,8 +230,8 @@ export default function MyShifts() {
             )}
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
-    </>
+    </PullToRefresh>
   );
 }
