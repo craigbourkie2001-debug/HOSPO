@@ -54,13 +54,19 @@ export default function EmployerOnboarding({ user, onComplete }) {
       }
 
       // Update user with employer role and venue association
-      await base44.auth.updateMe({
-        role: 'employer',
+      const updates = {
         company_name: formData.company_name,
         company_registration_number: formData.company_registration_number,
         onboarding_completed: true,
         [venueType === 'coffee_shop' ? 'coffee_shop_id' : 'restaurant_id']: venueId
-      });
+      };
+      
+      // Only update role if user is not admin (app owner)
+      if (user.role !== 'admin') {
+        updates.role = 'employer';
+      }
+      
+      await base44.auth.updateMe(updates);
 
       toast.success('Welcome to Hospo Employer Platform!');
       onComplete();

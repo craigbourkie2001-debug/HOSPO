@@ -53,7 +53,6 @@ import EmployerDashboard from './pages/EmployerDashboard';
 import EmployerLogin from './pages/EmployerLogin';
 import EmployerPremium from './pages/EmployerPremium';
 import EmployerSettings from './pages/EmployerSettings';
-import EmployerSignup from './pages/EmployerSignup';
 import Events from './pages/Events';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
@@ -76,7 +75,6 @@ export const PAGES = {
     "EmployerLogin": EmployerLogin,
     "EmployerPremium": EmployerPremium,
     "EmployerSettings": EmployerSettings,
-    "EmployerSignup": EmployerSignup,
     "Events": Events,
     "Home": Home,
     "Jobs": Jobs,

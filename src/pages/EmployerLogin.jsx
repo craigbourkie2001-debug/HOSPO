@@ -10,8 +10,21 @@ export default function EmployerLogin() {
     base44.auth.redirectToLogin(createPageUrl("EmployerDashboard"));
   };
 
-  const handleCreateAccount = () => {
-    window.location.href = createPageUrl("EmployerSignup");
+  const handleCreateAccount = async () => {
+    try {
+      const user = await base44.auth.me();
+      // User is logged in, just redirect to dashboard (onboarding will trigger automatically)
+      if (user.coffee_shop_id || user.restaurant_id) {
+        window.location.href = createPageUrl("EmployerDashboard");
+      } else {
+        // Mark for onboarding and go to dashboard
+        await base44.auth.updateMe({ onboarding_completed: false });
+        window.location.href = createPageUrl("EmployerDashboard");
+      }
+    } catch (error) {
+      // Not logged in, redirect to login then come back to trigger signup
+      base44.auth.redirectToLogin(createPageUrl("EmployerSignup"));
+    }
   };
 
   return (
