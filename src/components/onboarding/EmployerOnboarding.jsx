@@ -8,6 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Building2, ArrowRight, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 
+const specialtyOptions = ['espresso', 'filter', 'cold_brew', 'latte_art', 'pour_over', 'aeropress'];
+const cuisineOptions = ['irish', 'italian', 'french', 'asian', 'indian', 'mexican', 'american', 'seafood', 'vegetarian', 'fine_dining', 'casual', 'gastropub'];
+
 export default function EmployerOnboarding({ user, onComplete }) {
   const [step, setStep] = useState(1);
   const [venueType, setVenueType] = useState('coffee_shop');
@@ -20,9 +23,21 @@ export default function EmployerOnboarding({ user, onComplete }) {
     description: '',
     company_registration_number: '',
     specialty_focus: [],
-    cuisine_type: []
+    cuisine_type: [],
+    website: '',
+    instagram: '',
+    employee_count: ''
   });
   const [loading, setLoading] = useState(false);
+
+  const toggleSelection = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(item => item !== value)
+        : [...prev[field], value]
+    }));
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -71,7 +86,8 @@ export default function EmployerOnboarding({ user, onComplete }) {
       toast.success('Welcome to Hospo Employer Platform!');
       onComplete();
     } catch (error) {
-      toast.error('Failed to complete setup');
+      console.error('Onboarding error:', error);
+      toast.error('Failed to complete setup: ' + (error.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
@@ -88,7 +104,7 @@ export default function EmployerOnboarding({ user, onComplete }) {
             <h2 className="text-3xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               Employer Setup
             </h2>
-            <p className="text-sm" style={{ color: 'var(--clay)' }}>Step {step} of 3</p>
+            <p className="text-sm" style={{ color: 'var(--clay)' }}>Step {step} of 4</p>
           </div>
         </div>
 
@@ -217,13 +233,109 @@ export default function EmployerOnboarding({ user, onComplete }) {
               />
             </div>
 
-            <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
+            {venueType === 'coffee_shop' && (
+              <div>
+                <Label className="text-sm mb-3 block" style={{ color: 'var(--earth)' }}>Coffee Specialties</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {specialtyOptions.map(specialty => (
+                    <button
+                      key={specialty}
+                      type="button"
+                      onClick={() => toggleSelection('specialty_focus', specialty)}
+                      className="px-4 py-3 rounded-xl text-sm transition-all"
+                      style={{
+                        backgroundColor: formData.specialty_focus.includes(specialty) ? 'var(--terracotta)' : 'var(--sand)',
+                        color: formData.specialty_focus.includes(specialty) ? 'white' : 'var(--earth)'
+                      }}
+                    >
+                      {specialty.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {venueType === 'restaurant' && (
+              <div>
+                <Label className="text-sm mb-3 block" style={{ color: 'var(--earth)' }}>Cuisine Types</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {cuisineOptions.map(cuisine => (
+                    <button
+                      key={cuisine}
+                      type="button"
+                      onClick={() => toggleSelection('cuisine_type', cuisine)}
+                      className="px-4 py-3 rounded-xl text-sm transition-all"
+                      style={{
+                        backgroundColor: formData.cuisine_type.includes(cuisine) ? 'var(--terracotta)' : 'var(--sand)',
+                        color: formData.cuisine_type.includes(cuisine) ? 'white' : 'var(--earth)'
+                      }}
+                    >
+                      {cuisine.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setStep(2)}
+                className="rounded-xl h-12"
+              >
+                Back
+              </Button>
+              <Button
+                onClick={() => setStep(4)}
+                className="flex-1 rounded-xl h-12"
+                style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+              >
+                Continue
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-6">
+            <div>
+              <Label className="text-sm mb-2 block" style={{ color: 'var(--earth)' }}>Website (Optional)</Label>
+              <Input
+                value={formData.website}
+                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                placeholder="https://yourwebsite.ie"
+                className="rounded-xl h-12"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm mb-2 block" style={{ color: 'var(--earth)' }}>Instagram Handle (Optional)</Label>
+              <Input
+                value={formData.instagram}
+                onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                placeholder="@yourvenue"
+                className="rounded-xl h-12"
+              />
+            </div>
+
+            <div>
+              <Label className="text-sm mb-2 block" style={{ color: 'var(--earth)' }}>Approximate Team Size (Optional)</Label>
+              <Input
+                value={formData.employee_count}
+                onChange={(e) => setFormData({ ...formData, employee_count: e.target.value })}
+                placeholder="e.g. 5-10 employees"
+                className="rounded-xl h-12"
+              />
+            </div>
+
+            <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>
               <div className="flex items-start gap-3">
-                <Briefcase className="w-5 h-5 mt-1" style={{ color: 'var(--terracotta)' }} />
+                <Briefcase className="w-5 h-5 mt-1" />
                 <div>
-                  <h4 className="font-medium mb-2" style={{ color: 'var(--earth)' }}>Ready to hire?</h4>
-                  <p className="text-sm" style={{ color: 'var(--clay)' }}>
-                    After setup, you'll be able to post shifts and job openings to attract talented hospitality workers.
+                  <h4 className="font-medium mb-2">You're all set!</h4>
+                  <p className="text-sm opacity-90">
+                    After setup, you'll be able to post shifts and job openings to attract talented hospitality workers across Ireland.
                   </p>
                 </div>
               </div>
@@ -232,7 +344,7 @@ export default function EmployerOnboarding({ user, onComplete }) {
             <div className="flex gap-3">
               <Button
                 variant="outline"
-                onClick={() => setStep(2)}
+                onClick={() => setStep(3)}
                 className="rounded-xl h-12"
               >
                 Back

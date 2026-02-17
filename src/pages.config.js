@@ -65,6 +65,7 @@ import RoasterDetails from './pages/RoasterDetails';
 import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
 import SupportChat from './pages/SupportChat';
+import EmployerSignup from './pages/EmployerSignup';
 import __Layout from './Layout.jsx';
 
 
@@ -87,6 +88,7 @@ export const PAGES = {
     "Roasters": Roasters,
     "ShopDetails": ShopDetails,
     "SupportChat": SupportChat,
+    "EmployerSignup": EmployerSignup,
 }
 
 export const pagesConfig = {
