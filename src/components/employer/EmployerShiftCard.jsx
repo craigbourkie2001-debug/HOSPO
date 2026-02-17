@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat, Star, CreditCard } from "lucide-react";
+import { Calendar, Clock, Euro, Trash2, Users, Coffee, ChefHat, Star, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import PayShiftModal from "./PayShiftModal";
 import ShiftChatButton from "../messaging/ShiftChatButton";
@@ -88,7 +88,7 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
           </div>
 
           <div className="flex items-center gap-2">
-            <DollarSign className="w-4 h-4" style={{ color: 'var(--clay)' }} />
+            <Euro className="w-4 h-4" style={{ color: 'var(--clay)' }} />
             <span className="font-normal text-lg" style={{ color: 'var(--terracotta)' }}>
               €{shift.hourly_rate}/hr
             </span>
