@@ -31,11 +31,16 @@ export default function ShiftChatButton({ shift, className, size = "default", va
           return;
         }
 
-        recipientEmail = venue[0].created_by;
-        recipientName = shift.venue_name;
+        recipientEmail = venue[0].created_by || '';
+        recipientName = shift.venue_name || venue[0].name || 'Employer';
       } else {
-        recipientEmail = shift.assigned_to;
-        recipientName = shift.assigned_to_name;
+        recipientEmail = shift.assigned_to || '';
+        recipientName = shift.assigned_to_name || 'Worker';
+      }
+
+      if (!recipientEmail) {
+        toast.error('Could not find recipient information');
+        return;
       }
 
       const emails = [user.email, recipientEmail].sort();
@@ -74,13 +79,19 @@ export default function ShiftChatButton({ shift, className, size = "default", va
 
   return (
     <Button
-      variant={variant}
+      variant="ghost"
       size={size}
       onClick={handleStartChat}
       className={className}
-      style={{ minHeight: '44px' }}
+      style={{ 
+        minHeight: '44px',
+        border: '1px solid var(--sand)',
+        color: 'var(--earth)',
+        fontFamily: 'Inter, sans-serif',
+        fontWeight: '400'
+      }}
     >
-      <MessageCircle className="w-4 h-4 mr-2" />
+      <MessageCircle className="w-4 h-4 mr-2" style={{ strokeWidth: 1.5 }} />
       Chat About Shift
     </Button>
   );
