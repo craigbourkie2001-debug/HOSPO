@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { X, Star, Briefcase, Phone, Mail, Check, XCircle, Award, ChefHat, Coffee } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import StartConversationButton from "../messaging/StartConversationButton";
 
 export default function ApplicationsModal({ shift, onClose }) {
   const queryClient = useQueryClient();
@@ -169,17 +170,49 @@ ${shift.venue_name}
                         </div>
 
                         {/* Contact Info */}
-                        <div className="flex flex-wrap gap-4 text-sm mb-4" style={{ color: 'var(--clay)' }}>
-                          <span className="flex items-center gap-1">
-                            <Mail className="w-4 h-4" />
-                            {app.applicant_email}
-                          </span>
-                          {app.applicant_phone && (
+                        <div className="mb-4">
+                          <div className="flex flex-wrap gap-4 text-sm mb-3" style={{ color: 'var(--clay)' }}>
                             <span className="flex items-center gap-1">
-                              <Phone className="w-4 h-4" />
-                              {app.applicant_phone}
+                              <Mail className="w-4 h-4" />
+                              {app.applicant_email}
                             </span>
-                          )}
+                            {app.applicant_phone && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="w-4 h-4" />
+                                {app.applicant_phone}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <StartConversationButton 
+                              recipientEmail={app.applicant_email}
+                              recipientName={app.applicant_name}
+                              size="sm"
+                              className="flex-1"
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.location.href = `mailto:${app.applicant_email}`}
+                              className="flex-1"
+                              style={{ minHeight: '44px' }}
+                            >
+                              <Mail className="w-4 h-4 mr-2" />
+                              Email
+                            </Button>
+                            {app.applicant_phone && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => window.location.href = `tel:${app.applicant_phone}`}
+                                className="flex-1"
+                                style={{ minHeight: '44px' }}
+                              >
+                                <Phone className="w-4 h-4 mr-2" />
+                                Call
+                              </Button>
+                            )}
+                          </div>
                         </div>
 
                         {/* Skills */}

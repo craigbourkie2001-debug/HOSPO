@@ -327,7 +327,9 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
+    <>
+      <MobileHeader title="My Profile" icon={User} />
+      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
       <div className="max-w-4xl mx-auto">
         <Card className="mb-8 border rounded-2xl overflow-hidden" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <div className="h-32" style={{ backgroundColor: 'var(--sand)' }} />
