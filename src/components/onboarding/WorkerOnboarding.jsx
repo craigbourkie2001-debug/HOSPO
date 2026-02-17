@@ -39,6 +39,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
     legal_first_name: '',
     legal_last_name: '',
     pps_number: '',
+    identity_document_url: '',
+    identity_verified: false,
     worker_type: 'barista',
     visa_status: '',
     location: '',
@@ -57,9 +59,11 @@ export default function WorkerOnboarding({ user, onComplete }) {
   });
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCV, setUploadingCV] = useState(false);
+  const [uploadingIdentity, setUploadingIdentity] = useState(false);
+  const [verifyingIdentity, setVerifyingIdentity] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
 
-  const totalSteps = 7;
+  const totalSteps = 8;
 
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
@@ -90,6 +94,79 @@ export default function WorkerOnboarding({ user, onComplete }) {
       toast.error('Failed to upload CV');
     } finally {
       setUploadingCV(false);
+    }
+  };
+
+  const handleIdentityUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    setUploadingIdentity(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setFormData(prev => ({ ...prev, identity_document_url: file_url }));
+      toast.success('Document uploaded! Now verifying...');
+      
+      // Automatically verify the document
+      await verifyIdentity(file_url);
+    } catch (error) {
+      toast.error('Failed to upload document');
+    } finally {
+      setUploadingIdentity(false);
+    }
+  };
+
+  const verifyIdentity = async (documentUrl) => {
+    setVerifyingIdentity(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an identity verification system. Analyze this ID document (passport or driving license) and extract the following information in JSON format:
+        
+        {
+          "document_type": "passport" or "driving_license",
+          "first_name": "extracted first name",
+          "last_name": "extracted last name",
+          "date_of_birth": "DD/MM/YYYY",
+          "document_number": "ID number",
+          "is_valid": true/false (check if document appears authentic and not expired),
+          "verification_notes": "any concerns or observations"
+        }
+        
+        Important: Check that the document is clear, not blurry, and appears to be a real government-issued ID.`,
+        file_urls: [documentUrl],
+        response_json_schema: {
+          type: "object",
+          properties: {
+            document_type: { type: "string" },
+            first_name: { type: "string" },
+            last_name: { type: "string" },
+            date_of_birth: { type: "string" },
+            document_number: { type: "string" },
+            is_valid: { type: "boolean" },
+            verification_notes: { type: "string" }
+          }
+        }
+      });
+      
+      // Check if names match
+      const firstNameMatch = result.first_name.toLowerCase() === formData.legal_first_name.toLowerCase();
+      const lastNameMatch = result.last_name.toLowerCase() === formData.legal_last_name.toLowerCase();
+      
+      if (result.is_valid && firstNameMatch && lastNameMatch) {
+        setFormData(prev => ({ ...prev, identity_verified: true }));
+        toast.success('Identity verified successfully!');
+      } else if (!result.is_valid) {
+        toast.error('Document appears invalid or unclear. Please upload a clear photo of a valid ID.');
+        setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+      } else {
+        toast.error(`Name mismatch: Document shows "${result.first_name} ${result.last_name}" but you entered "${formData.legal_first_name} ${formData.legal_last_name}"`);
+        setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+      }
+    } catch (error) {
+      toast.error('Failed to verify document. Please try again.');
+      setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+    } finally {
+      setVerifyingIdentity(false);
     }
   };
 
@@ -163,18 +240,19 @@ export default function WorkerOnboarding({ user, onComplete }) {
     switch (step) {
       case 0: return true;
       case 1: return formData.legal_first_name && formData.legal_last_name && formData.pps_number;
-      case 2: return formData.worker_type && formData.visa_status;
-      case 3: return formData.location && formData.phone && formData.experience_years >= 0;
-      case 4: 
+      case 2: return formData.identity_verified;
+      case 3: return formData.worker_type && formData.visa_status;
+      case 4: return formData.location && formData.phone && formData.experience_years >= 0;
+      case 5: 
         if (formData.worker_type === 'both') {
           return formData.barista_skills.length > 0 && formData.chef_skills.length > 0;
         }
         return formData.worker_type === 'chef' 
           ? formData.chef_skills.length > 0 
           : formData.barista_skills.length > 0;
-      case 5: return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
-      case 6: return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
-      case 7: return formData.bio;
+      case 6: return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
+      case 7: return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
+      case 8: return formData.bio;
       default: return true;
     }
   };
@@ -337,8 +415,97 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 2: Role & Visa */}
+          {/* Step 2: Identity Verification */}
           {step === 2 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Verify Your Identity
+              </h2>
+              <p className="text-sm mb-4" style={{ color: 'var(--clay)' }}>
+                Upload a clear photo of your passport or driving license to verify your identity
+              </p>
+
+              <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
+                <div className="flex items-start gap-3 mb-4">
+                  <Shield className="w-5 h-5 mt-1" style={{ color: 'var(--terracotta)' }} />
+                  <div>
+                    <h3 className="font-normal mb-1" style={{ color: 'var(--earth)' }}>Why we need this</h3>
+                    <p className="text-sm" style={{ color: 'var(--clay)' }}>
+                      Identity verification ensures a safe and trusted marketplace for both workers and employers.
+                    </p>
+                  </div>
+                </div>
+                <ul className="text-sm space-y-1 ml-8" style={{ color: 'var(--clay)' }}>
+                  <li>• Make sure your document is valid and not expired</li>
+                  <li>• Take a clear, well-lit photo</li>
+                  <li>• Ensure all text is readable</li>
+                  <li>• Names must match what you entered</li>
+                </ul>
+              </div>
+
+              {!formData.identity_verified ? (
+                <div>
+                  <label className="text-sm font-normal mb-3 block" style={{ color: 'var(--clay)' }}>
+                    Upload Passport or Driving License *
+                  </label>
+                  {formData.identity_document_url && !formData.identity_verified ? (
+                    <div className="space-y-3">
+                      <img 
+                        src={formData.identity_document_url} 
+                        alt="ID Document" 
+                        className="w-full max-h-64 object-contain rounded-xl border-2"
+                        style={{ borderColor: 'var(--sand)' }}
+                      />
+                      {verifyingIdentity && (
+                        <div className="flex items-center gap-2 p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+                          <span className="text-sm" style={{ color: 'var(--clay)' }}>Verifying your identity...</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <label>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleIdentityUpload} 
+                        className="hidden" 
+                        disabled={uploadingIdentity || verifyingIdentity}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="rounded-xl w-full h-32 border-2 border-dashed"
+                        style={{ borderColor: 'var(--sand)' }}
+                        disabled={uploadingIdentity || verifyingIdentity}
+                        onClick={(e) => e.currentTarget.previousElementSibling.click()}
+                      >
+                        <div className="text-center">
+                          <Upload className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--clay)' }} />
+                          <span className="text-sm" style={{ color: 'var(--clay)' }}>
+                            {uploadingIdentity ? 'Uploading...' : 'Click to upload ID document'}
+                          </span>
+                        </div>
+                      </Button>
+                    </label>
+                  )}
+                </div>
+              ) : (
+                <div className="p-6 rounded-xl flex items-center gap-3" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>
+                  <CheckCircle2 className="w-8 h-8" />
+                  <div>
+                    <h3 className="font-normal text-lg mb-1">Identity Verified</h3>
+                    <p className="text-sm opacity-90">
+                      Your identity has been successfully verified
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 3: Role & Visa */}
+          {step === 3 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
@@ -395,8 +562,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 3: Basic Info */}
-          {step === 3 && (
+          {/* Step 4: Basic Info */}
+          {step === 4 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Basic Information
@@ -473,8 +640,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 4: Skills */}
-          {step === 4 && (
+          {/* Step 5: Skills */}
+          {step === 5 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Skills
@@ -541,8 +708,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 5: Availability */}
-          {step === 5 && (
+          {/* Step 6: Availability */}
+          {step === 6 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Availability
@@ -607,8 +774,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 6: Desired Rates */}
-          {step === 6 && (
+          {/* Step 7: Desired Rates */}
+          {step === 7 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Desired Hourly Rate
@@ -660,8 +827,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 7: About & CV */}
-          {step === 7 && (
+          {/* Step 8: About & CV */}
+          {step === 8 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Tell Us About Yourself
