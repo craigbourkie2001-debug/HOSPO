@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, DollarSign, Trash2, Users, Coffee, ChefHat, Star, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import PayShiftModal from "./PayShiftModal";
+import ShiftChatButton from "../messaging/ShiftChatButton";
 
 export default function EmployerShiftCard({ shift, onDelete, onViewApplications, onLeaveReview }) {
   const [showPayment, setShowPayment] = useState(false);
@@ -142,13 +143,21 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
           )}
 
           {shift.assigned_to && (
-            <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: 'var(--sand)' }}>
-              <Users className="w-4 h-4" style={{ color: 'var(--clay)' }} />
-              <div>
-                <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>ASSIGNED TO</div>
-                <div className="font-normal" style={{ color: 'var(--earth)' }}>{shift.assigned_to}</div>
+            <>
+              <div className="flex items-center gap-2 p-3 rounded-lg" style={{ backgroundColor: 'var(--sand)' }}>
+                <Users className="w-4 h-4" style={{ color: 'var(--clay)' }} />
+                <div>
+                  <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>ASSIGNED TO</div>
+                  <div className="font-normal" style={{ color: 'var(--earth)' }}>{shift.assigned_to}</div>
+                </div>
               </div>
-            </div>
+              <ShiftChatButton 
+                shift={shift} 
+                size="sm" 
+                variant="outline"
+                className="w-full"
+              />
+            </>
           )}
 
           {shift.description && (

@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat } from "lucide-react";
 import { format } from "date-fns";
+import ShiftChatButton from "../messaging/ShiftChatButton";
 
 export default function MyShiftCard({ shift }) {
   const isCompleted = shift.status === 'completed';
@@ -87,6 +88,17 @@ export default function MyShiftCard({ shift }) {
         {shift.assigned_at && (
           <div className="mt-3 text-xs text-center font-light" style={{ color: 'var(--clay)' }}>
             Confirmed on {format(new Date(shift.assigned_at), 'MMM d, yyyy')}
+          </div>
+        )}
+
+        {shift.status === 'filled' && shift.assigned_to && (
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--cream)' }}>
+            <ShiftChatButton 
+              shift={shift} 
+              size="sm" 
+              variant="outline"
+              className="w-full"
+            />
           </div>
         )}
       </CardContent>
