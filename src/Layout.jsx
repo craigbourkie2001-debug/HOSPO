@@ -38,6 +38,11 @@ const workerNavItems = [
     icon: Briefcase,
   },
   {
+    title: "Messages",
+    url: createPageUrl("Messages"),
+    icon: MessageCircle,
+  },
+  {
     title: "Coffee Shops",
     url: createPageUrl("CoffeeShops"),
     icon: Coffee,
@@ -112,7 +117,7 @@ export default function Layout({ children }) {
   const mobileNavItems = [
     { title: "Shifts", url: createPageUrl("BrowseShifts"), icon: Briefcase },
     { title: "My Shifts", url: createPageUrl("MyShifts"), icon: Clock },
-    { title: "Dashboard", url: createPageUrl("EmployerDashboard"), icon: LayoutDashboard },
+    { title: "Messages", url: createPageUrl("Messages"), icon: MessageCircle },
     { title: "Profile", url: createPageUrl("Profile"), icon: User },
   ];
 
