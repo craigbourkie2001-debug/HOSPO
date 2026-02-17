@@ -50,7 +50,10 @@
 import BrowseShifts from './pages/BrowseShifts';
 import CoffeeShops from './pages/CoffeeShops';
 import EmployerDashboard from './pages/EmployerDashboard';
+import EmployerLogin from './pages/EmployerLogin';
+import EmployerPremium from './pages/EmployerPremium';
 import EmployerSettings from './pages/EmployerSettings';
+import EmployerSignup from './pages/EmployerSignup';
 import Events from './pages/Events';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
@@ -63,9 +66,6 @@ import RoasterDetails from './pages/RoasterDetails';
 import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
 import SupportChat from './pages/SupportChat';
-import EmployerLogin from './pages/EmployerLogin';
-import EmployerPremium from './pages/EmployerPremium';
-import EmployerSignup from './pages/EmployerSignup';
 import __Layout from './Layout.jsx';
 
 
@@ -73,7 +73,10 @@ export const PAGES = {
     "BrowseShifts": BrowseShifts,
     "CoffeeShops": CoffeeShops,
     "EmployerDashboard": EmployerDashboard,
+    "EmployerLogin": EmployerLogin,
+    "EmployerPremium": EmployerPremium,
     "EmployerSettings": EmployerSettings,
+    "EmployerSignup": EmployerSignup,
     "Events": Events,
     "Home": Home,
     "Jobs": Jobs,
@@ -86,9 +89,6 @@ export const PAGES = {
     "Roasters": Roasters,
     "ShopDetails": ShopDetails,
     "SupportChat": SupportChat,
-    "EmployerLogin": EmployerLogin,
-    "EmployerPremium": EmployerPremium,
-    "EmployerSignup": EmployerSignup,
 }
 
 export const pagesConfig = {

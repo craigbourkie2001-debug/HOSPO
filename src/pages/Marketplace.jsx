@@ -1,21 +1,28 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search, ShoppingBag, Coffee, Wrench, Shirt, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import ProductCard from "../components/marketplace/ProductCard";
+import PullToRefresh from "../components/mobile/PullToRefresh";
+import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function Marketplace() {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("all");
+  const queryClient = useQueryClient();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['products'],
     queryFn: () => base44.entities.Product.filter({ is_available: true }, '-created_date'),
     initialData: [],
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['products'] });
+  };
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,9 +39,11 @@ export default function Marketplace() {
   };
 
   return (
-    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <MobileHeader title="Marketplace" icon={ShoppingBag} />
+      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-12">
           <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
             Marketplace
           </h1>
@@ -155,8 +164,9 @@ export default function Marketplace() {
               </motion.div>
             ))}
           </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 }

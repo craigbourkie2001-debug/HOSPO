@@ -23,9 +23,11 @@ export default function CoffeeShops() {
   );
 
   return (
-    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-12">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <MobileHeader title="Coffee Shops" icon={Coffee} />
+      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-12">
           <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
             Coffee Shops
           </h1>
@@ -120,8 +122,9 @@ export default function CoffeeShops() {
               </motion.div>
             ))}
           </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 }

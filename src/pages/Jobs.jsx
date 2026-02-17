@@ -1,23 +1,30 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Briefcase, Coffee, ChefHat, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import JobCard from "../components/jobs/JobCard";
 import ApplyJobModal from "../components/jobs/ApplyJobModal";
+import PullToRefresh from "../components/mobile/PullToRefresh";
+import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [employmentFilter, setEmploymentFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState(null);
+  const queryClient = useQueryClient();
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ['jobs'],
     queryFn: () => base44.entities.Job.filter({ status: 'open' }, '-created_date'),
     initialData: [],
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['jobs'] });
+  };
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.job_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,10 +39,12 @@ export default function Jobs() {
   const partTimeCount = jobs.filter(j => j.employment_type === 'part_time').length;
 
   return (
-    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
+    <PullToRefresh onRefresh={handleRefresh}>
+      <MobileHeader title="Jobs" icon={Briefcase} />
+      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-12">
           <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
             Contracted Jobs
           </h1>
@@ -182,10 +191,11 @@ export default function Jobs() {
           </div>
         )}
 
-        {selectedJob && (
-          <ApplyJobModal job={selectedJob} onClose={() => setSelectedJob(null)} />
-        )}
+          {selectedJob && (
+            <ApplyJobModal job={selectedJob} onClose={() => setSelectedJob(null)} />
+          )}
+        </div>
       </div>
-    </div>
+    </PullToRefresh>
   );
 }

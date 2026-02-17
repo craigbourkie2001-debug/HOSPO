@@ -220,6 +220,16 @@ export default function Layout({ children }) {
         input, select, textarea, button {
           min-height: 44px;
         }
+
+        .mobile-page-header {
+          padding-top: calc(env(safe-area-inset-top) + 4rem);
+        }
+
+        @media (min-width: 768px) {
+          .mobile-page-header {
+            padding-top: 3rem;
+          }
+        }
       `}</style>
       
       <div className="min-h-screen flex w-full" style={{ backgroundColor: 'var(--cream)' }}>
