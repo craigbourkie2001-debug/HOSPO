@@ -95,10 +95,15 @@ const generalNavItems = [
   },
 ];
 
-export default function Layout({ children }) {
+export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const [user, setUser] = React.useState(null);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
+
+  // Don't show layout on Welcome page
+  if (currentPageName === 'Welcome') {
+    return children;
+  }
 
   React.useEffect(() => {
     base44.auth.me().then(userData => {
@@ -111,7 +116,12 @@ export default function Layout({ children }) {
                  (!userData.location || !userData.phone || !userData.visa_status)) {
         setShowOnboarding('worker');
       }
-    }).catch(() => {});
+    }).catch(() => {
+      // Not authenticated - redirect to welcome page
+      if (!window.location.pathname.includes('/welcome')) {
+        window.location.href = createPageUrl('Welcome');
+      }
+    });
   }, []);
 
   const mobileNavItems = [
