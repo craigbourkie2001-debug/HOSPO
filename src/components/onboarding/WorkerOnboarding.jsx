@@ -36,6 +36,10 @@ const visaHoursLimits = {
 export default function WorkerOnboarding({ user, onComplete }) {
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
+    legal_first_name: '',
+    legal_last_name: '',
+    pps_number: '',
+    referred_by_code: '',
     worker_type: 'barista',
     visa_status: '',
     location: '',
@@ -56,7 +60,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const [uploadingCV, setUploadingCV] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
 
-  const totalSteps = 7;
+  const totalSteps = 8;
 
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
@@ -113,11 +117,39 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const completeMutation = useMutation({
     mutationFn: async () => {
       const weeklyLimit = visaHoursLimits[formData.visa_status];
-      await base44.auth.updateMe({
+      
+      // Generate unique referral code
+      const referralCode = `HOSPO${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      
+      const updateData = {
         ...formData,
         weekly_hours_limit: weeklyLimit,
+        referral_code: referralCode,
         onboarding_completed: true
-      });
+      };
+      
+      await base44.auth.updateMe(updateData);
+      
+      // If user used a referral code, create referral record
+      if (formData.referred_by_code) {
+        try {
+          // Find the referrer
+          const referrers = await base44.entities.User.filter({ referral_code: formData.referred_by_code });
+          if (referrers.length > 0) {
+            const referrer = referrers[0];
+            await base44.entities.Referral.create({
+              referrer_email: referrer.email,
+              referrer_name: referrer.full_name,
+              referred_email: user.email,
+              referred_name: user.full_name,
+              referral_code: formData.referred_by_code,
+              status: 'onboarded'
+            });
+          }
+        } catch (error) {
+          console.error('Failed to create referral record:', error);
+        }
+      }
     },
     onSuccess: () => {
       toast.success('Profile setup complete!');
@@ -156,18 +188,19 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const canProceed = () => {
     switch (step) {
       case 0: return true;
-      case 1: return formData.worker_type && formData.visa_status;
-      case 2: return formData.location && formData.phone && formData.experience_years >= 0;
-      case 3: 
+      case 1: return formData.legal_first_name && formData.legal_last_name && formData.pps_number;
+      case 2: return formData.worker_type && formData.visa_status;
+      case 3: return formData.location && formData.phone && formData.experience_years >= 0;
+      case 4: 
         if (formData.worker_type === 'both') {
           return formData.barista_skills.length > 0 && formData.chef_skills.length > 0;
         }
         return formData.worker_type === 'chef' 
           ? formData.chef_skills.length > 0 
           : formData.barista_skills.length > 0;
-      case 4: return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
-      case 5: return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
-      case 6: return formData.bio;
+      case 5: return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
+      case 6: return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
+      case 7: return formData.bio;
       default: return true;
     }
   };
@@ -270,8 +303,82 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 1: Role & Visa */}
+          {/* Step 1: Legal Identity & PPS */}
           {step === 1 && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Legal Information
+              </h2>
+              <p className="text-sm mb-4" style={{ color: 'var(--clay)' }}>
+                We need your legal name and PPS number to verify work authorization
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>
+                    Legal First Name *
+                  </label>
+                  <Input
+                    value={formData.legal_first_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, legal_first_name: e.target.value }))}
+                    placeholder="As appears on ID"
+                    className="rounded-xl border h-12"
+                    style={{ borderColor: 'var(--sand)' }}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>
+                    Legal Last Name *
+                  </label>
+                  <Input
+                    value={formData.legal_last_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, legal_last_name: e.target.value }))}
+                    placeholder="As appears on ID"
+                    className="rounded-xl border h-12"
+                    style={{ borderColor: 'var(--sand)' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm font-normal mb-2 block flex items-center gap-2" style={{ color: 'var(--clay)' }}>
+                  <Shield className="w-4 h-4" />
+                  PPS Number *
+                </label>
+                <Input
+                  value={formData.pps_number}
+                  onChange={(e) => setFormData(prev => ({ ...prev, pps_number: e.target.value.toUpperCase() }))}
+                  placeholder="1234567XX"
+                  className="rounded-xl border h-12"
+                  style={{ borderColor: 'var(--sand)' }}
+                  maxLength={9}
+                />
+                <p className="text-xs mt-2" style={{ color: 'var(--clay)' }}>
+                  Your PPS number is required to confirm work authorization in Ireland
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>
+                  Referral Code (Optional)
+                </label>
+                <Input
+                  value={formData.referred_by_code}
+                  onChange={(e) => setFormData(prev => ({ ...prev, referred_by_code: e.target.value.toUpperCase() }))}
+                  placeholder="HOSPOXXXXXX"
+                  className="rounded-xl border h-12"
+                  style={{ borderColor: 'var(--sand)' }}
+                />
+                <p className="text-xs mt-2" style={{ color: 'var(--clay)' }}>
+                  If a friend referred you, enter their code here
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Role & Visa */}
+          {step === 2 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
@@ -328,8 +435,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 2: Basic Info */}
-          {step === 2 && (
+          {/* Step 3: Basic Info */}
+          {step === 3 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Basic Information
@@ -406,8 +513,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 3: Skills */}
-          {step === 3 && (
+          {/* Step 4: Skills */}
+          {step === 4 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Skills
@@ -474,8 +581,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 4: Availability */}
-          {step === 4 && (
+          {/* Step 5: Availability */}
+          {step === 5 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Availability
@@ -540,8 +647,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 5: Desired Rates */}
-          {step === 5 && (
+          {/* Step 6: Desired Rates */}
+          {step === 6 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Desired Hourly Rate
@@ -593,8 +700,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 6: About & CV */}
-          {step === 6 && (
+          {/* Step 7: About & CV */}
+          {step === 7 && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Tell Us About Yourself
