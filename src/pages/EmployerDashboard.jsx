@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, Plus, Users, Clock, TrendingUp, Calendar, Coffee, ChefHat, Store, BarChart3 } from "lucide-react";
+import { Briefcase, Plus, Users, Clock, TrendingUp, Calendar, Coffee, ChefHat, Store, BarChart3, LayoutDashboard } from "lucide-react";
 import { motion } from "framer-motion";
 import ShiftFormModal from "../components/employer/ShiftFormModal";
 import EmployerShiftCard from "../components/employer/EmployerShiftCard";
@@ -14,6 +14,7 @@ import RecommendedCandidates from "../components/matching/RecommendedCandidates"
 import LeaveReviewModal from "../components/employer/LeaveReviewModal";
 import AnalyticsDashboard from "../components/employer/AnalyticsDashboard";
 import JobManagement from "../components/employer/JobManagement";
+import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function EmployerDashboard() {
   const [user, setUser] = useState(null);
@@ -124,8 +125,10 @@ export default function EmployerDashboard() {
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
-      <div className="max-w-7xl mx-auto">
+    <>
+      <MobileHeader title="Employer Dashboard" icon={LayoutDashboard} />
+      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+        <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -340,7 +343,8 @@ export default function EmployerDashboard() {
           shift={reviewShift}
           onClose={() => setReviewShift(null)}
         />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -1,20 +1,27 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Search, ChefHat, MapPin, Star, Phone, Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import PullToRefresh from "../components/mobile/PullToRefresh";
+import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function Restaurants() {
   const [searchQuery, setSearchQuery] = useState("");
+  const queryClient = useQueryClient();
 
   const { data: restaurants, isLoading } = useQuery({
     queryKey: ['restaurants'],
     queryFn: () => base44.entities.Restaurant.list('-average_rating'),
     initialData: [],
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['restaurants'] });
+  };
 
   const filteredRestaurants = restaurants.filter(restaurant =>
     restaurant.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||

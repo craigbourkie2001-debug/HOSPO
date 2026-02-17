@@ -278,7 +278,8 @@ export default function MyShifts() {
             )}
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

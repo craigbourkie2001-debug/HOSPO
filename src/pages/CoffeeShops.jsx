@@ -1,21 +1,28 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
-import { Search, Store, Star } from "lucide-react";
+import { Search, Store, Star, Coffee } from "lucide-react";
 import { motion } from "framer-motion";
 import CoffeeShopCard from "../components/shops/CoffeeShopCard";
 import { useNavigate } from "react-router-dom";
+import PullToRefresh from "../components/mobile/PullToRefresh";
+import MobileHeader from "../components/mobile/MobileHeader";
 
 export default function CoffeeShops() {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: shops, isLoading } = useQuery({
     queryKey: ['coffeeShops'],
     queryFn: () => base44.entities.CoffeeShop.list('-average_rating'),
     initialData: [],
   });
+
+  const handleRefresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ['coffeeShops'] });
+  };
 
   const filteredShops = shops.filter(shop =>
     shop.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
