@@ -58,6 +58,7 @@ import Events from './pages/Events';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
 import Marketplace from './pages/Marketplace';
+import Messages from './pages/Messages';
 import MyShifts from './pages/MyShifts';
 import Premium from './pages/Premium';
 import Profile from './pages/Profile';
@@ -66,7 +67,6 @@ import RoasterDetails from './pages/RoasterDetails';
 import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
 import SupportChat from './pages/SupportChat';
-import Messages from './pages/Messages';
 import __Layout from './Layout.jsx';
 
 
@@ -82,6 +82,7 @@ export const PAGES = {
     "Home": Home,
     "Jobs": Jobs,
     "Marketplace": Marketplace,
+    "Messages": Messages,
     "MyShifts": MyShifts,
     "Premium": Premium,
     "Profile": Profile,
@@ -90,7 +91,6 @@ export const PAGES = {
     "Roasters": Roasters,
     "ShopDetails": ShopDetails,
     "SupportChat": SupportChat,
-    "Messages": Messages,
 }
 
 export const pagesConfig = {
