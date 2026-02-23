@@ -16,6 +16,7 @@ export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [employmentFilter, setEmploymentFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState(null);
+  const [showWizard, setShowWizard] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: jobs, isLoading } = useQuery({
