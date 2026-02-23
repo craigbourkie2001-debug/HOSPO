@@ -1349,6 +1349,37 @@ export default function Profile() {
         )}
       </div>
 
+      {/* Logout and Delete Account Section */}
+        <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button
+              onClick={() => {
+                base44.auth.logout();
+                window.location.href = createPageUrl('Welcome');
+              }}
+              variant="outline"
+              className="w-full rounded-xl font-normal"
+              style={{ borderColor: 'var(--sand)', color: 'var(--clay)' }}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Log Out
+            </Button>
+            <Button
+              onClick={() => setShowDeleteDialog(true)}
+              variant="destructive"
+              className="w-full rounded-xl font-normal"
+            >
+              Delete Account
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Delete Account Confirmation Dialog */}
       {showDeleteDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -1377,6 +1408,7 @@ export default function Profile() {
                   try {
                     await base44.auth.updateMe({ is_deleted: true });
                     await base44.auth.logout();
+                    window.location.href = createPageUrl('Welcome');
                   } catch (error) {
                     toast.error('Failed to delete account');
                   }
