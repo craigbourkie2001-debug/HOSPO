@@ -14,11 +14,21 @@ Deno.serve(async (req) => {
     
     const shiftData = shift[0];
     
-    // Get employer email from shift's created_by
-    const employerEmail = shiftData.created_by;
+    // Get employer email from venue
+    let employerEmail = shiftData.created_by;
+    
+    if (!employerEmail && data.venue_type) {
+      // Try to get from venue
+      const venueEntity = data.venue_type === 'coffee_shop' ? 'CoffeeShop' : 'Restaurant';
+      const venue = await base44.asServiceRole.entities[venueEntity].filter({ id: data.venue_id });
+      
+      if (venue && venue.length > 0) {
+        employerEmail = venue[0].contact_email;
+      }
+    }
     
     if (!employerEmail) {
-      console.error('No employer email found for shift');
+      console.error('No employer email found for shift or venue');
       return Response.json({ error: 'Employer email not found' }, { status: 400 });
     }
 
