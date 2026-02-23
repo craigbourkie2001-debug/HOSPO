@@ -207,6 +207,13 @@ export default function Jobs() {
           {selectedJob && (
             <ApplyJobModal job={selectedJob} onClose={() => setSelectedJob(null)} />
           )}
+
+          {showWizard && (
+            <JobPostingWizard
+              onClose={() => setShowWizard(false)}
+              onSuccess={() => handleRefresh()}
+            />
+          )}
         </div>
       </div>
     </PullToRefresh>
