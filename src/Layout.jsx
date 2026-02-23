@@ -7,6 +7,7 @@ import NotificationBell from "./components/NotificationBell";
 import HospoLogo from "./components/HospoLogo";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
 import EmployerOnboarding from "./components/onboarding/EmployerOnboarding";
+import RoleSelection from "./components/onboarding/RoleSelection";
 import { base44 } from "@/api/base44Client";
 import {
   Sidebar,
