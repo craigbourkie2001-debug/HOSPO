@@ -3,12 +3,14 @@ import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Briefcase, Coffee, ChefHat, Clock } from "lucide-react";
+import { Search, Briefcase, Coffee, ChefHat, Clock, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import JobCard from "../components/jobs/JobCard";
 import ApplyJobModal from "../components/jobs/ApplyJobModal";
+import JobPostingWizard from "../components/jobs/JobPostingWizard";
 import PullToRefresh from "../components/mobile/PullToRefresh";
 import MobileHeader from "../components/mobile/MobileHeader";
+import { Button } from "@/components/ui/button";
 
 export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState("");
