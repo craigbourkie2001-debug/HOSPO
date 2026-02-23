@@ -76,7 +76,7 @@ export default function Profile() {
 
   const { data: workerReviews, isLoading: reviewsLoading } = useQuery({
     queryKey: ['workerReviews', user?.email],
-    queryFn: () => base44.entities.WorkerReview.filter({ worker_email: user?.email }),
+    queryFn: () => user?.email ? base44.entities.WorkerReview.filter({ worker_email: user?.email }) : Promise.resolve([]),
     initialData: [],
     enabled: !!user?.email
   });
