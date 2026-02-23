@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown, Settings } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
+import HospoLogo from "./components/HospoLogo";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
 import EmployerOnboarding from "./components/onboarding/EmployerOnboarding";
 import { base44 } from "@/api/base44Client";
@@ -250,15 +251,7 @@ export default function Layout({ children }) {
         <Sidebar className="border-r" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <SidebarHeader className="border-b p-8" style={{ borderColor: 'var(--sand)' }}>
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--terracotta)' }}>
-                  <Briefcase className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h2 className="font-light text-2xl tracking-wide" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Hospo</h2>
-                  <p className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>HOSPITALITY IRELAND</p>
-                </div>
-              </div>
+              <HospoLogo size="md" />
               <NotificationBell />
             </div>
           </SidebarHeader>
@@ -424,12 +417,7 @@ export default function Layout({ children }) {
             <div className="flex items-center gap-4 justify-between">
               <div className="flex items-center gap-4">
                 <SidebarTrigger className="p-2 rounded-lg transition-all duration-200" />
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--terracotta)' }}>
-                    <Briefcase className="w-4 h-4 text-white" />
-                  </div>
-                  <h1 className="text-xl font-light tracking-wide" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Hospo</h1>
-                </div>
+                <HospoLogo size="sm" />
               </div>
               <NotificationBell />
             </div>
