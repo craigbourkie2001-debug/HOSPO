@@ -103,14 +103,14 @@ export default function Layout({ children }) {
     base44.auth.me().then(userData => {
       setUser(userData);
       
-      // Show onboarding based on account_type and onboarding_completed flag
-      const isEmployer = userData.account_type === 'employer';
-      const isWorker = userData.account_type === 'worker' || !userData.account_type;
-      
-      if (!userData.onboarding_completed) {
-        if (isEmployer) {
+      // If account_type not set, show role selection first
+      if (!userData.account_type) {
+        setShowOnboarding('role-selection');
+      } else if (!userData.onboarding_completed) {
+        // Show onboarding for their specific role
+        if (userData.account_type === 'employer') {
           setShowOnboarding('employer');
-        } else if (isWorker) {
+        } else if (userData.account_type === 'worker') {
           setShowOnboarding('worker');
         }
       }
