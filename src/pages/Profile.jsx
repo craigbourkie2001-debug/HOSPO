@@ -7,9 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat, Sparkles, FileText, Camera, Trash2, Plus, AlertTriangle } from "lucide-react";
+import { User, Star, Briefcase, Award, MapPin, X, Upload, Shield, Clock, Coffee, ChefHat, Sparkles, FileText, Camera, Trash2, Plus, AlertTriangle, LogOut } from "lucide-react";
 import { toast } from "sonner";
 import MobileHeader from "../components/mobile/MobileHeader";
+import { createPageUrl } from "@/utils";
 
 const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
