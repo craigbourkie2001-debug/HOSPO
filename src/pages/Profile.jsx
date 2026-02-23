@@ -1348,9 +1348,7 @@ export default function Profile() {
             </CardContent>
           </Card>
         )}
-      </div>
-
-      {/* Logout and Delete Account Section */}
+        {/* Logout and Delete Account Section */}
         <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
             <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
