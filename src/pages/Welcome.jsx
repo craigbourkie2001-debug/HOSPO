@@ -7,21 +7,23 @@ import HospoLogo from "../components/HospoLogo";
 
 export default function Welcome() {
   React.useEffect(() => {
-    base44.auth.isAuthenticated().then(isAuth => {
-      if (isAuth) {
+    base44.auth.me().then(user => {
+      if (user && user.onboarding_completed) {
         window.location.href = createPageUrl('BrowseShifts');
       }
+    }).catch(() => {
+      // Not authenticated, stay on welcome page
     });
   }, []);
 
   const handleSignIn = async () => {
-    // Check if already authenticated and redirect
-    const isAuth = await base44.auth.isAuthenticated();
-    if (isAuth) {
+    // Check if already authenticated
+    const user = await base44.auth.me().catch(() => null);
+    if (user && user.onboarding_completed) {
       window.location.href = createPageUrl('BrowseShifts');
     } else {
-      // Redirect to login with return URL
-      const returnUrl = window.location.origin + createPageUrl('BrowseShifts');
+      // Redirect to login, return to welcome page for onboarding
+      const returnUrl = window.location.origin + createPageUrl('Welcome');
       base44.auth.redirectToLogin(returnUrl);
     }
   };
