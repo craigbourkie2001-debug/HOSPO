@@ -1,8 +1,9 @@
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Briefcase, ArrowRight, Coffee, ChefHat, Clock } from "lucide-react";
+import { ArrowRight, Coffee, ChefHat, Clock } from "lucide-react";
 import { createPageUrl } from "@/utils";
+import HospoLogo from "../components/HospoLogo";
 
 export default function Welcome() {
   React.useEffect(() => {
@@ -32,15 +33,14 @@ export default function Welcome() {
     }}>
       <div className="max-w-2xl w-full text-center">
         {/* Logo */}
-        <div className="w-24 h-24 rounded-full mx-auto mb-8 flex items-center justify-center" 
-             style={{ backgroundColor: '#C89F8C' }}>
-          <Briefcase className="w-12 h-12 text-white" strokeWidth={1.5} />
+        <div className="mb-8 flex justify-center">
+          <HospoLogo size="lg" />
         </div>
 
         {/* Main Heading */}
         <h1 className="text-5xl md:text-6xl font-light mb-4 tracking-tight" 
             style={{ fontFamily: 'Crimson Pro, serif', color: '#705D56' }}>
-          Welcome to Hospo
+          Welcome
         </h1>
         
         <p className="text-lg md:text-xl font-light mb-12" style={{ color: '#A67C6D' }}>
@@ -79,7 +79,7 @@ export default function Welcome() {
         </Button>
 
         {/* Footer Info */}
-        <div className="mt-12 pt-8 border-t" style={{ borderColor: '#E8E3DC' }}>
+        <div className="mt-12 pt-8 border-t flex items-center justify-center gap-2" style={{ borderColor: '#E8E3DC' }}>
           <p className="text-sm font-light" style={{ color: '#A67C6D' }}>
             Connect with top venues across Ireland
           </p>
