@@ -455,6 +455,23 @@ export default function Layout({ children }) {
         </div>
 
         {/* Onboarding Modals */}
+        {showOnboarding === 'role-selection' && user && (
+          <RoleSelection
+            user={user}
+            onComplete={() => {
+              setShowOnboarding(false);
+              base44.auth.me().then(userData => {
+                setUser(userData);
+                // Trigger onboarding for the selected role
+                if (userData.account_type === 'employer') {
+                  setShowOnboarding('employer');
+                } else if (userData.account_type === 'worker') {
+                  setShowOnboarding('worker');
+                }
+              }).catch(() => {});
+            }}
+          />
+        )}
         {showOnboarding === 'worker' && user && (
           <WorkerOnboarding 
             user={user} 
