@@ -44,16 +44,6 @@ const workerNavItems = [
     icon: MessageCircle,
   },
   {
-    title: "Coffee Shops",
-    url: createPageUrl("CoffeeShops"),
-    icon: Coffee,
-  },
-  {
-    title: "Restaurants",
-    url: createPageUrl("Restaurants"),
-    icon: ChefHat,
-  },
-  {
     title: "My Profile",
     url: createPageUrl("Profile"),
     icon: User,
