@@ -18,11 +18,8 @@ export default function Welcome() {
         } else if (user.onboarding_completed) {
           const isEmployer = user.account_type === 'employer' || user.role === 'employer';
           window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
-        } else {
-          // Incomplete, but no intent. Proceed to app to trigger onboarding modal
-          const isEmployer = user.account_type === 'employer' || user.role === 'employer';
-          window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
         }
+        // If incomplete and no intent, STAY on Welcome page to let them choose
       }
     }).catch(() => {
       // Not authenticated, stay on welcome page
@@ -31,10 +28,20 @@ export default function Welcome() {
 
   const handleSignIn = async (type) => {
     const user = await base44.auth.me().catch(() => null);
-    if (user && user.onboarding_completed) {
-      const isEmployer = user.account_type === 'employer' || user.role === 'employer';
-      window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
+    
+    if (user) {
+      // User is already logged in
+      if (user.onboarding_completed) {
+        // Already onboarded, redirect to dashboard
+        const isEmployer = user.account_type === 'employer' || user.role === 'employer';
+        window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
+      } else {
+        // Logged in but not onboarded - update intent and go to onboarding
+        await base44.auth.updateMe({ account_type: type });
+        window.location.href = createPageUrl(type === 'employer' ? 'EmployerDashboard' : 'BrowseShifts');
+      }
     } else {
+      // Not logged in - redirect to login
       const returnUrl = window.location.origin + createPageUrl('Welcome') + `?intent=${type}`;
       base44.auth.redirectToLogin(returnUrl);
     }
