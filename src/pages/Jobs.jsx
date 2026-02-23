@@ -47,14 +47,24 @@ export default function Jobs() {
       <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-            Contracted Jobs
-          </h1>
-          <p className="text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
-            Full-time and part-time positions across Irish hospitality
-          </p>
-        </div>
+          <div className="mb-12 flex items-start justify-between">
+            <div>
+              <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Contracted Jobs
+              </h1>
+              <p className="text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
+                Full-time and part-time positions across Irish hospitality
+              </p>
+            </div>
+            <Button
+              onClick={() => setShowWizard(true)}
+              className="hidden md:flex rounded-xl px-6 h-auto py-3 gap-2"
+              style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+            >
+              <Plus className="w-5 h-5" strokeWidth={1.5} />
+              Post a Job
+            </Button>
+          </div>
 
         {/* Employment Type Tabs */}
         <Tabs value={employmentFilter} onValueChange={setEmploymentFilter} className="mb-6">
