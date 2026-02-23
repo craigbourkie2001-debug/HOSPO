@@ -112,10 +112,13 @@ export default function Layout({ children }) {
     base44.auth.me().then(userData => {
       setUser(userData);
       
-      // Show onboarding based on role and check if venue is set up
-      if (userData.role === 'employer' && (!userData.onboarding_completed || (!userData.coffee_shop_id && !userData.restaurant_id))) {
+      // Show onboarding based on account_type/role and check if venue is set up
+      const isEmployer = userData.account_type === 'employer' || userData.role === 'employer';
+      const isWorker = userData.account_type === 'worker' || (!userData.account_type && userData.role !== 'employer');
+      
+      if (isEmployer && (!userData.onboarding_completed || (!userData.coffee_shop_id && !userData.restaurant_id))) {
         setShowOnboarding('employer');
-      } else if (userData.role === 'user' && !userData.onboarding_completed && 
+      } else if (isWorker && !userData.onboarding_completed && 
                  (!userData.location || !userData.phone || !userData.visa_status)) {
         setShowOnboarding('worker');
       }
@@ -258,6 +261,7 @@ export default function Layout({ children }) {
           
           <SidebarContent className="p-4">
             {/* Worker Section */}
+            {(!user || user.account_type === 'worker' || (!user.account_type && user.role !== 'employer')) && (
             <SidebarGroup>
               <div className="px-4 py-2 text-xs tracking-widest font-normal" style={{ color: 'var(--clay)' }}>
                 FOR WORKERS
@@ -292,8 +296,10 @@ export default function Layout({ children }) {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+            )}
 
             {/* Employer Section */}
+            {(!user || user.account_type === 'employer' || user.role === 'employer') && (
             <SidebarGroup className="mt-4">
               <div className="px-4 py-2 text-xs tracking-widest font-normal" style={{ color: 'var(--clay)' }}>
                 FOR EMPLOYERS
@@ -328,6 +334,7 @@ export default function Layout({ children }) {
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>
+            )}
 
             {/* General Section */}
             <SidebarGroup className="mt-4">

@@ -1,29 +1,41 @@
 import React from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Coffee, ChefHat, Clock } from "lucide-react";
+import { ArrowRight, Coffee, ChefHat, Clock, Store } from "lucide-react";
 import { createPageUrl } from "@/utils";
 import HospoLogo from "../components/HospoLogo";
 
 export default function Welcome() {
   React.useEffect(() => {
-    base44.auth.me().then(user => {
-      if (user && user.onboarding_completed) {
-        window.location.href = createPageUrl('BrowseShifts');
+    const urlParams = new URLSearchParams(window.location.search);
+    const intent = urlParams.get('intent');
+
+    base44.auth.me().then(async user => {
+      if (user) {
+        if (!user.onboarding_completed && intent) {
+          await base44.auth.updateMe({ account_type: intent });
+          window.location.href = createPageUrl(intent === 'employer' ? 'EmployerDashboard' : 'BrowseShifts');
+        } else if (user.onboarding_completed) {
+          const isEmployer = user.account_type === 'employer' || user.role === 'employer';
+          window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
+        } else {
+          // Incomplete, but no intent. Proceed to app to trigger onboarding modal
+          const isEmployer = user.account_type === 'employer' || user.role === 'employer';
+          window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
+        }
       }
     }).catch(() => {
       // Not authenticated, stay on welcome page
     });
   }, []);
 
-  const handleSignIn = async () => {
-    // Check if already authenticated
+  const handleSignIn = async (type) => {
     const user = await base44.auth.me().catch(() => null);
     if (user && user.onboarding_completed) {
-      window.location.href = createPageUrl('BrowseShifts');
+      const isEmployer = user.account_type === 'employer' || user.role === 'employer';
+      window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
     } else {
-      // Redirect to login, return to welcome page for onboarding
-      const returnUrl = window.location.origin + createPageUrl('Welcome');
+      const returnUrl = window.location.origin + createPageUrl('Welcome') + `?intent=${type}`;
       base44.auth.redirectToLogin(returnUrl);
     }
   };
@@ -49,36 +61,38 @@ export default function Welcome() {
           Ireland's hospitality staffing platform
         </p>
 
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <div className="p-6 rounded-2xl" style={{ backgroundColor: '#FFFCF7', border: '1px solid #E8E3DC' }}>
-            <Coffee className="w-8 h-8 mx-auto mb-3" style={{ color: '#C89F8C' }} strokeWidth={1.5} />
-            <p className="text-sm font-light" style={{ color: '#705D56' }}>Find shifts</p>
+        {/* Sign In Options */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          <div className="p-8 rounded-2xl flex flex-col items-center justify-center text-center hover-lift cursor-pointer transition-all" 
+               style={{ backgroundColor: '#FFFCF7', border: '1px solid #E8E3DC' }}
+               onClick={() => handleSignIn('worker')}>
+            <Coffee className="w-12 h-12 mb-4" style={{ color: '#C89F8C' }} strokeWidth={1.5} />
+            <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: '#705D56' }}>I'm looking for shifts</h3>
+            <p className="text-sm font-light mb-6" style={{ color: '#A67C6D' }}>Find flexible hospitality work</p>
+            <Button
+              className="rounded-xl px-8 py-6 w-full text-base font-normal tracking-wide transition-all duration-300"
+              style={{ backgroundColor: '#C89F8C', color: 'white', border: 'none', pointerEvents: 'none' }}
+            >
+              Sign In as Worker
+              <ArrowRight className="w-5 h-5 ml-2" strokeWidth={1.5} />
+            </Button>
           </div>
-          <div className="p-6 rounded-2xl" style={{ backgroundColor: '#FFFCF7', border: '1px solid #E8E3DC' }}>
-            <ChefHat className="w-8 h-8 mx-auto mb-3" style={{ color: '#C89F8C' }} strokeWidth={1.5} />
-            <p className="text-sm font-light" style={{ color: '#705D56' }}>Work flexibly</p>
-          </div>
-          <div className="p-6 rounded-2xl" style={{ backgroundColor: '#FFFCF7', border: '1px solid #E8E3DC' }}>
-            <Clock className="w-8 h-8 mx-auto mb-3" style={{ color: '#C89F8C' }} strokeWidth={1.5} />
-            <p className="text-sm font-light" style={{ color: '#705D56' }}>Get paid instantly</p>
+          
+          <div className="p-8 rounded-2xl flex flex-col items-center justify-center text-center hover-lift cursor-pointer transition-all" 
+               style={{ backgroundColor: '#FFFCF7', border: '1px solid #E8E3DC' }}
+               onClick={() => handleSignIn('employer')}>
+            <Store className="w-12 h-12 mb-4" style={{ color: '#C89F8C' }} strokeWidth={1.5} />
+            <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: '#705D56' }}>I want to hire staff</h3>
+            <p className="text-sm font-light mb-6" style={{ color: '#A67C6D' }}>Post shifts and find talent</p>
+            <Button
+              className="rounded-xl px-8 py-6 w-full text-base font-normal tracking-wide transition-all duration-300"
+              style={{ backgroundColor: '#705D56', color: 'white', border: 'none', pointerEvents: 'none' }}
+            >
+              Sign In as Employer
+              <ArrowRight className="w-5 h-5 ml-2" strokeWidth={1.5} />
+            </Button>
           </div>
         </div>
-
-        {/* Sign In Button */}
-        <Button
-          onClick={handleSignIn}
-          size="lg"
-          className="rounded-xl px-8 py-6 text-base font-normal tracking-wide transition-all duration-300"
-          style={{ 
-            backgroundColor: '#C89F8C', 
-            color: 'white',
-            border: 'none'
-          }}
-        >
-          Sign In to Get Started
-          <ArrowRight className="w-5 h-5 ml-2" strokeWidth={1.5} />
-        </Button>
 
         {/* Footer Info */}
         <div className="mt-12 pt-8 border-t flex items-center justify-center gap-2" style={{ borderColor: '#E8E3DC' }}>
