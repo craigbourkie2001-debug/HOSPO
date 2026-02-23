@@ -112,15 +112,16 @@ export default function Layout({ children }) {
     base44.auth.me().then(userData => {
       setUser(userData);
       
-      // Show onboarding based on account_type/role and check if venue is set up
-      const isEmployer = userData.account_type === 'employer' || userData.role === 'employer';
-      const isWorker = userData.account_type === 'worker' || (!userData.account_type && userData.role !== 'employer');
+      // Show onboarding based on account_type and onboarding_completed flag
+      const isEmployer = userData.account_type === 'employer';
+      const isWorker = userData.account_type === 'worker' || !userData.account_type;
       
-      if (isEmployer && (!userData.onboarding_completed || (!userData.coffee_shop_id && !userData.restaurant_id))) {
-        setShowOnboarding('employer');
-      } else if (isWorker && !userData.onboarding_completed && 
-                 (!userData.location || !userData.phone || !userData.visa_status)) {
-        setShowOnboarding('worker');
+      if (!userData.onboarding_completed) {
+        if (isEmployer) {
+          setShowOnboarding('employer');
+        } else if (isWorker) {
+          setShowOnboarding('worker');
+        }
       }
     }).catch(() => {});
   }, [location.pathname]);
