@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Coffee, ChefHat } from "lucide-react";
+import { Search, Coffee, ChefHat, Wine, Users } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShiftCard from "../components/shifts/ShiftCard";
 import ShiftFilters from "../components/shifts/ShiftFilters";
@@ -88,8 +88,13 @@ export default function BrowseShifts() {
   const hasMore = isMobile && filteredShifts.length > mobileDisplayCount;
 
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
-  const baristaCount = shifts.filter(s => s.role_type !== 'chef').length;
-  const chefCount = shifts.filter(s => s.role_type === 'chef').length;
+  const roleCounts = {
+    barista: shifts.filter(s => s.role_type === 'barista').length,
+    bartender: shifts.filter(s => s.role_type === 'bartender').length,
+    mixologist: shifts.filter(s => s.role_type === 'mixologist').length,
+    chef: shifts.filter(s => s.role_type === 'chef').length,
+    waiter: shifts.filter(s => s.role_type === 'waiter').length,
+  };
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
@@ -107,29 +112,53 @@ export default function BrowseShifts() {
 
         {/* Role Tabs */}
         <Tabs value={roleFilter} onValueChange={setRoleFilter} className="mb-6">
-          <TabsList className="grid grid-cols-3 w-full md:w-auto md:inline-grid p-1.5 rounded-2xl h-auto" style={{ backgroundColor: 'var(--sand)' }}>
+          <TabsList className="grid grid-cols-3 md:grid-cols-6 w-full p-1.5 rounded-2xl h-auto gap-1" style={{ backgroundColor: 'var(--sand)' }}>
             <TabsTrigger 
               value="all" 
-              className="rounded-xl py-3 px-6 font-normal tracking-wide data-[state=active]:bg-white transition-all"
+              className="rounded-xl py-3 px-3 md:px-4 font-normal text-sm md:text-base tracking-wide data-[state=active]:bg-white transition-all"
               style={{ color: 'var(--earth)' }}
             >
-              All Shifts ({shifts.length})
+              All ({shifts.length})
             </TabsTrigger>
             <TabsTrigger 
               value="barista" 
-              className="rounded-xl py-3 px-6 font-normal tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-2"
+              className="rounded-xl py-3 px-3 font-normal text-sm tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-1"
               style={{ color: 'var(--earth)' }}
             >
               <Coffee className="w-4 h-4" />
-              Barista ({baristaCount})
+              <span className="hidden md:inline">({roleCounts.barista})</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="bartender" 
+              className="rounded-xl py-3 px-3 font-normal text-sm tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-1"
+              style={{ color: 'var(--earth)' }}
+            >
+              <Wine className="w-4 h-4" />
+              <span className="hidden md:inline">({roleCounts.bartender})</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="mixologist" 
+              className="rounded-xl py-3 px-3 font-normal text-sm tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-1"
+              style={{ color: 'var(--earth)' }}
+            >
+              <Wine className="w-4 h-4" />
+              <span className="hidden md:inline">({roleCounts.mixologist})</span>
             </TabsTrigger>
             <TabsTrigger 
               value="chef" 
-              className="rounded-xl py-3 px-6 font-normal tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-2"
+              className="rounded-xl py-3 px-3 font-normal text-sm tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-1"
               style={{ color: 'var(--earth)' }}
             >
               <ChefHat className="w-4 h-4" />
-              Chef ({chefCount})
+              <span className="hidden md:inline">({roleCounts.chef})</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="waiter" 
+              className="rounded-xl py-3 px-3 font-normal text-sm tracking-wide data-[state=active]:bg-white transition-all flex items-center gap-1"
+              style={{ color: 'var(--earth)' }}
+            >
+              <Users className="w-4 h-4" />
+              <span className="hidden md:inline">({roleCounts.waiter})</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
