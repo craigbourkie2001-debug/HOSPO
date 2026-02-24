@@ -83,12 +83,10 @@ export default function EmployerOnboarding({ user, onComplete }) {
       
       await base44.auth.updateMe(updates);
 
-      toast.success('Welcome to Hospo Employer Platform!');
-      onComplete();
+      window.location.href = createPageUrl('EmployerDashboard');
     } catch (error) {
       console.error('Onboarding error:', error);
-      toast.error('Failed to complete setup: ' + (error.message || 'Unknown error'));
-    } finally {
+      alert('Failed to complete setup: ' + (error.message || 'Unknown error'));
       setLoading(false);
     }
   };
