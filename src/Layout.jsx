@@ -477,7 +477,7 @@ export default function Layout({ children }) {
             user={user} 
             onComplete={() => {
               setShowOnboarding(false);
-              base44.auth.me().then(setUser).catch(() => {});
+              window.location.href = createPageUrl('BrowseShifts');
             }} 
           />
         )}
@@ -486,10 +486,7 @@ export default function Layout({ children }) {
             user={user} 
             onComplete={() => {
               setShowOnboarding(false);
-              base44.auth.me().then(userData => {
-                setUser(userData);
-                window.location.reload(); // Refresh to load venue data
-              }).catch(() => {});
+              window.location.href = createPageUrl('EmployerDashboard');
             }} 
           />
         )}
