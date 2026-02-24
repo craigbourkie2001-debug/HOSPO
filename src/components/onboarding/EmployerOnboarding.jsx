@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, ArrowRight, Briefcase } from "lucide-react";
-import { toast } from "sonner";
+import { createPageUrl } from "@/utils";
 
 const specialtyOptions = ['espresso', 'filter', 'cold_brew', 'latte_art', 'pour_over', 'aeropress'];
 const cuisineOptions = ['irish', 'italian', 'french', 'asian', 'indian', 'mexican', 'american', 'seafood', 'vegetarian', 'fine_dining', 'casual', 'gastropub'];
