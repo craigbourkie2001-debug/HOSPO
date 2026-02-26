@@ -379,14 +379,26 @@ export default function Profile() {
                   </div>
                 )}
               </div>
-              <Button
-                onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
-                disabled={updateProfileMutation.isPending}
-                className="rounded-xl font-normal tracking-wide"
-                style={{ backgroundColor: isEditing ? 'var(--terracotta)' : 'var(--earth)', color: 'white' }}
-              >
-                {updateProfileMutation.isPending ? 'Saving...' : isEditing ? 'Save Profile' : 'Edit Profile'}
-              </Button>
+              <div className="flex gap-2">
+                <Link to={createPageUrl("ProfileBuilder")}>
+                  <Button
+                    variant="outline"
+                    className="rounded-xl font-normal tracking-wide"
+                    style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }}
+                  >
+                    <Wand2 className="w-4 h-4 mr-2" />
+                    Profile Builder
+                  </Button>
+                </Link>
+                <Button
+                  onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
+                  disabled={updateProfileMutation.isPending}
+                  className="rounded-xl font-normal tracking-wide"
+                  style={{ backgroundColor: isEditing ? 'var(--terracotta)' : 'var(--earth)', color: 'white' }}
+                >
+                  {updateProfileMutation.isPending ? 'Saving...' : isEditing ? 'Save Profile' : 'Edit Profile'}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
