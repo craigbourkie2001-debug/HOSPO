@@ -39,53 +39,28 @@ export default function ApplicationsModal({ shift, onClose }) {
         await base44.entities.Shift.update(shift.id, {
           status: 'filled',
           assigned_to: applicantEmail,
+          assigned_to_name: applicantName,
           assigned_at: new Date().toISOString()
         });
-        
+
         // Reject other pending applications
         const otherApps = applications.filter(a => a.id !== applicationId && a.status === 'pending');
-        for (const app of otherApps) {
-          await base44.entities.ShiftApplication.update(app.id, { status: 'rejected' });
-        }
-        
+        await Promise.all(otherApps.map(app =>
+          base44.entities.ShiftApplication.update(app.id, { status: 'rejected' })
+        ));
+
         // Send acceptance email
         await base44.integrations.Core.SendEmail({
           to: applicantEmail,
-          subject: `Application Accepted - ${shift.venue_name} on ${format(new Date(shift.date), 'MMM d')}`,
-          body: `
-Congratulations ${applicantName}!
-
-Your application for the ${isChefRole ? 'chef' : 'barista'} shift at ${shift.venue_name} has been accepted.
-
-Shift Details:
-- Date: ${format(new Date(shift.date), 'EEEE, MMMM d, yyyy')}
-- Time: ${shift.start_time} - ${shift.end_time}
-- Location: ${shift.location}
-- Pay Rate: €${shift.hourly_rate}/hr
-
-Please arrive on time and bring any necessary documentation.
-
-Best regards,
-${shift.venue_name}
-          `.trim()
+          subject: `Shift Confirmed – ${shift.venue_name} on ${format(new Date(shift.date), 'MMM d')}`,
+          body: `Congratulations ${applicantName}!\n\nYour application for the ${isChefRole ? 'chef' : 'barista'} shift at ${shift.venue_name} has been accepted.\n\nShift Details:\n- Date: ${format(new Date(shift.date), 'EEEE, MMMM d, yyyy')}\n- Time: ${shift.start_time} – ${shift.end_time}\n- Location: ${shift.location}\n- Pay Rate: €${shift.hourly_rate}/hr\n\nPlease arrive 10 minutes early and bring your ID.\n\nBest regards,\n${shift.venue_name} via Hospo`
         });
       } else if (status === 'rejected') {
         // Send rejection email
         await base44.integrations.Core.SendEmail({
           to: applicantEmail,
-          subject: `Application Update - ${shift.venue_name}`,
-          body: `
-Hi ${applicantName},
-
-Thank you for your interest in the ${isChefRole ? 'chef' : 'barista'} position at ${shift.venue_name}.
-
-Unfortunately, we have decided to move forward with another candidate for the shift on ${format(new Date(shift.date), 'MMMM d, yyyy')}.
-
-We appreciate your application and encourage you to apply for future opportunities.
-
-Best regards,
-${shift.venue_name}
-          `.trim()
+          subject: `Application Update – ${shift.venue_name}`,
+          body: `Hi ${applicantName},\n\nThank you for your interest in the ${isChefRole ? 'chef' : 'barista'} position at ${shift.venue_name}.\n\nUnfortunately, we have decided to move forward with another candidate for the shift on ${format(new Date(shift.date), 'MMMM d, yyyy')}.\n\nWe appreciate your time and encourage you to apply for future shifts.\n\nBest regards,\n${shift.venue_name} via Hospo`
         });
       }
     },
