@@ -817,8 +817,54 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 5: Skills */}
-          {step === 5 && (
+          {/* Step 5 (non-visa) or Step 6 (visa): Basic Info */}
+          {step === 5 && requiresVisaDoc(formData.visa_status) && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Basic Information
+              </h2>
+
+              <div>
+                <label className="text-sm font-normal mb-3 block">Profile Picture (Optional)</label>
+                <div className="flex items-center gap-4">
+                  {formData.profile_picture_url ? (
+                    <img src={formData.profile_picture_url} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-light text-white" style={{ backgroundColor: 'var(--terracotta)' }}>
+                      {user.full_name?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
+                  <label>
+                    <input type="file" accept="image/*" onChange={handleProfilePicUpload} className="hidden" disabled={uploadingPic} />
+                    <Button type="button" variant="outline" className="rounded-xl" disabled={uploadingPic} onClick={(e) => e.currentTarget.previousElementSibling.click()}>
+                      <Camera className="w-4 h-4 mr-2" />
+                      {uploadingPic ? 'Uploading...' : 'Upload Photo'}
+                    </Button>
+                  </label>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-normal mb-2 block flex items-center gap-2" style={{ color: 'var(--clay)' }}>
+                    <MapPin className="w-4 h-4" /> Location *
+                  </label>
+                  <Input value={formData.location} onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))} placeholder="Dublin, Ireland" className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
+                </div>
+                <div>
+                  <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Phone Number *</label>
+                  <Input value={formData.phone} onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))} placeholder="+353..." className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Years of Experience *</label>
+                <Input type="number" min="0" value={formData.experience_years} onChange={(e) => setFormData(prev => ({ ...prev, experience_years: parseInt(e.target.value) }))} className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
+              </div>
+            </div>
+          )}
+
+          {/* Skills */}
+          {step === 5 && !requiresVisaDoc(formData.visa_status) && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Skills
