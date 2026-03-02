@@ -388,7 +388,9 @@ export default function Layout({ children }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-normal text-sm truncate" style={{ color: 'var(--earth)' }}>
-                      {user.full_name || 'User'}
+                      {(user.legal_first_name && user.legal_last_name)
+                        ? `${user.legal_first_name} ${user.legal_last_name}`
+                        : user.full_name || user.email?.split('@')[0]}
                     </p>
                     <p className="text-xs truncate" style={{ color: 'var(--clay)' }}>
                       {user.email}
