@@ -1260,7 +1260,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
               Back
             </Button>
           )}
-          {step < totalSteps - 1 ? (
+          {step < totalSteps ? (
             <Button
               onClick={() => setStep(step + 1)}
               disabled={!canProceed()}
