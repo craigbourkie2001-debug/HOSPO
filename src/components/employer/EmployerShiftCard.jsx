@@ -109,6 +109,18 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
             </Button>
           )}
 
+          {/* Mark as Complete button for filled shifts */}
+          {shift.status === 'filled' && shift.assigned_to && (
+            <Button
+              onClick={() => setShowCompleteModal(true)}
+              className="w-full rounded-xl font-normal flex items-center gap-2"
+              style={{ backgroundColor: 'var(--sage)', color: 'white' }}
+            >
+              <Star className="w-4 h-4" />
+              Complete Shift & Review Worker
+            </Button>
+          )}
+
           {/* Payment and Review Buttons for Completed Shifts */}
           {shift.status === 'completed' && shift.assigned_to && (
             <div className="space-y-2">
@@ -127,18 +139,6 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
                 >
                   <CreditCard className="w-4 h-4" />
                   Pay Worker
-                </Button>
-              )}
-              
-              {!shift.reviewed && onLeaveReview && (
-                <Button
-                  onClick={() => onLeaveReview(shift)}
-                  variant="outline"
-                  className="w-full rounded-xl font-normal flex items-center gap-2"
-                  style={{ borderColor: 'var(--sand)' }}
-                >
-                  <Star className="w-4 h-4" />
-                  Leave Review
                 </Button>
               )}
             </div>
