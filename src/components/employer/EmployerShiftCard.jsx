@@ -8,6 +8,7 @@ import { Calendar, Clock, Euro, Trash2, Users, Coffee, ChefHat, Star, CreditCard
 import { format } from "date-fns";
 import PayShiftModal from "./PayShiftModal";
 import ShiftChatButton from "../messaging/ShiftChatButton";
+import CompleteShiftModal from "./CompleteShiftModal";
 
 export default function EmployerShiftCard({ shift, onDelete, onViewApplications, onLeaveReview }) {
   const [showPayment, setShowPayment] = useState(false);
