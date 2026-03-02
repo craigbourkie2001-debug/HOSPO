@@ -1028,8 +1028,34 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 7: Desired Rates */}
-          {step === 7 && (
+          {step === 7 && requiresVisaDoc(formData.visa_status) && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Your Availability</h2>
+              <div>
+                <label className="text-sm font-normal mb-3 block flex items-center gap-2" style={{ color: 'var(--clay)' }}><Clock className="w-4 h-4" /> Available Days *</label>
+                <div className="flex flex-wrap gap-2">
+                  {dayOptions.map(day => (
+                    <Badge key={day} className="cursor-pointer transition-all hover-lift rounded-xl px-4 py-2" style={formData.availability.includes(day) ? { backgroundColor: 'var(--sage)', color: 'white' } : { backgroundColor: 'transparent', border: '2px solid var(--sand)', color: 'var(--clay)' }} onClick={() => toggleDay(day)}>
+                      {day.charAt(0).toUpperCase() + day.slice(1)}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-normal mb-3 block" style={{ color: 'var(--clay)' }}>Preferred Shift Times *</label>
+                <div className="flex flex-wrap gap-2">
+                  {[{ value: 'early_morning', label: 'Early Morning (5am-9am)' }, { value: 'morning', label: 'Morning (9am-12pm)' }, { value: 'afternoon', label: 'Afternoon (12pm-5pm)' }, { value: 'evening', label: 'Evening (5pm-10pm)' }, { value: 'late_night', label: 'Late Night (10pm+)' }].map(time => (
+                    <Badge key={time.value} className="cursor-pointer transition-all hover-lift rounded-xl px-4 py-2" style={formData.preferred_shift_times.includes(time.value) ? { backgroundColor: 'var(--olive)', color: 'white' } : { backgroundColor: 'transparent', border: '2px solid var(--sand)', color: 'var(--clay)' }} onClick={() => toggleShiftTime(time.value)}>
+                      {time.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Rates */}
+          {step === 7 && !requiresVisaDoc(formData.visa_status) && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Desired Hourly Rate
