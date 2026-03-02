@@ -366,7 +366,9 @@ export default function Profile() {
               </div>
               <div className="flex-1 text-center md:text-left mb-4 md:mb-0">
                 <h1 className="text-3xl font-normal mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                  {user.full_name}
+                  {(user.legal_first_name && user.legal_last_name)
+                    ? `${user.legal_first_name} ${user.legal_last_name}`
+                    : user.full_name || user.email?.split('@')[0]}
                 </h1>
                 <p className="font-light" style={{ color: 'var(--clay)' }}>{user.email}</p>
                 {user.visa_status && (
