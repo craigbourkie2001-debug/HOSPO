@@ -78,6 +78,19 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
       toast.error('Please fill in all required fields');
       return;
     }
+    if (formData.end_time <= formData.start_time) {
+      toast.error('End time must be after start time');
+      return;
+    }
+    if (parseFloat(formData.hourly_rate) <= 0) {
+      toast.error('Hourly rate must be greater than 0');
+      return;
+    }
+    const today = new Date().toISOString().split('T')[0];
+    if (formData.date < today) {
+      toast.error('Shift date cannot be in the past');
+      return;
+    }
     createShiftMutation.mutate({
       ...formData,
       hourly_rate: parseFloat(formData.hourly_rate)
