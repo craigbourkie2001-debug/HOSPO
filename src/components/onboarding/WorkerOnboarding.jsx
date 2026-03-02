@@ -322,14 +322,24 @@ export default function WorkerOnboarding({ user, onComplete }) {
     }));
   };
 
+  // When visa doc required, step 4 is the new visa doc step, and 5-9 are old 4-8
+  const getLogicalStep = (s) => {
+    if (!requiresVisaDoc(formData.visa_status)) return s;
+    if (s <= 3) return s;
+    if (s === 4) return 'visa_doc';
+    return s - 1; // logical step is physical step - 1
+  };
+
   const canProceed = () => {
-    switch (step) {
+    const logical = getLogicalStep(step);
+    switch (logical) {
       case 0: return true;
       case 1: return formData.legal_first_name && formData.legal_last_name && formData.pps_number;
       case 2: return formData.identity_verified;
       case 3: return formData.worker_type && formData.visa_status;
+      case 'visa_doc': return visaDocumentVerified;
       case 4: return formData.location && formData.phone && formData.experience_years >= 0;
-      case 5: 
+      case 5:
         if (formData.worker_type === 'both') {
           return formData.barista_skills.length > 0 && formData.chef_skills.length > 0;
         }
