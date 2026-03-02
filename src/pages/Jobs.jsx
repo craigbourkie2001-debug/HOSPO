@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Briefcase, Coffee, ChefHat, Clock, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Briefcase, Clock, SlidersHorizontal, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import JobCard from "../components/jobs/JobCard";
 import ApplyJobModal from "../components/jobs/ApplyJobModal";
@@ -11,13 +12,26 @@ import JobPostingWizard from "../components/jobs/JobPostingWizard";
 import PullToRefresh from "../components/mobile/PullToRefresh";
 import MobileHeader from "../components/mobile/MobileHeader";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function Jobs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [employmentFilter, setEmploymentFilter] = useState("all");
   const [selectedJob, setSelectedJob] = useState(null);
   const [showWizard, setShowWizard] = useState(false);
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [salaryFilter, setSalaryFilter] = useState("all");
+  const [experienceFilter, setExperienceFilter] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
+  const [user, setUser] = useState(null);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    base44.auth.me().then(setUser).catch(() => {});
+  }, []);
+
+  const isEmployer = user?.account_type === 'employer' || user?.role === 'employer';
 
   const { data: jobs, isLoading } = useQuery({
     queryKey: ['jobs'],
