@@ -115,7 +115,32 @@ export default function MyShiftCard({ shift }) {
             />
           </div>
         )}
+
+        {shift.status === 'completed' && (
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--cream)' }}>
+            {hasReviewed ? (
+              <div className="flex items-center gap-2 p-3 rounded-lg text-sm" style={{ backgroundColor: '#8A9B8E15', color: 'var(--sage)' }}>
+                <CheckCircle className="w-4 h-4" />
+                Review submitted
+              </div>
+            ) : (
+              <Button
+                onClick={() => setShowReviewModal(true)}
+                variant="outline"
+                className="w-full rounded-xl font-normal flex items-center gap-2"
+                style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }}
+              >
+                <Star className="w-4 h-4" />
+                Review {shift.venue_name}
+              </Button>
+            )}
+          </div>
+        )}
       </CardContent>
+
+      {showReviewModal && (
+        <ReviewVenueModal shift={shift} onClose={() => setShowReviewModal(false)} />
+      )}
     </Card>
   );
 }
