@@ -9,11 +9,13 @@ export default function MyShiftCard({ shift }) {
   const isCompleted = shift.status === 'completed';
   const isChefRole = shift.role_type === 'chef';
   const hours = (() => {
-    const start = parseInt(shift.start_time?.split(':')[0] || 0);
-    const end = parseInt(shift.end_time?.split(':')[0] || 0);
-    return end - start;
+    if (!shift.start_time || !shift.end_time) return 0;
+    const [startH, startM] = shift.start_time.split(':').map(Number);
+    const [endH, endM] = shift.end_time.split(':').map(Number);
+    const totalMins = (endH * 60 + endM) - (startH * 60 + startM);
+    return totalMins > 0 ? Math.round((totalMins / 60) * 10) / 10 : 0;
   })();
-  const totalPay = hours * shift.hourly_rate;
+  const totalPay = Math.round(hours * (shift.hourly_rate || 0) * 100) / 100;
 
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:-translate-y-1 border rounded-2xl hover-lift" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
