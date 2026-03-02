@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Send, Bot, User, Loader2 } from "lucide-react";
+import { Send, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MessageBubble from "../components/chat/MessageBubble";
 
