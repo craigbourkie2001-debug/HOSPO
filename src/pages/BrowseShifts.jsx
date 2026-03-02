@@ -256,6 +256,7 @@ export default function BrowseShifts() {
                   key={shift.id}
                   shift={shift} 
                   onApply={() => setSelectedShift(shift)}
+                  distance={getShiftDistance(shift, userLocation)}
                 />
               ))}
             </div>
