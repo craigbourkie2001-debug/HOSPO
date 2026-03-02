@@ -4,13 +4,14 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Coffee, ChefHat, Wine, Users } from "lucide-react";
+import { Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShiftCard from "../components/shifts/ShiftCard";
 import ShiftFilters from "../components/shifts/ShiftFilters";
 import ApplyModal from "../components/shifts/ApplyModal";
 import RecommendedShifts from "../components/matching/RecommendedShifts";
 import PullToRefresh from "../components/mobile/PullToRefresh";
+import HospoLogo from "../components/HospoLogo";
 
 export default function BrowseShifts() {
   const [user, setUser] = useState(null);
