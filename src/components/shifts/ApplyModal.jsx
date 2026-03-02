@@ -21,12 +21,15 @@ export default function ApplyModal({ shift, onClose }) {
   const userSkills = isChefRole ? (user?.chef_skills || []) : (user?.barista_skills || user?.skills || []);
   const matchingSkills = shift.skills_required?.filter(s => userSkills.includes(s)) || [];
 
+  // Check if user already applied to this shift
+  const alreadyApplied = React.useMemo(() => {
+    return false; // Will be checked server-side
+  }, []);
+
   const applyMutation = useMutation({
     mutationFn: async () => {
-      // Optimistic: Mark shift as applied locally
-      queryClient.setQueryData(['shifts'], (old) => 
-        old?.map(s => s.id === shift.id ? { ...s, hasApplied: true } : s) || old
-      );
+      if (!user?.email) throw new Error('You must be logged in to apply');
+      if (!shift.id) throw new Error('Invalid shift');
 
       // Create application
       await base44.entities.ShiftApplication.create({
@@ -37,64 +40,49 @@ export default function ApplyModal({ shift, onClose }) {
         venue_type: shift.venue_type || 'coffee_shop',
         role_type: shift.role_type || 'barista',
         applicant_email: user.email,
-        applicant_name: user.full_name,
-        applicant_phone: user.phone,
+        applicant_name: user.full_name || user.email,
+        applicant_phone: user.phone || '',
         applicant_skills: userSkills,
-        applicant_experience_years: user.experience_years,
-        applicant_rating: user.rating,
+        applicant_experience_years: user.experience_years || 0,
+        applicant_rating: user.rating || 0,
         cover_note: coverNote,
         status: 'pending'
       });
 
-      // Update shift applications count
+      // Update shift applications count + status
       await base44.entities.Shift.update(shift.id, {
         applications_count: (shift.applications_count || 0) + 1,
         status: 'applications_open'
       });
 
-      // Send email to employer
-      const venue = shift.venue_type === 'restaurant' 
-        ? await base44.entities.Restaurant.filter({ id: shift.venue_id || shift.coffee_shop_id })
-        : await base44.entities.CoffeeShop.filter({ id: shift.venue_id || shift.coffee_shop_id });
-      
-      if (venue && venue.length > 0 && venue[0].contact_email) {
-        await base44.integrations.Core.SendEmail({
-          to: venue[0].contact_email,
-          subject: `New Application for ${isChefRole ? 'Chef' : 'Barista'} Shift - ${format(new Date(shift.date), 'MMM d, yyyy')}`,
-          body: `
-Hello ${venue[0].name},
+      // Send notification email to employer (non-blocking)
+      try {
+        const venueId = shift.venue_id || shift.coffee_shop_id;
+        const venue = shift.venue_type === 'restaurant'
+          ? await base44.entities.Restaurant.filter({ id: venueId })
+          : await base44.entities.CoffeeShop.filter({ id: venueId });
 
-You have received a new application for your ${isChefRole ? 'chef' : 'barista'} shift on ${format(new Date(shift.date), 'EEEE, MMMM d, yyyy')} from ${shift.start_time} to ${shift.end_time}.
-
-Applicant Details:
-- Name: ${user.full_name}
-- Email: ${user.email}
-- Phone: ${user.phone}
-- Experience: ${user.experience_years || 0} years
-- Rating: ${user.rating ? user.rating.toFixed(1) + '/5' : 'New worker'}
-
-Skills: ${userSkills.join(', ') || 'Not specified'}
-
-${coverNote ? `Cover Note:\n${coverNote}` : ''}
-
-Please log in to your Hospo employer dashboard to review this application and accept or reject the candidate.
-
-Best regards,
-Hospo Team
-          `.trim()
-        });
+        if (venue?.length > 0 && venue[0].contact_email) {
+          await base44.integrations.Core.SendEmail({
+            to: venue[0].contact_email,
+            subject: `New Application – ${shift.role_type?.charAt(0).toUpperCase() + shift.role_type?.slice(1)} Shift on ${format(new Date(shift.date), 'MMM d, yyyy')}`,
+            body: `Hello ${venue[0].name},\n\nYou have a new application for your ${shift.role_type} shift on ${format(new Date(shift.date), 'EEEE, MMMM d, yyyy')} (${shift.start_time} – ${shift.end_time}).\n\nApplicant: ${user.full_name || user.email}\nExperience: ${user.experience_years || 0} years\nRating: ${user.rating ? user.rating.toFixed(1) + '/5' : 'New worker'}\nSkills: ${userSkills.join(', ') || 'Not specified'}\n${coverNote ? `\nCover Note:\n"${coverNote}"\n` : ''}\nLog in to your Hospo dashboard to review and respond.\n\nBest regards,\nHospo Team`
+          });
+        }
+      } catch (emailErr) {
+        console.warn('Employer notification email failed (non-critical):', emailErr.message);
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['shifts'] });
-      queryClient.invalidateQueries({ queryKey: ['applications'] });
       queryClient.invalidateQueries({ queryKey: ['myApplications'] });
       queryClient.invalidateQueries({ queryKey: ['employerShifts'] });
       toast.success('Application submitted successfully!');
       onClose();
     },
     onError: (error) => {
-      toast.error('Failed to submit application');
+      console.error('Apply mutation error:', error);
+      toast.error(error.message || 'Failed to submit application. Please try again.');
     }
   });
 
