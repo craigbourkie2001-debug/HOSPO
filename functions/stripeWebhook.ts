@@ -122,19 +122,19 @@ Deno.serve(async (req) => {
       });
       
       if (users.length > 0) {
-        await base44.asServiceRole.entities.User.update(users[0].id, {
+        const cancelledUser = users[0];
+        await base44.asServiceRole.entities.User.update(cancelledUser.id, {
           employer_premium: false,
+          is_premium: false,
           stripe_subscription_id: null,
           premium_cancelled_at: new Date().toISOString()
         });
-
         await base44.asServiceRole.integrations.Core.SendEmail({
-          to: users[0].email,
+          to: cancelledUser.email,
           subject: 'Hospo+ Premium Subscription Cancelled',
-          body: `Your Hospo+ Premium subscription has been cancelled.\n\nYou'll continue to have access to premium features until the end of your billing period.\n\nIf you'd like to reactivate your subscription, you can do so anytime from your dashboard.\n\nThank you for being a premium member!`
+          body: `Your Hospo+ Premium subscription has been cancelled.\n\nYou'll continue to have access to premium features until the end of your billing period.\n\nIf you'd like to reactivate, you can do so anytime from your dashboard.\n\nThank you for being a premium member!`
         });
-
-        console.log('Premium subscription cancelled for:', users[0].email);
+        console.log('Premium subscription cancelled for:', cancelledUser.email);
       }
     }
 
