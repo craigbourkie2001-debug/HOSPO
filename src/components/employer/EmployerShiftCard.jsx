@@ -12,6 +12,7 @@ import CompleteShiftModal from "./CompleteShiftModal";
 
 export default function EmployerShiftCard({ shift, onDelete, onViewApplications, onLeaveReview }) {
   const [showPayment, setShowPayment] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
 
   // Check payment status
   const { data: payments = [] } = useQuery({
