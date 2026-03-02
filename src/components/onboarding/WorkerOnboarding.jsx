@@ -1107,8 +1107,31 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 8: About & CV */}
-          {step === 8 && (
+          {step === 8 && requiresVisaDoc(formData.visa_status) && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Your Desired Hourly Rate</h2>
+              <p className="text-sm" style={{ color: 'var(--clay)' }}>This helps employers understand your expectations</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-normal mb-2 block flex items-center gap-2" style={{ color: 'var(--clay)' }}><DollarSign className="w-4 h-4" /> Minimum Rate *</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-normal" style={{ color: 'var(--clay)' }}>€</span>
+                    <Input type="number" min="0" step="0.50" value={formData.desired_hourly_rate_min} onChange={(e) => setFormData(prev => ({ ...prev, desired_hourly_rate_min: parseFloat(e.target.value) }))} placeholder="12.00" className="rounded-xl border h-12 pl-8" style={{ borderColor: 'var(--sand)' }} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Maximum Rate *</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 font-normal" style={{ color: 'var(--clay)' }}>€</span>
+                    <Input type="number" min="0" step="0.50" value={formData.desired_hourly_rate_max} onChange={(e) => setFormData(prev => ({ ...prev, desired_hourly_rate_max: parseFloat(e.target.value) }))} placeholder="18.00" className="rounded-xl border h-12 pl-8" style={{ borderColor: 'var(--sand)' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* About & CV */}
+          {step === 8 && !requiresVisaDoc(formData.visa_status) && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Tell Us About Yourself
