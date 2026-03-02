@@ -189,7 +189,7 @@ Rank by:
                         className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-light text-white"
                         style={{ backgroundColor: 'var(--terracotta)' }}
                       >
-                        {candidate.full_name?.[0]?.toUpperCase() || 'U'}
+                        {(candidate.legal_first_name || candidate.full_name)?.[0]?.toUpperCase() || 'U'}
                       </div>
                     )}
                     <div className="flex-1">
