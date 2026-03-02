@@ -349,6 +349,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
       case 6: return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
       case 7: return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
       case 8: return formData.bio;
+      case 9: return formData.bio; // visa flow: step 9 = about
       default: return true;
     }
   };
