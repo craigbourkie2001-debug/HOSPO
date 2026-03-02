@@ -36,11 +36,9 @@ Deno.serve(async (req) => {
       const session = event.data.object;
       const { payment_id, shift_id, worker_email, subscription_type, user_email } = session.metadata;
 
-      // Handle premium subscription
+      // Handle employer premium subscription
       if (subscription_type === 'employer_premium' && user_email) {
-        console.log('Premium subscription completed:', { user_email, subscription_id: session.subscription });
-
-        // Update user to premium status
+        console.log('Employer premium subscription completed:', { user_email, subscription_id: session.subscription });
         const users = await base44.asServiceRole.entities.User.filter({ email: user_email });
         if (users.length > 0) {
           await base44.asServiceRole.entities.User.update(users[0].id, {
@@ -48,17 +46,34 @@ Deno.serve(async (req) => {
             stripe_subscription_id: session.subscription,
             premium_activated_at: new Date().toISOString()
           });
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: user_email,
+            subject: 'Welcome to Hospo+ Employer Premium!',
+            body: `Congratulations! Your Hospo+ Employer Premium subscription is now active.\n\nYou now have access to:\n- Featured placement for all shifts\n- Featured placement for all job postings\n- Premium badge on your venue profile\n- Priority support\n- Advanced analytics\n\nThank you for choosing Hospo+ Premium!`
+          });
+          console.log('Employer premium activated for:', user_email);
+        }
+        return Response.json({ received: true });
+      }
 
-          // Send confirmation email
+      // Handle worker premium subscription
+      if (subscription_type === 'worker_premium' && user_email) {
+        console.log('Worker premium subscription completed:', { user_email, subscription_id: session.subscription });
+        const users = await base44.asServiceRole.entities.User.filter({ email: user_email });
+        if (users.length > 0) {
+          await base44.asServiceRole.entities.User.update(users[0].id, {
+            is_premium: true,
+            stripe_subscription_id: session.subscription,
+            premium_activated_at: new Date().toISOString(),
+            premium_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+          });
           await base44.asServiceRole.integrations.Core.SendEmail({
             to: user_email,
             subject: 'Welcome to Hospo+ Premium!',
-            body: `Congratulations! Your Hospo+ Premium subscription is now active.\n\nYou now have access to:\n- Featured placement for all shifts\n- Featured placement for all job postings\n- Premium badge on your venue profile\n- Priority support\n- Advanced analytics\n\nAll your future shift and job postings will automatically be featured.\n\nThank you for choosing Hospo+ Premium!`
+            body: `Congratulations! Your Hospo+ Premium subscription is now active.\n\nYou now have access to:\n- Priority matching — shown to employers first\n- Featured profile in search results\n- Advanced analytics\n\nThank you for choosing Hospo+!`
           });
-
-          console.log('Premium subscription activated for:', user_email);
+          console.log('Worker premium activated for:', user_email);
         }
-        
         return Response.json({ received: true });
       }
 
