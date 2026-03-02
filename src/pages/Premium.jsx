@@ -14,21 +14,28 @@ export default function Premium() {
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      toast.success('Welcome to Hospo+ Premium! Your subscription is now active.');
+    }
+  }, []);
+
   const handleUpgrade = async () => {
+    if (window.self !== window.top) {
+      toast.error('Payments only work in the published app. Please open the published app to subscribe.');
+      return;
+    }
     setIsLoading(true);
     try {
-      // TODO: Implement Stripe checkout when Stripe is configured
-      toast.info("Stripe payment integration coming soon!");
-      
-      // Placeholder for Stripe Checkout
-      // const { url } = await base44.integrations.Stripe.CreateCheckoutSession({
-      //   price_id: "price_hospo_plus_monthly",
-      //   success_url: window.location.origin + "/premium?success=true",
-      //   cancel_url: window.location.origin + "/premium"
-      // });
-      // window.location.href = url;
+      const { data } = await base44.functions.invoke('createWorkerSubscription', {});
+      if (data.sessionUrl) {
+        window.location.href = data.sessionUrl;
+      } else {
+        throw new Error('No checkout URL received');
+      }
     } catch (error) {
-      toast.error("Failed to start checkout");
+      toast.error('Failed to start checkout. Please try again.');
     } finally {
       setIsLoading(false);
     }

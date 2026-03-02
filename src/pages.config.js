@@ -62,13 +62,13 @@ import Messages from './pages/Messages';
 import MyShifts from './pages/MyShifts';
 import Premium from './pages/Premium';
 import Profile from './pages/Profile';
+import ProfileBuilder from './pages/ProfileBuilder';
 import Restaurants from './pages/Restaurants';
 import RoasterDetails from './pages/RoasterDetails';
 import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
 import SupportChat from './pages/SupportChat';
 import Welcome from './pages/Welcome';
-import ProfileBuilder from './pages/ProfileBuilder';
 import __Layout from './Layout.jsx';
 
 
@@ -88,13 +88,13 @@ export const PAGES = {
     "MyShifts": MyShifts,
     "Premium": Premium,
     "Profile": Profile,
+    "ProfileBuilder": ProfileBuilder,
     "Restaurants": Restaurants,
     "RoasterDetails": RoasterDetails,
     "Roasters": Roasters,
     "ShopDetails": ShopDetails,
     "SupportChat": SupportChat,
     "Welcome": Welcome,
-    "ProfileBuilder": ProfileBuilder,
 }
 
 export const pagesConfig = {
