@@ -22,7 +22,7 @@ const roleColors = {
   waiter: 'var(--earth)',
 };
 
-export default function ShiftCard({ shift, onApply, isLoading, featured = false }) {
+export default function ShiftCard({ shift, onApply, isLoading, featured = false, distance = null }) {
   const roleColor = roleColors[shift.role_type] || 'var(--terracotta)';
   const roleLabel = shift.role_type === 'chef' && shift.chef_level
     ? shift.chef_level.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
