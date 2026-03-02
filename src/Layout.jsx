@@ -383,9 +383,13 @@ export default function Layout({ children }) {
             {user && (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
-                  <div className="w-11 h-11 rounded-full flex items-center justify-center font-light text-white text-lg" style={{ backgroundColor: 'var(--terracotta)' }}>
-                    {user.full_name?.[0]?.toUpperCase() || 'U'}
-                  </div>
+                  {user.profile_picture_url ? (
+                    <img src={user.profile_picture_url} alt="Profile" className="w-11 h-11 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-11 h-11 rounded-full flex items-center justify-center font-light text-white text-lg flex-shrink-0" style={{ backgroundColor: 'var(--terracotta)' }}>
+                      {(user.legal_first_name || user.full_name)?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="font-normal text-sm truncate" style={{ color: 'var(--earth)' }}>
                       {(user.legal_first_name && user.legal_last_name)
