@@ -168,6 +168,15 @@ export default function BrowseShifts() {
           </div>
         </div>
 
+        {/* Proximity Filter */}
+        <ProximityFilter
+          userLocation={userLocation}
+          onLocationSet={setUserLocation}
+          onLocationClear={() => setUserLocation(null)}
+          proximityKm={proximityKm}
+          onProximityChange={setProximityKm}
+        />
+
         {/* Filters */}
         <ShiftFilters 
           filters={filters}
