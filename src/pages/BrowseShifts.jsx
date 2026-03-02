@@ -85,8 +85,12 @@ export default function BrowseShifts() {
                             shift.chef_level === filters.chefLevel ||
                             shift.role_type !== 'chef';
     
+    // Proximity filter
+    const shiftDistance = getShiftDistance(shift, userLocation);
+    const matchesProximity = !userLocation || (shiftDistance !== null && shiftDistance <= proximityKm);
+
     return matchesSearch && matchesLocation && matchesDate && matchesSkills && matchesRole && 
-           matchesPayRate && matchesShiftTime && matchesChefLevel;
+           matchesPayRate && matchesShiftTime && matchesChefLevel && matchesProximity;
   });
 
   const displayedShifts = isMobile ? filteredShifts.slice(0, mobileDisplayCount) : filteredShifts;
