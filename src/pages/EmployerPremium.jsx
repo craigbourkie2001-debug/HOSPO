@@ -22,9 +22,9 @@ export default function EmployerPremium() {
   const isPremium = user?.employer_premium === true;
 
   const handleUpgrade = async () => {
-    // Check if running in iframe (preview)
     if (window.self !== window.top) {
-      toast.error('Payments only work in the published app. Please publish your app to subscribe.');
+      toast.info('Checkout opens in the published app. Opening now...', { duration: 3000 });
+      window.open(window.location.href, '_blank');
       return;
     }
 
@@ -32,10 +32,14 @@ export default function EmployerPremium() {
     try {
       const { data } = await base44.functions.invoke('createPremiumSubscription', {});
 
-      if (data.sessionUrl) {
+      if (data?.sessionUrl) {
         window.location.href = data.sessionUrl;
+      } else if (data?.error) {
+        toast.error(data.error);
+        setProcessing(false);
       } else {
-        throw new Error('No checkout URL received');
+        toast.error('Failed to start subscription. Please try again.');
+        setProcessing(false);
       }
     } catch (error) {
       console.error('Subscription error:', error);
@@ -180,7 +184,7 @@ export default function EmployerPremium() {
                   </CardTitle>
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-5xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                      €49
+                      €29.99
                     </span>
                     <span className="text-lg" style={{ color: 'var(--clay)' }}>/month</span>
                   </div>

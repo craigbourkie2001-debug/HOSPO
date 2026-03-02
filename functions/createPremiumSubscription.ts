@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
     // Create Stripe checkout session for subscription
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [{ price: 'price_1T6UigE2QjaxHD8f0fx6NOfK', quantity: 1 }],
+      line_items: [{ price: 'price_1T6WB9E2QjaxHD8fyEunG6Ij', quantity: 1 }],
       mode: 'subscription',
       success_url: `${origin}/employerdashboard?premium=success`,
       cancel_url: `${origin}/employerpremium?premium=cancelled`,
