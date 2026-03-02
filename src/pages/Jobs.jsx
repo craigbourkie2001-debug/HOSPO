@@ -156,6 +156,95 @@ export default function Jobs() {
           </div>
         </div>
 
+        {/* Filter Toggle */}
+        <div className="mb-4 flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setShowFilters(o => !o)}
+            className="rounded-xl flex items-center gap-2"
+            style={{ borderColor: 'var(--sand)', color: 'var(--clay)' }}
+          >
+            <SlidersHorizontal className="w-4 h-4" />
+            Filters
+            {activeFilterCount > 0 && (
+              <Badge className="ml-1 rounded-full text-xs" style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}>
+                {activeFilterCount}
+              </Badge>
+            )}
+          </Button>
+          {activeFilterCount > 0 && (
+            <button onClick={clearFilters} className="text-sm flex items-center gap-1" style={{ color: 'var(--clay)' }}>
+              <X className="w-3 h-3" /> Clear filters
+            </button>
+          )}
+        </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="mb-8 p-5 rounded-2xl border grid grid-cols-2 md:grid-cols-4 gap-4" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+            <div>
+              <label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>LOCATION</label>
+              <Select value={locationFilter} onValueChange={setLocationFilter}>
+                <SelectTrigger className="rounded-xl border h-10" style={{ borderColor: 'var(--sand)' }}>
+                  <SelectValue placeholder="All locations" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.filter(l => l !== "all").map(l => (
+                    <SelectItem key={l} value={l}>{l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>ROLE TYPE</label>
+              <Select value={roleFilter} onValueChange={setRoleFilter}>
+                <SelectTrigger className="rounded-xl border h-10" style={{ borderColor: 'var(--sand)' }}>
+                  <SelectValue placeholder="All roles" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Roles</SelectItem>
+                  {roles.filter(r => r !== "all").map(r => (
+                    <SelectItem key={r} value={r}>{r.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>SALARY RANGE</label>
+              <Select value={salaryFilter} onValueChange={setSalaryFilter}>
+                <SelectTrigger className="rounded-xl border h-10" style={{ borderColor: 'var(--sand)' }}>
+                  <SelectValue placeholder="Any salary" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Salary</SelectItem>
+                  <SelectItem value="0-30k">Up to €30,000</SelectItem>
+                  <SelectItem value="30-40k">€30,000 – €40,000</SelectItem>
+                  <SelectItem value="40-50k">€40,000 – €50,000</SelectItem>
+                  <SelectItem value="50k+">€50,000+</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="text-xs tracking-wider mb-2 block" style={{ color: 'var(--clay)' }}>EXPERIENCE</label>
+              <Select value={experienceFilter} onValueChange={setExperienceFilter}>
+                <SelectTrigger className="rounded-xl border h-10" style={{ borderColor: 'var(--sand)' }}>
+                  <SelectValue placeholder="Any experience" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Experience</SelectItem>
+                  <SelectItem value="0-1">0–1 Years</SelectItem>
+                  <SelectItem value="2-3">2–3 Years</SelectItem>
+                  <SelectItem value="4+">4+ Years</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
           <motion.div 
