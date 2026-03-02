@@ -658,8 +658,89 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 4: Basic Info */}
-          {step === 4 && (
+          {/* Visa Document Step (only for non-Irish/EU) */}
+          {step === 4 && requiresVisaDoc(formData.visa_status) && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Upload Work Authorization Document
+              </h2>
+              <p className="text-sm mb-4" style={{ color: 'var(--clay)' }}>
+                Since you are not an Irish or EU citizen, you must upload a valid document proving your right to work in Ireland (IRP card, GNIB card, work permit, etc.)
+              </p>
+
+              <div className="p-5 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
+                <div className="flex items-start gap-3">
+                  <Shield className="w-5 h-5 mt-1 flex-shrink-0" style={{ color: 'var(--terracotta)' }} />
+                  <div>
+                    <h3 className="font-normal mb-1" style={{ color: 'var(--earth)' }}>Accepted documents</h3>
+                    <ul className="text-sm space-y-1" style={{ color: 'var(--clay)' }}>
+                      <li>• IRP card (Irish Residence Permit)</li>
+                      <li>• GNIB card</li>
+                      <li>• Work permit / Employment Permit</li>
+                      <li>• Stamp visa page in passport</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {!visaDocumentVerified ? (
+                <div>
+                  {visaDocumentUrl && !visaDocumentVerified ? (
+                    <div className="space-y-3">
+                      <img
+                        src={visaDocumentUrl}
+                        alt="Visa document"
+                        className="w-full max-h-64 object-contain rounded-xl border-2"
+                        style={{ borderColor: 'var(--sand)' }}
+                      />
+                      {verifyingVisa && (
+                        <div className="flex items-center gap-2 p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+                          <span className="text-sm" style={{ color: 'var(--clay)' }}>Verifying your document with AI...</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <label>
+                      <input
+                        type="file"
+                        accept="image/*,.pdf"
+                        onChange={handleVisaDocUpload}
+                        className="hidden"
+                        disabled={uploadingVisaDoc || verifyingVisa}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="rounded-xl w-full h-32 border-2 border-dashed"
+                        style={{ borderColor: 'var(--sand)' }}
+                        disabled={uploadingVisaDoc || verifyingVisa}
+                        onClick={(e) => e.currentTarget.previousElementSibling.click()}
+                      >
+                        <div className="text-center">
+                          <Upload className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--clay)' }} />
+                          <span className="text-sm" style={{ color: 'var(--clay)' }}>
+                            {uploadingVisaDoc ? 'Uploading...' : 'Click to upload work authorization document'}
+                          </span>
+                        </div>
+                      </Button>
+                    </label>
+                  )}
+                </div>
+              ) : (
+                <div className="p-6 rounded-xl flex items-center gap-3" style={{ backgroundColor: 'var(--sage)', color: 'white' }}>
+                  <CheckCircle2 className="w-8 h-8" />
+                  <div>
+                    <h3 className="font-normal text-lg mb-1">Work Authorization Verified</h3>
+                    <p className="text-sm opacity-90">Your document has been successfully verified by our AI system</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Step 4 (non-visa) or Step 5 (visa): Basic Info */}
+          {step === 4 && !requiresVisaDoc(formData.visa_status) && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Basic Information
