@@ -106,10 +106,12 @@ export default function MyShifts() {
             <Clock className="w-8 h-8 mb-3" style={{ strokeWidth: 1.5 }} />
             <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {shifts.reduce((sum, s) => {
-                const start = s.start_time?.split(':')[0] || 0;
-                const end = s.end_time?.split(':')[0] || 0;
-                return sum + (end - start);
-              }, 0)}
+                if (!s.start_time || !s.end_time) return sum;
+                const [sh, sm] = s.start_time.split(':').map(Number);
+                const [eh, em] = s.end_time.split(':').map(Number);
+                const mins = (eh * 60 + em) - (sh * 60 + sm);
+                return sum + (mins > 0 ? mins / 60 : 0);
+              }, 0).toFixed(1)}
             </div>
             <div className="text-xs tracking-wider opacity-90">TOTAL HOURS</div>
           </motion.div>
