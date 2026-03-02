@@ -61,10 +61,18 @@ export default function ShiftCard({ shift, onApply, isLoading, featured = false,
           {shift.venue_name || shift.coffee_shop_name}
         </h3>
 
-        {/* Location */}
-        <p className="text-sm font-light mb-4" style={{ color: 'var(--clay)' }}>
-          {shift.location}
-        </p>
+        {/* Location + distance */}
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-sm font-light" style={{ color: 'var(--clay)' }}>
+            {shift.location}
+          </p>
+          {distance !== null && (
+            <span className="flex items-center gap-1 text-xs font-normal px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--sage)' + '22', color: 'var(--sage)' }}>
+              <MapPin className="w-3 h-3" style={{ strokeWidth: 2 }} />
+              {formatDistance(distance)}
+            </span>
+          )}
+        </div>
 
         {/* Date & time row */}
         <div className="flex gap-3 mb-4">
