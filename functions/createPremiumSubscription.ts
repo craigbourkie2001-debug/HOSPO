@@ -12,16 +12,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (user.role !== 'employer') {
-      return Response.json({ error: 'Only employers can subscribe to premium' }, { status: 403 });
-    }
-
-    const { price_id } = await req.json();
-
-    if (!price_id) {
-      return Response.json({ error: 'Missing price_id' }, { status: 400 });
-    }
-
     // Check if already has active subscription
     if (user.employer_premium && user.stripe_subscription_id) {
       return Response.json({ error: 'Already has active premium subscription' }, { status: 400 });
@@ -32,12 +22,7 @@ Deno.serve(async (req) => {
     // Create Stripe checkout session for subscription
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price: price_id,
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: 'price_1T6UigE2QjaxHD8f0fx6NOfK', quantity: 1 }],
       mode: 'subscription',
       success_url: `${origin}/employerdashboard?premium=success`,
       cancel_url: `${origin}/employerpremium?premium=cancelled`,
