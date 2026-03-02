@@ -30,9 +30,7 @@ export default function EmployerPremium() {
 
     setProcessing(true);
     try {
-      const { data } = await base44.functions.invoke('createPremiumSubscription', {
-        price_id: 'price_1T1YWjE2QjaxHD8fiGW64eFV'
-      });
+      const { data } = await base44.functions.invoke('createPremiumSubscription', {});
 
       if (data.sessionUrl) {
         window.location.href = data.sessionUrl;
