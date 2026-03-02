@@ -94,9 +94,15 @@ export default function ProductCard({ product }) {
             className="rounded-xl font-normal tracking-wide transition-all hover-lift"
             style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
             size="sm"
+            onClick={handleBuy}
+            disabled={loading}
           >
-            <ShoppingCart className="w-4 h-4 mr-1" />
-            Add
+            {loading ? (
+              <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+            ) : (
+              <ShoppingCart className="w-4 h-4 mr-1" />
+            )}
+            {loading ? 'Loading...' : 'Buy'}
           </Button>
         </div>
       </CardContent>
