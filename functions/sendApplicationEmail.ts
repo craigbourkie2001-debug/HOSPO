@@ -3,16 +3,11 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
 
-    if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { 
-      emailType, 
-      applicantEmail, 
-      applicantName, 
+    const {
+      emailType,
+      applicantEmail,
+      applicantName,
       venueName,
       shiftDate,
       startTime,
@@ -26,140 +21,48 @@ Deno.serve(async (req) => {
     } = await req.json();
 
     if (!emailType || !applicantEmail || !applicantName || !venueName) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return Response.json({ error: 'Missing required fields: emailType, applicantEmail, applicantName, venueName' }, { status: 400 });
     }
-
-    // Get Gmail access token
-    const accessToken = await base44.asServiceRole.connectors.getAccessToken('gmail');
 
     let emailSubject = '';
     let emailBody = '';
 
-    // Generate email content based on type
     if (emailType === 'acknowledgment') {
-      emailSubject = `Application Received - ${venueName}`;
-      emailBody = `
-Hi ${applicantName},
+      emailSubject = `Application Received – ${venueName}`;
+      emailBody = `Hi ${applicantName},\n\nThank you for applying to the ${roleType} position at ${venueName}!\n\nWe've received your application and are reviewing it carefully. You'll hear back within 3–5 business days.\n\nBest regards,\nHospo Ireland Team`;
 
-Thank you for applying to the ${roleType} position at ${venueName}!
-
-We've received your application and we're reviewing it carefully. You'll hear back from us within 3-5 business days with next steps.
-
-If you have any questions in the meantime, feel free to reach out.
-
-Best regards,
-Hospo Ireland Team
-`;
     } else if (emailType === 'interview') {
-      emailSubject = `Interview Scheduled - ${venueName}`;
-      emailBody = `
-Hi ${applicantName},
+      emailSubject = `Interview Scheduled – ${venueName}`;
+      emailBody = `Hi ${applicantName},\n\nGreat news! We'd like to invite you to an interview for the ${roleType} position at ${venueName}.\n\nInterview Details:\n- Date: ${interviewDate}\n- Time: ${interviewTime}\n- Venue: ${venueName}\n${contactPerson ? `- Contact: ${contactPerson}\n` : ''}${contactPhone ? `- Phone: ${contactPhone}\n` : ''}\nPlease confirm your attendance by replying to this email.\n\nBest regards,\nHospo Ireland Team`;
 
-Great news! We'd like to invite you to an interview for the ${roleType} position at ${venueName}.
-
-**Interview Details:**
-- Date: ${interviewDate}
-- Time: ${interviewTime}
-- Venue: ${venueName}
-${contactPerson ? `- Contact: ${contactPerson}` : ''}
-${contactPhone ? `- Phone: ${contactPhone}` : ''}
-
-Please confirm your attendance by replying to this email. If this time doesn't work for you, let us know and we'll find an alternative.
-
-Looking forward to meeting you!
-
-Best regards,
-Hospo Ireland Team
-`;
     } else if (emailType === 'rejection') {
-      emailSubject = `Application Update - ${venueName}`;
-      emailBody = `
-Hi ${applicantName},
+      emailSubject = `Application Update – ${venueName}`;
+      emailBody = `Hi ${applicantName},\n\nThank you for your interest in the ${roleType ? roleType + ' ' : ''}position at ${venueName}.\n\nAfter careful consideration, we've decided to move forward with other candidates at this time. We encourage you to apply for future opportunities.\n\nBest regards,\nHospo Ireland Team`;
 
-Thank you for your interest in the ${roleType} position at ${venueName}.
-
-After careful consideration, we've decided to move forward with other candidates whose experience more closely matches our current needs.
-
-We appreciate the time you've taken to apply and encourage you to apply for future opportunities that match your skills.
-
-Best regards,
-Hospo Ireland Team
-`;
     } else if (emailType === 'shift_confirmation') {
-      emailSubject = `Shift Confirmation - ${venueName} on ${shiftDate}`;
-      emailBody = `
-Hi ${applicantName},
+      emailSubject = `Shift Confirmed – ${venueName}${shiftDate ? ' on ' + shiftDate : ''}`;
+      emailBody = `Hi ${applicantName},\n\nCongratulations! Your shift application has been accepted.\n\nShift Details:\n- Venue: ${venueName}${shiftDate ? '\n- Date: ' + shiftDate : ''}${startTime ? '\n- Time: ' + startTime + (endTime ? ' – ' + endTime : '') : ''}${roleType ? '\n- Role: ' + roleType.charAt(0).toUpperCase() + roleType.slice(1) : ''}${hourlyRate ? '\n- Hourly Rate: €' + hourlyRate + '/hour' : ''}\n\nPlease arrive 10 minutes early and bring your ID.\n\nBest regards,\nHospo Ireland Team`;
 
-Congratulations! Your shift application has been accepted.
-
-**Shift Details:**
-- Venue: ${venueName}
-- Date: ${shiftDate}
-- Time: ${startTime} - ${endTime}
-- Role: ${roleType.charAt(0).toUpperCase() + roleType.slice(1)}
-- Hourly Rate: €${hourlyRate}/hour
-
-Please arrive 10 minutes early and bring your ID with you.
-
-If you have any questions or need to reschedule, please contact the venue or reply to this email.
-
-Looking forward to seeing you!
-
-Best regards,
-Hospo Ireland Team
-`;
     } else {
-      return Response.json({ error: 'Invalid email type' }, { status: 400 });
+      return Response.json({ error: 'Invalid emailType' }, { status: 400 });
     }
 
-    // Create RFC 2822 formatted email
-    const message = [
-      `From: ${user.email}`,
-      `To: ${applicantEmail}`,
-      `Subject: ${emailSubject}`,
-      'Content-Type: text/plain; charset="UTF-8"',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      emailBody
-    ].join('\r\n');
+    // Use Core integration to send email (no Gmail OAuth needed)
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      to: applicantEmail,
+      subject: emailSubject,
+      body: emailBody
+    });
 
-    // Encode message in base64url format for Gmail API
-    const encodedMessage = Buffer.from(message)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-
-    // Send email via Gmail API
-    const sendResponse = await fetch(
-      'https://www.googleapis.com/gmail/v1/users/me/messages/send',
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          raw: encodedMessage
-        })
-      }
-    );
-
-    if (!sendResponse.ok) {
-      const errorData = await sendResponse.text();
-      console.error('Gmail API error:', errorData);
-      return Response.json({ error: 'Failed to send email' }, { status: sendResponse.status });
-    }
-
-    const result = await sendResponse.json();
+    console.log(`${emailType} email sent to ${applicantEmail}`);
 
     return Response.json({
       success: true,
-      message: `${emailType} email sent successfully`,
-      messageId: result.id
+      message: `${emailType} email sent successfully`
     });
+
   } catch (error) {
-    console.error('Error sending application email:', error);
+    console.error('Error in sendApplicationEmail:', error.message, error.stack);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
