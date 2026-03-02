@@ -123,6 +123,85 @@ export default function WorkerOnboarding({ user, onComplete }) {
     }
   };
 
+  const handleVisaDocUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingVisaDoc(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      setVisaDocumentUrl(file_url);
+      toast.success('Document uploaded! Verifying...');
+      await verifyVisaDocument(file_url);
+    } catch (error) {
+      toast.error('Failed to upload document');
+    } finally {
+      setUploadingVisaDoc(false);
+    }
+  };
+
+  const verifyVisaDocument = async (documentUrl) => {
+    setVerifyingVisa(true);
+    try {
+      const result = await base44.integrations.Core.InvokeLLM({
+        prompt: `You are an Irish immigration document verification system. Analyze this document image and determine if it is a valid Irish work authorization document (IRP card, GNIB card, stamp, visa, work permit, or similar). 
+        
+        Check:
+        1. Is this a genuine-looking official document?
+        2. Does it appear valid and not expired?
+        3. Does the name on the document match: ${formData.legal_first_name} ${formData.legal_last_name}?
+        4. Is the document type appropriate for Irish work authorization?
+        
+        Respond in JSON format with:
+        {
+          "is_valid_document": true/false,
+          "document_type": "description of what type of document this appears to be",
+          "name_on_document": "name as it appears on the document",
+          "name_matches": true/false,
+          "expiry_date": "date if visible or null",
+          "is_expired": true/false,
+          "verification_notes": "brief explanation"
+        }`,
+        file_urls: [documentUrl],
+        response_json_schema: {
+          type: "object",
+          properties: {
+            is_valid_document: { type: "boolean" },
+            document_type: { type: "string" },
+            name_on_document: { type: "string" },
+            name_matches: { type: "boolean" },
+            expiry_date: { type: "string" },
+            is_expired: { type: "boolean" },
+            verification_notes: { type: "string" }
+          }
+        }
+      });
+
+      if (!result.is_valid_document) {
+        toast.error('Document does not appear to be a valid work authorization document. Please upload the correct document.');
+        setVisaDocumentUrl('');
+        setVisaDocumentVerified(false);
+      } else if (result.is_expired) {
+        toast.error('This document appears to be expired. Please upload a current, valid document.');
+        setVisaDocumentUrl('');
+        setVisaDocumentVerified(false);
+      } else if (!result.name_matches) {
+        toast.error(`Name mismatch: Document shows "${result.name_on_document}" but you entered "${formData.legal_first_name} ${formData.legal_last_name}"`);
+        setVisaDocumentUrl('');
+        setVisaDocumentVerified(false);
+      } else {
+        setVisaDocumentVerified(true);
+        setFormData(prev => ({ ...prev, visa_document_url: documentUrl }));
+        toast.success('Work authorization document verified!');
+      }
+    } catch (error) {
+      toast.error('Failed to verify document. Please try again.');
+      setVisaDocumentUrl('');
+      setVisaDocumentVerified(false);
+    } finally {
+      setVerifyingVisa(false);
+    }
+  };
+
   const verifyIdentity = async (documentUrl) => {
     setVerifyingIdentity(true);
     try {
