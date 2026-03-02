@@ -549,27 +549,27 @@ export default function WorkerOnboarding({ user, onComplete }) {
                 </div>
               ) : (
                 <div>
-                  {visaDocumentUrl ? (
-                    <div className="space-y-3">
-                      <img src={visaDocumentUrl} alt="Visa document" className="w-full max-h-64 object-contain rounded-xl border-2" style={{ borderColor: 'var(--sand)' }} />
-                      {verifyingVisa && (
-                        <div className="flex items-center gap-2 p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
-                          <div className="animate-spin rounded-full h-5 w-5 border-2" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
-                          <span className="text-sm" style={{ color: 'var(--clay)' }}>Verifying your document with AI...</span>
-                        </div>
-                      )}
+                  {(uploadingVisaDoc || verifyingVisa) ? (
+                    <div className="flex flex-col items-center gap-4 p-10 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>
+                      <div className="animate-spin rounded-full h-10 w-10 border-4" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
+                      <div className="text-center">
+                        <p className="font-normal mb-1" style={{ color: 'var(--earth)' }}>
+                          {uploadingVisaDoc ? 'Uploading document...' : 'Verifying work authorization...'}
+                        </p>
+                        <p className="text-sm" style={{ color: 'var(--clay)' }}>This can take up to 30 seconds, please don't close or refresh the page</p>
+                      </div>
                     </div>
-                  ) : (
+                  ) : !visaDocumentVerified ? (
                     <label>
                       <input type="file" accept="image/*,.pdf" onChange={handleVisaDocUpload} className="hidden" disabled={uploadingVisaDoc || verifyingVisa} />
                       <Button type="button" variant="outline" className="rounded-xl w-full h-32 border-2 border-dashed" style={{ borderColor: 'var(--sand)' }} disabled={uploadingVisaDoc || verifyingVisa} onClick={(e) => e.currentTarget.previousElementSibling.click()}>
                         <div className="text-center">
                           <Upload className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--clay)' }} />
-                          <span className="text-sm" style={{ color: 'var(--clay)' }}>{uploadingVisaDoc ? 'Uploading...' : 'Click to upload work authorization document'}</span>
+                          <span className="text-sm" style={{ color: 'var(--clay)' }}>Click to upload work authorization document</span>
                         </div>
                       </Button>
                     </label>
-                  )}
+                  ) : null}
                 </div>
               )}
             </div>
