@@ -1208,7 +1208,6 @@ export default function WorkerOnboarding({ user, onComplete }) {
               </div>
             </div>
           )}
-        </div>
 
           {/* Step 9 (visa only): About & CV */}
           {step === 9 && requiresVisaDoc(formData.visa_status) && (
