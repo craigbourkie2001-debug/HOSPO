@@ -1209,6 +1209,45 @@ export default function WorkerOnboarding({ user, onComplete }) {
           )}
         </div>
 
+          {/* Step 9 (visa only): About & CV */}
+          {step === 9 && requiresVisaDoc(formData.visa_status) && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Tell Us About Yourself</h2>
+              <div>
+                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>About Me *</label>
+                <Textarea value={formData.bio} onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))} placeholder="Tell employers about your experience, passion for hospitality, and what makes you a great worker..." className="rounded-xl border" style={{ borderColor: 'var(--sand)' }} rows={4} />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-normal" style={{ color: 'var(--clay)' }}>Professional Summary (Optional)</label>
+                  <Button size="sm" variant="outline" onClick={generateSummary} disabled={generatingAI} className="rounded-xl text-xs" style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }}>
+                    <Sparkles className="w-3 h-3 mr-1" />
+                    {generatingAI ? 'Generating...' : 'Generate with AI'}
+                  </Button>
+                </div>
+                <Textarea value={formData.professional_summary} onChange={(e) => setFormData(prev => ({ ...prev, professional_summary: e.target.value }))} placeholder="A compelling professional summary..." className="rounded-xl border" style={{ borderColor: 'var(--sand)' }} rows={3} />
+              </div>
+              <div>
+                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Upload CV/Resume (Optional)</label>
+                {formData.resume_url ? (
+                  <div className="flex items-center justify-between p-3 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
+                    <span className="text-sm" style={{ color: 'var(--earth)' }}>CV uploaded</span>
+                    <Button size="sm" variant="ghost" onClick={() => setFormData(prev => ({ ...prev, resume_url: '' }))}><X className="w-4 h-4" /></Button>
+                  </div>
+                ) : (
+                  <label>
+                    <input type="file" accept=".pdf,.doc,.docx" onChange={handleCVUpload} className="hidden" />
+                    <Button type="button" variant="outline" className="rounded-xl w-full" disabled={uploadingCV} onClick={(e) => e.currentTarget.previousElementSibling.click()}>
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploadingCV ? 'Uploading...' : 'Upload CV'}
+                    </Button>
+                  </label>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Navigation */}
         <div className="flex gap-3">
           {step > 0 && (
