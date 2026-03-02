@@ -1250,6 +1250,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
 
         {/* Navigation */}
         <div className="flex gap-3">
+
           {step > 0 && (
             <Button
               variant="outline"
