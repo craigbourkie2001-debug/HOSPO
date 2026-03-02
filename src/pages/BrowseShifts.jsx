@@ -30,6 +30,8 @@ export default function BrowseShifts() {
   const [selectedShift, setSelectedShift] = useState(null);
   const [mobileDisplayCount, setMobileDisplayCount] = useState(12);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [userLocation, setUserLocation] = useState(null);
+  const [proximityKm, setProximityKm] = useState(10);
 
   const queryClient = useQueryClient();
 
