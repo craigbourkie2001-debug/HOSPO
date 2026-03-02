@@ -931,8 +931,39 @@ export default function WorkerOnboarding({ user, onComplete }) {
             </div>
           )}
 
-          {/* Step 6: Availability */}
-          {step === 6 && (
+          {step === 6 && requiresVisaDoc(formData.visa_status) && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Your Skills</h2>
+              <p className="text-sm" style={{ color: 'var(--clay)' }}>Select all skills that apply to you</p>
+              {(formData.worker_type === 'barista' || formData.worker_type === 'both') && (
+                <div>
+                  <label className="text-sm font-normal mb-3 block flex items-center gap-2" style={{ color: 'var(--clay)' }}><Coffee className="w-4 h-4" /> Barista Skills *</label>
+                  <div className="flex flex-wrap gap-2">
+                    {baristaSkillOptions.map(skill => (
+                      <Badge key={skill} className="cursor-pointer transition-all hover-lift rounded-xl px-4 py-2" style={formData.barista_skills.includes(skill) ? { backgroundColor: 'var(--terracotta)', color: 'white' } : { backgroundColor: 'transparent', border: '2px solid var(--sand)', color: 'var(--clay)' }} onClick={() => toggleSkill(skill, 'barista')}>
+                        {skill.replace(/_/g, ' ')}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {(formData.worker_type === 'chef' || formData.worker_type === 'both') && (
+                <div>
+                  <label className="text-sm font-normal mb-3 block flex items-center gap-2" style={{ color: 'var(--clay)' }}><ChefHat className="w-4 h-4" /> Chef Skills *</label>
+                  <div className="flex flex-wrap gap-2">
+                    {chefSkillOptions.map(skill => (
+                      <Badge key={skill} className="cursor-pointer transition-all hover-lift rounded-xl px-4 py-2" style={formData.chef_skills.includes(skill) ? { backgroundColor: 'var(--sage)', color: 'white' } : { backgroundColor: 'transparent', border: '2px solid var(--sand)', color: 'var(--clay)' }} onClick={() => toggleSkill(skill, 'chef')}>
+                        {skill.replace(/_/g, ' ')}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Availability */}
+          {step === 6 && !requiresVisaDoc(formData.visa_status) && (
             <div className="space-y-6">
               <h2 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Your Availability
