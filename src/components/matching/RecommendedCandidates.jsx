@@ -194,7 +194,9 @@ Rank by:
                     )}
                     <div className="flex-1">
                       <h4 className="font-normal text-lg" style={{ color: 'var(--earth)' }}>
-                        {candidate.full_name}
+                        {(candidate.legal_first_name && candidate.legal_last_name)
+                          ? `${candidate.legal_first_name} ${candidate.legal_last_name}`
+                          : candidate.full_name || candidate.email?.split('@')[0]}
                       </h4>
                       <div className="flex items-center gap-3 text-sm flex-wrap" style={{ color: 'var(--clay)' }}>
                         <span className="flex items-center gap-1">
