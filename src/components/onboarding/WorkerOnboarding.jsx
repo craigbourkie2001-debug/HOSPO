@@ -63,7 +63,14 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const [verifyingIdentity, setVerifyingIdentity] = useState(false);
   const [generatingAI, setGeneratingAI] = useState(false);
 
-  const totalSteps = 8;
+  const [visaDocumentUrl, setVisaDocumentUrl] = useState('');
+  const [visaDocumentVerified, setVisaDocumentVerified] = useState(false);
+  const [verifyingVisa, setVerifyingVisa] = useState(false);
+  const [uploadingVisaDoc, setUploadingVisaDoc] = useState(false);
+
+  const requiresVisaDoc = (status) => !['irish_citizen', 'eu_citizen', ''].includes(status);
+
+  const totalSteps = requiresVisaDoc(formData.visa_status) ? 9 : 8;
 
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
