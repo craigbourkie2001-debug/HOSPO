@@ -183,6 +183,9 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
       {showPayment && (
         <PayShiftModal shift={shift} onClose={() => setShowPayment(false)} />
       )}
+      {showCompleteModal && (
+        <CompleteShiftModal shift={shift} onClose={() => setShowCompleteModal(false)} />
+      )}
     </Card>
   );
 }
