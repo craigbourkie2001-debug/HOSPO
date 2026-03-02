@@ -43,17 +43,44 @@ export default function Jobs() {
     await queryClient.invalidateQueries({ queryKey: ['jobs'] });
   };
 
+  const locations = ["all", ...new Set(jobs.map(j => j.location).filter(Boolean))];
+  const roles = ["all", ...new Set(jobs.map(j => j.role_type).filter(Boolean))];
+
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = job.job_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          job.venue_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          job.location?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesEmployment = employmentFilter === "all" || job.employment_type === employmentFilter;
-    
-    return matchesSearch && matchesEmployment;
+    const matchesLocation = locationFilter === "all" || job.location === locationFilter;
+    const matchesRole = roleFilter === "all" || job.role_type === roleFilter;
+    const matchesExperience = experienceFilter === "all" ||
+      (experienceFilter === "0-1" && (job.experience_years || 0) <= 1) ||
+      (experienceFilter === "2-3" && job.experience_years >= 2 && job.experience_years <= 3) ||
+      (experienceFilter === "4+" && job.experience_years >= 4);
+
+    let matchesSalary = true;
+    if (salaryFilter !== "all") {
+      const salary = job.salary_min || job.hourly_rate * 40 * 52 || 0;
+      if (salaryFilter === "0-30k") matchesSalary = salary < 30000;
+      if (salaryFilter === "30-40k") matchesSalary = salary >= 30000 && salary < 40000;
+      if (salaryFilter === "40-50k") matchesSalary = salary >= 40000 && salary < 50000;
+      if (salaryFilter === "50k+") matchesSalary = salary >= 50000;
+    }
+
+    return matchesSearch && matchesEmployment && matchesLocation && matchesRole && matchesSalary && matchesExperience;
   });
+
+  const activeFilterCount = [locationFilter, roleFilter, salaryFilter, experienceFilter].filter(f => f !== "all").length;
 
   const fullTimeCount = jobs.filter(j => j.employment_type === 'full_time').length;
   const partTimeCount = jobs.filter(j => j.employment_type === 'part_time').length;
+
+  const clearFilters = () => {
+    setLocationFilter("all");
+    setRoleFilter("all");
+    setSalaryFilter("all");
+    setExperienceFilter("all");
+  };
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
