@@ -23,19 +23,25 @@ export default function Premium() {
 
   const handleUpgrade = async () => {
     if (window.self !== window.top) {
-      toast.error('Payments only work in the published app. Please open the published app to subscribe.');
+      toast.info('Checkout opens in the published app. Opening now...', { duration: 3000 });
+      // Try to open in parent or new tab
+      const targetUrl = window.location.href;
+      window.open(targetUrl, '_blank');
       return;
     }
     setIsLoading(true);
     try {
       const { data } = await base44.functions.invoke('createWorkerSubscription', {});
-      if (data.sessionUrl) {
+      if (data?.sessionUrl) {
         window.location.href = data.sessionUrl;
+      } else if (data?.error) {
+        toast.error(data.error);
       } else {
-        throw new Error('No checkout URL received');
+        toast.error('Failed to start checkout. Please try again.');
       }
     } catch (error) {
       toast.error('Failed to start checkout. Please try again.');
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
