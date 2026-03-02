@@ -97,14 +97,16 @@ export default function Jobs() {
                 Full-time and part-time positions across Irish hospitality
               </p>
             </div>
-            <Button
-              onClick={() => setShowWizard(true)}
-              className="hidden md:flex rounded-xl px-6 h-auto py-3 gap-2"
-              style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
-            >
-              <Plus className="w-5 h-5" strokeWidth={1.5} />
-              Post a Job
-            </Button>
+            {isEmployer && (
+              <Button
+                onClick={() => setShowWizard(true)}
+                className="hidden md:flex rounded-xl px-6 h-auto py-3 gap-2"
+                style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+              >
+                <Briefcase className="w-5 h-5" strokeWidth={1.5} />
+                Post a Job
+              </Button>
+            )}
           </div>
 
         {/* Employment Type Tabs */}
