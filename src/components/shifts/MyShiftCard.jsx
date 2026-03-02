@@ -1,11 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { base44 } from "@/api/base44Client";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star } from "lucide-react";
 import { format } from "date-fns";
 import ShiftChatButton from "../messaging/ShiftChatButton";
+import ReviewVenueModal from "../shifts/ReviewVenueModal";
 
 export default function MyShiftCard({ shift }) {
+  const [showReviewModal, setShowReviewModal] = useState(false);
+
+  const { data: existingReviews = [] } = useQuery({
+    queryKey: ['venueReview', shift.id],
+    queryFn: () => base44.entities.VenueReview.filter({ shift_id: shift.id }),
+    enabled: shift.status === 'completed'
+  });
+  const hasReviewed = existingReviews.length > 0;
   const isCompleted = shift.status === 'completed';
   const isChefRole = shift.role_type === 'chef';
   const hours = (() => {
