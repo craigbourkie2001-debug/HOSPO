@@ -69,6 +69,7 @@ import Roasters from './pages/Roasters';
 import ShopDetails from './pages/ShopDetails';
 import SupportChat from './pages/SupportChat';
 import Welcome from './pages/Welcome';
+import TermsAndConditions from './pages/TermsAndConditions';
 import __Layout from './Layout.jsx';
 
 
@@ -95,6 +96,7 @@ export const PAGES = {
     "ShopDetails": ShopDetails,
     "SupportChat": SupportChat,
     "Welcome": Welcome,
+    "TermsAndConditions": TermsAndConditions,
 }
 
 export const pagesConfig = {
