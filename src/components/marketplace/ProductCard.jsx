@@ -7,6 +7,35 @@ import { base44 } from "@/api/base44Client";
 import { toast } from "sonner";
 
 export default function ProductCard({ product }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleBuy = async () => {
+    // Prevent checkout inside an iframe
+    if (window.self !== window.top) {
+      toast.error('Checkout is only supported in the published app. Please open the app directly.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await base44.functions.invoke('createProductCheckout', {
+        product_id: product.id,
+        product_name: product.name,
+        price: product.price,
+        currency: 'eur',
+      });
+      if (response.data?.url) {
+        window.location.href = response.data.url;
+      } else {
+        toast.error('Failed to start checkout. Please try again.');
+      }
+    } catch (error) {
+      toast.error('Failed to start checkout. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:-translate-y-1 border rounded-2xl hover-lift" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
       <div className="h-48 overflow-hidden relative" style={{ backgroundColor: 'var(--sand)' }}>
