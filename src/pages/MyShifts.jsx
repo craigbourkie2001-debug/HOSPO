@@ -36,7 +36,7 @@ export default function MyShifts() {
     initialData: [],
   });
 
-  const upcomingShifts = shifts.filter(s => s.status === 'filled' && new Date(s.date) >= new Date());
+  const upcomingShifts = shifts.filter(s => s.status === 'filled');
   const completedShifts = shifts.filter(s => s.status === 'completed');
   const pendingApplications = applications.filter(a => a.status === 'pending');
 
