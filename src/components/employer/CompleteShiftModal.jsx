@@ -159,6 +159,8 @@ export default function CompleteShiftModal({ shift, onClose }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerShifts'] });
+      queryClient.invalidateQueries({ queryKey: ['myShifts'] });
+      queryClient.invalidateQueries({ queryKey: ['workerReviews'] });
       toast.success('Shift completed & review submitted. Worker has been notified!');
       onClose();
     },
