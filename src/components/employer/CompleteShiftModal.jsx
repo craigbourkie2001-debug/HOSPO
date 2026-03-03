@@ -127,21 +127,28 @@ export default function CompleteShiftModal({ shift, onClose }) {
         strengths: observedSkills
       });
 
-      // Recalculate worker's average rating
+      // Mark shift as completed + reviewed FIRST (so worker sees it immediately)
+      await base44.entities.Shift.update(shift.id, { status: 'completed', reviewed: true });
+
+      // Recalculate worker's average rating and update profile
       const allReviews = await base44.entities.WorkerReview.filter({ worker_email: shift.assigned_to });
       const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
       const workers = await base44.entities.User.filter({ email: shift.assigned_to });
       if (workers?.length > 0) {
-        const workerSkills = workers[0].barista_skills || workers[0].chef_skills || [];
-        const newConfirmedSkills = [...new Set([...workerSkills, ...observedSkills])];
-        const updateData = { rating: parseFloat(avgRating.toFixed(2)) };
-        if (isChefRole) updateData.chef_skills = newConfirmedSkills;
-        else updateData.barista_skills = newConfirmedSkills;
-        await base44.entities.User.update(workers[0].id, updateData);
+        const worker = workers[0];
+        const existingBaristaSkills = worker.barista_skills || [];
+        const existingChefSkills = worker.chef_skills || [];
+        const updateData = {
+          rating: parseFloat(avgRating.toFixed(2)),
+          shifts_completed: (worker.shifts_completed || 0) + 1
+        };
+        if (isChefRole) {
+          updateData.chef_skills = [...new Set([...existingChefSkills, ...observedSkills])];
+        } else {
+          updateData.barista_skills = [...new Set([...existingBaristaSkills, ...observedSkills])];
+        }
+        await base44.entities.User.update(worker.id, updateData);
       }
-
-      // Mark shift as completed + reviewed
-      await base44.entities.Shift.update(shift.id, { status: 'completed', reviewed: true });
 
       // Notify worker to review the venue
       await base44.integrations.Core.SendEmail({
