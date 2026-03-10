@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Phone, Mail, MessageSquare, Plus, ArrowLeft } from "lucide-react";
 import ReviewCard from "../components/reviews/ReviewCard";
+import VenueRatingBreakdown from "../components/reviews/VenueRatingBreakdown";
 import { toast } from "sonner";
 
 export default function ShopDetails() {

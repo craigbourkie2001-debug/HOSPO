@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Star, Briefcase, MapPin, Award, Clock, Coffee, ChefHat, Shield, Euro } from "lucide-react";
+import WorkerRatingBreakdown from "../reviews/WorkerRatingBreakdown";
 
 export default function WorkerProfileModal({ workerEmail, onClose }) {
   const { data: workers = [] } = useQuery({

@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import MobileHeader from "../components/mobile/MobileHeader";
 import { createPageUrl } from "@/utils";
+import WorkerRatingBreakdown from "../components/reviews/WorkerRatingBreakdown";
 
 const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
