@@ -117,12 +117,21 @@ export default function Layout({ children }) {
     }).catch(() => {});
   }, [location.pathname]);
 
-  const mobileNavItems = [
-    { title: "Shifts", url: createPageUrl("BrowseShifts"), icon: Briefcase },
-    { title: "My Shifts", url: createPageUrl("MyShifts"), icon: Clock },
-    { title: "Messages", url: createPageUrl("Messages"), icon: MessageCircle },
-    { title: "Profile", url: createPageUrl("Profile"), icon: User },
-  ];
+  const isEmployer = user?.account_type === 'employer';
+  const isWorker = user?.account_type === 'worker';
+
+  const mobileNavItems = isEmployer
+    ? [
+        { title: "Dashboard", url: createPageUrl("EmployerDashboard"), icon: LayoutDashboard },
+        { title: "Messages", url: createPageUrl("Messages"), icon: MessageCircle },
+        { title: "Settings", url: createPageUrl("EmployerSettings"), icon: Settings },
+      ]
+    : [
+        { title: "Shifts", url: createPageUrl("BrowseShifts"), icon: Briefcase },
+        { title: "My Shifts", url: createPageUrl("MyShifts"), icon: Clock },
+        { title: "Messages", url: createPageUrl("Messages"), icon: MessageCircle },
+        { title: "Profile", url: createPageUrl("Profile"), icon: User },
+      ];
 
   return (
     <SidebarProvider>
@@ -252,8 +261,8 @@ export default function Layout({ children }) {
           </SidebarHeader>
           
           <SidebarContent className="p-4">
-            {/* Worker Section */}
-            {(!user || user.account_type === 'worker' || (!user.account_type && user.role !== 'employer')) && (
+            {/* Worker Section — only shown to workers or unauthenticated users */}
+            {!isEmployer && (
             <SidebarGroup>
               <div className="px-4 py-2 text-xs tracking-widest font-normal" style={{ color: 'var(--clay)' }}>
                 FOR WORKERS
@@ -290,9 +299,9 @@ export default function Layout({ children }) {
             </SidebarGroup>
             )}
 
-            {/* Employer Section */}
-            {(!user || user.account_type === 'employer' || user.role === 'employer') && (
-            <SidebarGroup className="mt-4">
+            {/* Employer Section — only shown to employers */}
+            {isEmployer && (
+            <SidebarGroup>
               <div className="px-4 py-2 text-xs tracking-widest font-normal" style={{ color: 'var(--clay)' }}>
                 FOR EMPLOYERS
               </div>
