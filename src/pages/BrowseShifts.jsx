@@ -219,6 +219,11 @@ export default function BrowseShifts() {
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sortedShifts.length > 0 && sortedShifts[0]?.is_premium_featured && (
+                <div className="col-span-full flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--terracotta)' }}>
+                  ⭐ Featured shifts shown first
+                </div>
+              )}
               {displayedShifts.map((shift) => (
                 <ShiftCard 
                   key={shift.id}
