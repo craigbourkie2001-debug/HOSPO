@@ -107,43 +107,52 @@ export default function BrowseShifts() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="min-h-screen p-4 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
-        <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-10 flex items-start justify-between">
-          <div>
-            <div className="mb-4">
-              <HospoLogo size="md" />
-            </div>
-            <h1 className="text-3xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              Available Shifts
-            </h1>
-            <p className="text-sm md:text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
-              Find your next opportunity in Irish hospitality
-            </p>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--cream)', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif' }}>
+        <div className="max-w-7xl mx-auto px-4 md:px-12 pt-6 md:pt-12 pb-4">
+
+        {/* Large Title Header */}
+        <div className="mb-6">
+          <h1 className="text-4xl md:text-5xl font-semibold mb-1 tracking-tight" style={{ color: 'var(--earth)', letterSpacing: '-0.02em' }}>
+            Available Shifts
+          </h1>
+          <p className="text-base" style={{ color: 'var(--clay)' }}>
+            {filteredShifts.length} {filteredShifts.length === 1 ? 'shift' : 'shifts'} in Ireland
+          </p>
+        </div>
+
+        {/* Search Bar — iOS style */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4" style={{ color: 'var(--clay)' }} />
+            <Input
+              placeholder="Search venues or locations..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-11 h-11 rounded-xl text-base border-0 shadow-none"
+              style={{ backgroundColor: 'var(--sand)', color: 'var(--earth)' }}
+            />
           </div>
         </div>
 
-        {/* Role Tabs */}
-        <Tabs value={roleFilter} onValueChange={setRoleFilter} className="mb-6">
-          <TabsList className="flex flex-wrap w-full p-1 rounded-2xl h-auto gap-1" style={{ backgroundColor: 'var(--sand)' }}>
+        {/* Role Filter — iOS segmented style */}
+        <Tabs value={roleFilter} onValueChange={setRoleFilter} className="mb-4">
+          <TabsList className="flex w-full p-1 rounded-xl h-auto gap-0.5 overflow-x-auto" style={{ backgroundColor: 'var(--sand)' }}>
             {[
-              { value: 'all', label: `All`, count: shifts.length },
-              { value: 'barista', label: `Barista`, count: roleCounts.barista },
-              { value: 'bartender', label: `Bar`, count: roleCounts.bartender },
-              { value: 'mixologist', label: `Mix`, count: roleCounts.mixologist },
-              { value: 'chef', label: `Chef`, count: roleCounts.chef },
-              { value: 'waiter', label: `Waiter`, count: roleCounts.waiter },
+              { value: 'all', label: 'All', count: shifts.length },
+              { value: 'barista', label: 'Barista', count: roleCounts.barista },
+              { value: 'bartender', label: 'Bar', count: roleCounts.bartender },
+              { value: 'mixologist', label: 'Mix', count: roleCounts.mixologist },
+              { value: 'chef', label: 'Chef', count: roleCounts.chef },
+              { value: 'waiter', label: 'Waiter', count: roleCounts.waiter },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="rounded-xl py-2 px-3 font-normal text-xs md:text-sm tracking-wide data-[state=active]:bg-white transition-all flex-1 min-w-0"
+                className="rounded-lg py-2 px-3 text-xs font-medium flex-1 min-w-0 data-[state=active]:shadow-sm transition-all data-[state=active]:bg-white"
                 style={{ color: 'var(--earth)' }}
               >
                 <span className="truncate">{tab.label}</span>
-                <span className="ml-1 opacity-60 hidden md:inline">({tab.count})</span>
-                <span className="ml-1 opacity-60 md:hidden text-xs">{tab.count > 0 ? tab.count : ''}</span>
+                {tab.count > 0 && <span className="ml-1 text-xs opacity-50">{tab.count}</span>}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -151,24 +160,6 @@ export default function BrowseShifts() {
 
         {/* AI Recommendations */}
         <RecommendedShifts user={user} onApply={setSelectedShift} />
-
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative">
-            <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
-            <Input
-              placeholder="Search by venue or location..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-14 h-14 rounded-2xl border text-base"
-              style={{ 
-                borderColor: 'var(--sand)',
-                backgroundColor: 'var(--warm-white)',
-                color: 'var(--earth)'
-              }}
-            />
-          </div>
-        </div>
 
         {/* Proximity Filter */}
         <ProximityFilter
@@ -180,7 +171,7 @@ export default function BrowseShifts() {
         />
 
         {/* Filters */}
-        <ShiftFilters 
+        <ShiftFilters
           filters={filters}
           setFilters={setFilters}
           availableLocations={availableLocations}
@@ -188,86 +179,40 @@ export default function BrowseShifts() {
           roleFilter={roleFilter}
         />
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8 md:mb-12">
-          <div 
-            className="p-4 md:p-6 rounded-2xl"
-            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
-          >
-            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              {filteredShifts.length}
-            </div>
-            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>SHIFTS</div>
-          </div>
-          
-          <div 
-            className="p-4 md:p-6 rounded-2xl"
-            style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
-          >
-            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              €{Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}
-            </div>
-            <div className="text-xs tracking-wider opacity-90">AVG RATE</div>
-          </div>
-          
-          <div 
-            className="p-4 md:p-6 rounded-2xl"
-            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
-          >
-            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              {availableLocations.length}
-            </div>
-            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>LOCATIONS</div>
-          </div>
-          
-          <div 
-            className="p-4 md:p-6 rounded-2xl"
-            style={{ backgroundColor: 'var(--sage)', color: 'white' }}
-          >
-            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              {[...new Set(shifts.map(s => s.coffee_shop_id))].length}
-            </div>
-            <div className="text-xs tracking-wider opacity-90">VENUES</div>
-          </div>
-        </div>
-
         {/* Shifts Grid */}
+        <div className="mt-2">
         {isLoading ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-96 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--sand)' }} />
+              <div key={i} className="h-52 rounded-2xl animate-pulse" style={{ backgroundColor: 'var(--sand)' }} />
             ))}
           </div>
         ) : filteredShifts.length === 0 ? (
-          <div className="text-center py-24 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
-            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
-              <Search className="w-10 h-10" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
+          <div className="text-center py-20 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+            <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+              <Search className="w-7 h-7" style={{ color: 'var(--clay)' }} />
             </div>
-            <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              No shifts found
-            </h3>
-            <p className="font-light" style={{ color: 'var(--clay)' }}>
-              Try adjusting your filters or check back later
-            </p>
+            <h3 className="text-xl font-semibold mb-1" style={{ color: 'var(--earth)' }}>No shifts found</h3>
+            <p className="text-sm" style={{ color: 'var(--clay)' }}>Try adjusting your filters</p>
           </div>
         ) : (
           <>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {displayedShifts.map((shift) => (
-                <ShiftCard 
+                <ShiftCard
                   key={shift.id}
-                  shift={shift} 
+                  shift={shift}
                   onApply={() => setSelectedShift(shift)}
                   distance={getShiftDistance(shift, userLocation)}
                 />
               ))}
             </div>
-            
+
             {hasMore && (
-              <div className="mt-8 flex justify-center">
+              <div className="mt-6 flex justify-center">
                 <Button
                   onClick={() => setMobileDisplayCount(prev => prev + 12)}
-                  className="rounded-xl font-normal tracking-wide px-8"
+                  className="rounded-xl font-medium px-8 h-11"
                   style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
                 >
                   Load More ({filteredShifts.length - mobileDisplayCount} remaining)
@@ -276,11 +221,12 @@ export default function BrowseShifts() {
             )}
           </>
         )}
+        </div>
 
         {selectedShift && (
-          <ApplyModal 
-            shift={selectedShift} 
-            onClose={() => setSelectedShift(null)} 
+          <ApplyModal
+            shift={selectedShift}
+            onClose={() => setSelectedShift(null)}
           />
         )}
         </div>
