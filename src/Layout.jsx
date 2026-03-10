@@ -337,8 +337,8 @@ export default function Layout({ children }) {
             </SidebarGroup>
             )}
 
-            {/* General Section */}
-            <SidebarGroup className="mt-4">
+            {/* General Section — only for workers */}
+            {!isEmployer && <SidebarGroup className="mt-4">
               <SidebarGroupContent>
                 <SidebarMenu>
                   {generalNavItems.map((item) => {
@@ -368,7 +368,7 @@ export default function Layout({ children }) {
                   })}
                 </SidebarMenu>
               </SidebarGroupContent>
-            </SidebarGroup>
+            </SidebarGroup>}
 
             {user && (
               <div className="mx-2 mt-6 p-5 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
