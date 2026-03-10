@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Euro, Trash2, Users, Coffee, ChefHat, Star, CreditCard } from "lucide-react";
+import { Calendar, Clock, Euro, Trash2, Users, Coffee, ChefHat, Star, CreditCard, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import PayShiftModal from "./PayShiftModal";
 import ShiftChatButton from "../messaging/ShiftChatButton";
@@ -132,14 +132,22 @@ export default function EmployerShiftCard({ shift, onDelete, onViewApplications,
                   </span>
                 </div>
               ) : (
-                <Button
-                  onClick={() => setShowPayment(true)}
-                  className="w-full rounded-xl font-normal flex items-center gap-2"
-                  style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
-                >
-                  <CreditCard className="w-4 h-4" />
-                  Pay Worker
-                </Button>
+                <div className="space-y-2">
+                  <div className="flex items-start gap-2 p-3 rounded-lg" style={{ backgroundColor: '#FFF3E0', border: '1px solid #FFB74D' }}>
+                    <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#F57C00' }} />
+                    <span className="text-xs font-normal" style={{ color: '#E65100' }}>
+                      Payment required — workers must be paid through the platform
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => setShowPayment(true)}
+                    className="w-full rounded-xl font-normal flex items-center gap-2"
+                    style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    Pay Worker Now
+                  </Button>
+                </div>
               )}
             </div>
           )}
