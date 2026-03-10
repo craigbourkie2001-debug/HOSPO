@@ -370,7 +370,7 @@ export default function Layout({ children }) {
               </SidebarGroupContent>
             </SidebarGroup>}
 
-            {user && (
+            {user && !isEmployer && (
               <div className="mx-2 mt-6 p-5 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
