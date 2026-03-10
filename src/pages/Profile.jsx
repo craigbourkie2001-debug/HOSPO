@@ -332,119 +332,74 @@ export default function Profile() {
   return (
     <>
       <MobileHeader title="My Profile" icon={User} />
-      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
-      <div className="max-w-4xl mx-auto">
-        <Card className="mb-8 border rounded-2xl overflow-hidden" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <div className="h-32" style={{ backgroundColor: 'var(--sand)' }} />
-          <CardContent className="pt-0">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 -mt-16 md:-mt-12">
-              <div className="relative group">
-                {isEditing && (
-                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePictureUpload}
-                      className="hidden"
-                      disabled={uploadingProfilePic}
-                    />
-                    <Camera className="w-8 h-8 text-white" />
-                  </label>
-                )}
-                {formData.profile_picture_url || user.profile_picture_url ? (
-                  <img 
-                    src={formData.profile_picture_url || user.profile_picture_url} 
-                    alt="Profile"
-                    className="w-24 h-24 rounded-full border-4 object-cover" 
-                    style={{ borderColor: 'var(--warm-white)' }}
-                  />
-                ) : (
-                  <div className="w-24 h-24 rounded-full border-4 flex items-center justify-center text-3xl font-light text-white" style={{ backgroundColor: 'var(--terracotta)', borderColor: 'var(--warm-white)', fontFamily: 'Crimson Pro, serif' }}>
-                    {user.full_name?.[0]?.toUpperCase() || 'U'}
-                  </div>
-                )}
+      <div className="min-h-screen pt-24 md:pt-12 pb-8" style={{ backgroundColor: 'var(--cream)', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif' }}>
+      <div className="max-w-4xl mx-auto px-4 md:px-12">
+
+        {/* Profile Header */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="relative group flex-shrink-0">
+            {isEditing && (
+              <label className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                <input type="file" accept="image/*" onChange={handleProfilePictureUpload} className="hidden" disabled={uploadingProfilePic} />
+                <Camera className="w-6 h-6 text-white" />
+              </label>
+            )}
+            {formData.profile_picture_url || user.profile_picture_url ? (
+              <img src={formData.profile_picture_url || user.profile_picture_url} alt="Profile" className="w-20 h-20 rounded-full object-cover" />
+            ) : (
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-semibold text-white" style={{ backgroundColor: 'var(--terracotta)' }}>
+                {user.full_name?.[0]?.toUpperCase() || 'U'}
               </div>
-              <div className="flex-1 text-center md:text-left mb-4 md:mb-0">
-                <h1 className="text-3xl font-normal mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                  {(user.legal_first_name && user.legal_last_name)
-                    ? `${user.legal_first_name} ${user.legal_last_name}`
-                    : user.full_name || user.email?.split('@')[0]}
-                </h1>
-                <p className="font-light" style={{ color: 'var(--clay)' }}>{user.email}</p>
-                {user.visa_status && (
-                  <div className="flex items-center gap-2 mt-2 justify-center md:justify-start">
-                    <Shield className="w-4 h-4" style={{ color: 'var(--sage)' }} />
-                    <span className="text-sm font-normal" style={{ color: 'var(--clay)' }}>
-                      {user.visa_status.replace(/_/g, ' ').toUpperCase()}
-                      {user.weekly_hours_limit && ` • ${user.weekly_hours_limit}h/week limit`}
-                    </span>
-                  </div>
-                )}
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl font-semibold truncate" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>
+              {(user.legal_first_name && user.legal_last_name)
+                ? `${user.legal_first_name} ${user.legal_last_name}`
+                : user.full_name || user.email?.split('@')[0]}
+            </h1>
+            <p className="text-sm mt-0.5 truncate" style={{ color: 'var(--clay)' }}>{user.email}</p>
+            {user.visa_status && (
+              <div className="flex items-center gap-1.5 mt-1">
+                <Shield className="w-3.5 h-3.5" style={{ color: 'var(--sage)' }} />
+                <span className="text-xs" style={{ color: 'var(--clay)' }}>
+                  {user.visa_status.replace(/_/g, ' ')}
+                  {user.weekly_hours_limit && ` · ${user.weekly_hours_limit}h/wk`}
+                </span>
               </div>
-              <div className="flex gap-2">
-                <Link to={createPageUrl("ProfileBuilder")}>
-                  <Button
-                    variant="outline"
-                    className="rounded-xl font-normal tracking-wide"
-                    style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }}
-                  >
-                    <Wand2 className="w-4 h-4 mr-2" />
-                    Profile Builder
-                  </Button>
-                </Link>
-                <Button
-                  onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
-                  disabled={updateProfileMutation.isPending}
-                  className="rounded-xl font-normal tracking-wide"
-                  style={{ backgroundColor: isEditing ? 'var(--terracotta)' : 'var(--earth)', color: 'white' }}
-                >
-                  {updateProfileMutation.isPending ? 'Saving...' : isEditing ? 'Save Profile' : 'Edit Profile'}
-                </Button>
-              </div>
+            )}
+          </div>
+          <div className="flex flex-col gap-2 flex-shrink-0">
+            <Link to={createPageUrl("ProfileBuilder")}>
+              <Button variant="outline" className="rounded-xl h-10 text-sm font-medium w-full" style={{ borderColor: 'var(--sand)', color: 'var(--earth)' }}>
+                <Wand2 className="w-4 h-4 mr-1.5" />
+                Builder
+              </Button>
+            </Link>
+            <Button
+              onClick={() => isEditing ? handleSubmit() : setIsEditing(true)}
+              disabled={updateProfileMutation.isPending}
+              className="rounded-xl h-10 text-sm font-medium"
+              style={{ backgroundColor: isEditing ? 'var(--terracotta)' : 'var(--earth)', color: 'white' }}
+            >
+              {updateProfileMutation.isPending ? 'Saving…' : isEditing ? 'Save' : 'Edit'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          {[
+            { label: 'Shifts', value: user.shifts_completed || 0 },
+            { label: 'Rating', value: user.rating > 0 ? user.rating.toFixed(1) : '—' },
+            { label: 'Exp.', value: `${user.experience_years || 0}y` },
+            { label: 'Hrs/wk', value: user.hours_worked_this_week || 0 },
+          ].map(({ label, value }) => (
+            <div key={label} className="p-3 rounded-2xl text-center" style={{ backgroundColor: 'var(--warm-white)' }}>
+              <div className="text-xl font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.02em' }}>{value}</div>
+              <div className="text-xs mt-0.5" style={{ color: 'var(--clay)' }}>{label}</div>
             </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid md:grid-cols-4 gap-5 mb-8">
-          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-            <CardContent className="p-6 text-center">
-              <Briefcase className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--sage)', strokeWidth: 1.5 }} />
-              <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                {user.shifts_completed || 0}
-              </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>SHIFTS DONE</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-            <CardContent className="p-6 text-center">
-              <Star className="w-8 h-8 mx-auto mb-2 fill-current" style={{ color: 'var(--terracotta)', strokeWidth: 1.5 }} />
-              <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                {user.rating > 0 ? user.rating.toFixed(1) : 'New'}
-              </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>EMPLOYER RATING</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-            <CardContent className="p-6 text-center">
-              <Award className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
-              <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                {user.experience_years || 0}y
-              </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>EXPERIENCE</div>
-            </CardContent>
-          </Card>
-
-          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-            <CardContent className="p-6 text-center">
-              <Clock className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--olive)', strokeWidth: 1.5 }} />
-              <div className="text-3xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                {user.hours_worked_this_week || 0}
-              </div>
-              <div className="text-xs tracking-wider font-light" style={{ color: 'var(--clay)' }}>HOURS THIS WEEK</div>
-            </CardContent>
-          </Card>
+          ))}
         </div>
 
         <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
