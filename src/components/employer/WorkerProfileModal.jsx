@@ -227,6 +227,7 @@ export default function WorkerProfileModal({ workerEmail, onClose }) {
               <h3 className="text-lg font-normal mb-3" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Reviews ({reviews.length})
               </h3>
+              <WorkerRatingBreakdown reviews={reviews} />
               <div className="space-y-3">
                 {reviews.map((review, idx) => (
                   <div key={idx} className="p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>

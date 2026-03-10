@@ -1324,6 +1324,7 @@ export default function Profile() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <WorkerRatingBreakdown reviews={workerReviews} />
               {workerReviews.map((review, idx) => (
                 <div key={idx} className="p-5 rounded-xl border" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--cream)' }}>
                   <div className="flex justify-between items-start mb-3">
