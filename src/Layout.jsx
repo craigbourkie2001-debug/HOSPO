@@ -63,19 +63,9 @@ const employerNavItems = [
     url: createPageUrl("EmployerSettings"),
     icon: Settings,
   },
-  {
-    title: "Upgrade to Premium",
-    url: createPageUrl("EmployerPremium"),
-    icon: Crown,
-  },
 ];
 
 const generalNavItems = [
-  {
-    title: "Hospo+ Premium",
-    url: createPageUrl("Premium"),
-    icon: Crown,
-  },
   {
     title: "Support Chat",
     url: createPageUrl("SupportChat"),
