@@ -97,7 +97,7 @@ export default function EmployerDashboard() {
   }
 
   // If onboarding not completed, show loading state (onboarding modal will appear from Layout)
-  if (!user.onboarding_completed || !user.coffee_shop_id && !user.restaurant_id) {
+  if (!user.onboarding_completed || (!user.coffee_shop_id && !user.restaurant_id)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="text-center">

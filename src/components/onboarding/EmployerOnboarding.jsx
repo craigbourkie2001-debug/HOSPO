@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, ArrowRight, Briefcase } from "lucide-react";
+import { toast } from "sonner";
 import { createPageUrl } from "@/utils";
 
 const specialtyOptions = ['espresso', 'filter', 'cold_brew', 'latte_art', 'pour_over', 'aeropress'];
@@ -79,7 +80,7 @@ export default function EmployerOnboarding({ user, onComplete }) {
       window.location.href = createPageUrl('EmployerDashboard');
     } catch (error) {
       console.error('Onboarding error:', error);
-      alert('Failed to complete setup: ' + (error.message || 'Unknown error'));
+      toast.error('Failed to complete setup: ' + (error.message || 'Please try again.'));
       setLoading(false);
     }
   };
