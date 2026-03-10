@@ -972,6 +972,10 @@ export default function Profile() {
                       preferred_shift_times: user.preferred_shift_times || [],
                       desired_hourly_rate_min: user.desired_hourly_rate_min || '',
                       desired_hourly_rate_max: user.desired_hourly_rate_max || '',
+                      iban: user.iban || '',
+                      bic: user.bic || '',
+                      bank_holder_name: user.bank_holder_name || '',
+                      bank_name: user.bank_name || '',
                       work_experience: user.work_experience || [],
                       skill_portfolio: user.skill_portfolio || []
                     });
