@@ -1365,6 +1365,51 @@ export default function Profile() {
             </CardContent>
           </Card>
         )}
+        {/* Banking / Payment Details */}
+        <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="font-normal flex items-center gap-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+                Payment Details
+              </CardTitle>
+              {!isEditing && (
+                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="rounded-xl font-normal" style={{ borderColor: 'var(--sand)' }}>
+                  {profileData.iban ? 'Update' : 'Add Banking'}
+                </Button>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!profileData.iban && !isEditing && (
+              <div className="flex items-start gap-3 p-4 rounded-xl mb-3" style={{ backgroundColor: '#FFF3E0', border: '1px solid #FFB74D' }}>
+                <span className="text-xl">⚠️</span>
+                <div>
+                  <p className="font-normal text-sm" style={{ color: '#E65100' }}>No bank details on file</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#BF360C' }}>You won't be able to receive shift payments until you add your IBAN.</p>
+                </div>
+              </div>
+            )}
+            {profileData.iban && !isEditing && (
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--sand)' }}>
+                  <span style={{ color: 'var(--clay)' }}>Account Holder</span>
+                  <span style={{ color: 'var(--earth)' }}>{profileData.bank_holder_name || '—'}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--sand)' }}>
+                  <span style={{ color: 'var(--clay)' }}>IBAN</span>
+                  <span className="font-mono" style={{ color: 'var(--earth)' }}>••••{profileData.iban?.slice(-4)}</span>
+                </div>
+                {profileData.bank_name && (
+                  <div className="flex justify-between py-2">
+                    <span style={{ color: 'var(--clay)' }}>Bank</span>
+                    <span style={{ color: 'var(--earth)' }}>{profileData.bank_name}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Logout and Delete Account Section */}
         <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
