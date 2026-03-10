@@ -37,15 +37,17 @@ export default function LeaveReviewModal({ shift, onClose }) {
 
       // Get all reviews for this worker to calculate new average
       const allReviews = await base44.entities.WorkerReview.filter({ worker_email: shift.assigned_to });
-      const avgRating = allReviews.length > 0 
-        ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length 
+      const avgRating = allReviews.length > 0
+        ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length
         : 0;
 
-      // Update worker's average rating (update the User entity)
+      // Update worker's average rating and total_reviews
       const workers = await base44.entities.User.filter({ email: shift.assigned_to });
       if (workers && workers.length > 0) {
         await base44.entities.User.update(workers[0].id, {
-          rating: parseFloat(avgRating.toFixed(2))
+          rating: parseFloat(avgRating.toFixed(2)),
+          total_reviews: allReviews.length,
+          shifts_completed: (workers[0].shifts_completed || 0) + 1
         });
       }
 
@@ -95,7 +97,7 @@ export default function LeaveReviewModal({ shift, onClose }) {
   const canSubmit = rating > 0 && punctualityRating > 0 && skillRating > 0 && attitudeRating > 0;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100] overflow-y-auto">
       <div className="max-w-2xl w-full rounded-2xl p-8 my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">

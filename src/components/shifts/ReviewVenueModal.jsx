@@ -87,7 +87,7 @@ export default function ReviewVenueModal({ shift, onClose }) {
   const canSubmit = overallRating > 0 && managementRating > 0 && environmentRating > 0 && payRating > 0;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-start justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-start justify-center p-4 z-[100] overflow-y-auto">
       <div className="max-w-2xl w-full rounded-2xl p-8 my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
 
         {/* Header */}
