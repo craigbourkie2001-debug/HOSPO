@@ -492,6 +492,7 @@ export default function Layout({ children }) {
           />
         )}
       </div>
+      <Toaster position="bottom-center" richColors />
     </SidebarProvider>
   );
 }
