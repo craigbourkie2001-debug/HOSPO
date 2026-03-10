@@ -126,22 +126,24 @@ export default function BrowseShifts() {
 
         {/* Role Tabs */}
         <Tabs value={roleFilter} onValueChange={setRoleFilter} className="mb-6">
-          <TabsList className="flex flex-wrap w-full p-1.5 rounded-2xl h-auto gap-1" style={{ backgroundColor: 'var(--sand)' }}>
+          <TabsList className="flex flex-wrap w-full p-1 rounded-2xl h-auto gap-1" style={{ backgroundColor: 'var(--sand)' }}>
             {[
-              { value: 'all', label: `All (${shifts.length})` },
-              { value: 'barista', label: `Barista (${roleCounts.barista})` },
-              { value: 'bartender', label: `Bartender (${roleCounts.bartender})` },
-              { value: 'mixologist', label: `Mixologist (${roleCounts.mixologist})` },
-              { value: 'chef', label: `Chef (${roleCounts.chef})` },
-              { value: 'waiter', label: `Waiter (${roleCounts.waiter})` },
+              { value: 'all', label: `All`, count: shifts.length },
+              { value: 'barista', label: `Barista`, count: roleCounts.barista },
+              { value: 'bartender', label: `Bar`, count: roleCounts.bartender },
+              { value: 'mixologist', label: `Mix`, count: roleCounts.mixologist },
+              { value: 'chef', label: `Chef`, count: roleCounts.chef },
+              { value: 'waiter', label: `Waiter`, count: roleCounts.waiter },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="rounded-xl py-2.5 px-4 font-normal text-sm tracking-wide data-[state=active]:bg-white transition-all"
+                className="rounded-xl py-2 px-3 font-normal text-xs md:text-sm tracking-wide data-[state=active]:bg-white transition-all flex-1 min-w-0"
                 style={{ color: 'var(--earth)' }}
               >
-                {tab.label}
+                <span className="truncate">{tab.label}</span>
+                <span className="ml-1 opacity-60 hidden md:inline">({tab.count})</span>
+                <span className="ml-1 opacity-60 md:hidden text-xs">{tab.count > 0 ? tab.count : ''}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -189,7 +191,7 @@ export default function BrowseShifts() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8 md:mb-12">
           <div 
-            className="p-6 rounded-2xl"
+            className="p-4 md:p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
             <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
