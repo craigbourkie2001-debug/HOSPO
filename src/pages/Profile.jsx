@@ -1378,13 +1378,13 @@ export default function Profile() {
               </CardTitle>
               {!isEditing && (
                 <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="rounded-xl font-normal" style={{ borderColor: 'var(--sand)' }}>
-                  {profileData.iban ? 'Update' : 'Add Banking'}
+                  {user.iban ? 'Update' : 'Add Banking'}
                 </Button>
               )}
             </div>
           </CardHeader>
           <CardContent>
-            {!profileData.iban && !isEditing && (
+            {!user.iban && !isEditing && (
               <div className="flex items-start gap-3 p-4 rounded-xl mb-3" style={{ backgroundColor: '#FFF3E0', border: '1px solid #FFB74D' }}>
                 <span className="text-xl">⚠️</span>
                 <div>
@@ -1393,20 +1393,43 @@ export default function Profile() {
                 </div>
               </div>
             )}
-            {profileData.iban && !isEditing && (
+            {isEditing && (
+              <div className="space-y-4">
+                <div>
+                  <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>ACCOUNT HOLDER NAME *</label>
+                  <Input value={formData.bank_holder_name} onChange={(e) => setFormData(prev => ({ ...prev, bank_holder_name: e.target.value }))} placeholder="As it appears on your bank account" className="rounded-xl border" style={{ borderColor: 'var(--sand)' }} />
+                </div>
+                <div>
+                  <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>IBAN *</label>
+                  <Input value={formData.iban} onChange={(e) => setFormData(prev => ({ ...prev, iban: e.target.value.replace(/\s/g, '').toUpperCase() }))} placeholder="IE29AIBK93115212345678" className="rounded-xl border font-mono" style={{ borderColor: 'var(--sand)' }} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>BIC / SWIFT (Optional)</label>
+                    <Input value={formData.bic} onChange={(e) => setFormData(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))} placeholder="AIBKIE2D" className="rounded-xl border font-mono" style={{ borderColor: 'var(--sand)' }} />
+                  </div>
+                  <div>
+                    <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>BANK NAME (Optional)</label>
+                    <Input value={formData.bank_name} onChange={(e) => setFormData(prev => ({ ...prev, bank_name: e.target.value }))} placeholder="AIB, Bank of Ireland..." className="rounded-xl border" style={{ borderColor: 'var(--sand)' }} />
+                  </div>
+                </div>
+                <p className="text-xs" style={{ color: 'var(--clay)' }}>🔒 Stored securely and only used to transfer your shift earnings.</p>
+              </div>
+            )}
+            {user.iban && !isEditing && (
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--sand)' }}>
                   <span style={{ color: 'var(--clay)' }}>Account Holder</span>
-                  <span style={{ color: 'var(--earth)' }}>{profileData.bank_holder_name || '—'}</span>
+                  <span style={{ color: 'var(--earth)' }}>{user.bank_holder_name || '—'}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--sand)' }}>
                   <span style={{ color: 'var(--clay)' }}>IBAN</span>
-                  <span className="font-mono" style={{ color: 'var(--earth)' }}>••••{profileData.iban?.slice(-4)}</span>
+                  <span className="font-mono" style={{ color: 'var(--earth)' }}>••••{user.iban?.slice(-4)}</span>
                 </div>
-                {profileData.bank_name && (
+                {user.bank_name && (
                   <div className="flex justify-between py-2">
                     <span style={{ color: 'var(--clay)' }}>Bank</span>
-                    <span style={{ color: 'var(--earth)' }}>{profileData.bank_name}</span>
+                    <span style={{ color: 'var(--earth)' }}>{user.bank_name}</span>
                   </div>
                 )}
               </div>
