@@ -107,7 +107,8 @@ export default function MyShiftCard({ shift }) {
         )}
 
         {shift.status === 'filled' && shift.assigned_to && (
-          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--cream)' }}>
+          <div className="mt-3 pt-3 border-t space-y-3" style={{ borderColor: 'var(--cream)' }}>
+            <ClockInButton shift={shift} />
             <ShiftChatButton 
               shift={shift} 
               size="sm" 
