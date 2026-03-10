@@ -402,9 +402,9 @@ export default function Profile() {
           ))}
         </div>
 
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Work Authorization</CardTitle>
+        <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>Work Authorization</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -441,9 +441,9 @@ export default function Profile() {
         </Card>
 
         {/* Worker Type */}
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Worker Type</CardTitle>
+        <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>Worker Type</CardTitle>
           </CardHeader>
           <CardContent>
             {isEditing ? (
@@ -484,9 +484,9 @@ export default function Profile() {
         </Card>
 
         {/* Professional Summary & Resume */}
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Professional Profile</CardTitle>
+        <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>Professional Profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
@@ -937,10 +937,10 @@ export default function Profile() {
         </Card>
 
         {/* Work Experience */}
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
+        <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>
                 Work Experience
               </CardTitle>
               {isEditing && (
@@ -1081,10 +1081,10 @@ export default function Profile() {
         </Card>
 
         {/* Certifications */}
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
+        <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>
                 Certifications
               </CardTitle>
               {isEditing && (
@@ -1172,10 +1172,10 @@ export default function Profile() {
         </Card>
 
         {/* Portfolio */}
-        <Card className="border rounded-2xl mb-8" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
+        <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>
                 Portfolio {user.worker_type === 'chef' ? '(Plated Dishes)' : user.worker_type === 'barista' ? '(Latte Art & Coffee)' : ''}
               </CardTitle>
               {isEditing && (
@@ -1271,11 +1271,11 @@ export default function Profile() {
         </Card>
 
         {workerReviews && workerReviews.length > 0 && (
-          <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-            <CardHeader>
-              <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                Employer Reviews ({workerReviews.length})
-              </CardTitle>
+          <Card className="rounded-2xl mb-5 border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+            <CardHeader className="pb-3">
+                <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>
+                  Employer Reviews ({workerReviews.length})
+                </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {workerReviews.map((review, idx) => (
@@ -1319,11 +1319,9 @@ export default function Profile() {
           </Card>
         )}
         {/* Logout and Delete Account Section */}
-        <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <CardTitle className="font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              Account
-            </CardTitle>
+        <Card className="rounded-2xl border-0 shadow-sm" style={{ backgroundColor: 'var(--warm-white)' }}>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold" style={{ color: 'var(--earth)', letterSpacing: '-0.01em' }}>Account</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <Button
