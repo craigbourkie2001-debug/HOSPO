@@ -129,13 +129,13 @@ export default function EmployerDashboard() {
   return (
     <>
       <MobileHeader title="Employer Dashboard" icon={LayoutDashboard} />
-      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+      <div className="min-h-screen p-4 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-6 md:mb-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-5xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              <h1 className="text-3xl md:text-5xl font-light mb-2 md:mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Employer Dashboard
               </h1>
               {venues.length > 1 ?
@@ -180,15 +180,15 @@ export default function EmployerDashboard() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-6 md:mb-12">
           <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-6 rounded-2xl hover-lift"
+              className="p-4 md:p-6 rounded-2xl hover-lift"
               style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
 
-            <Briefcase className="w-8 h-8 mb-3" style={{ color: 'var(--sage)', strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            <Briefcase className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ color: 'var(--sage)', strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {availableShifts.length}
             </div>
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>OPEN SHIFTS</div>
@@ -198,11 +198,11 @@ export default function EmployerDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="p-6 rounded-2xl hover-lift"
+              className="p-4 md:p-6 rounded-2xl hover-lift"
               style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}>
 
-            <Users className="w-8 h-8 mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <Users className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {totalApplications}
             </div>
             <div className="text-xs tracking-wider opacity-90">APPLICATIONS</div>
@@ -212,11 +212,11 @@ export default function EmployerDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="p-6 rounded-2xl hover-lift"
+              className="p-4 md:p-6 rounded-2xl hover-lift"
               style={{ backgroundColor: 'var(--sage)', color: 'white' }}>
 
-            <Clock className="w-8 h-8 mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <Clock className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3 opacity-90" style={{ strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {filledShifts.length}
             </div>
             <div className="text-xs tracking-wider opacity-90">FILLED SHIFTS</div>
@@ -226,11 +226,11 @@ export default function EmployerDashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="p-6 rounded-2xl hover-lift"
+              className="p-4 md:p-6 rounded-2xl hover-lift"
               style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
 
-            <TrendingUp className="w-8 h-8 mb-3" style={{ color: 'var(--olive)', strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            <TrendingUp className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ color: 'var(--olive)', strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {completedShifts.length}
             </div>
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>COMPLETED</div>

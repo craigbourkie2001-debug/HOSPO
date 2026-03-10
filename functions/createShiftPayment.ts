@@ -54,6 +54,7 @@ Deno.serve(async (req) => {
     const employerTotal = grossAmount + platformFeeEmployer;
 
     // Create payment record
+    const FEE_RATE = 0.10;
     const payment = await base44.entities.Payment.create({
       shift_id,
       worker_email: shift.assigned_to,
@@ -68,12 +69,14 @@ Deno.serve(async (req) => {
       platform_fee_worker: platformFeeWorker,
       worker_payout: workerPayout,
       employer_total: employerTotal,
+      fee_rate: FEE_RATE,
       status: 'pending'
     });
 
     // Create Stripe checkout session
     const origin = req.headers.get('origin') || 'https://app.base44.com';
     
+    const idempotencyKey = `shift-payment-${payment.id}`;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -98,7 +101,7 @@ Deno.serve(async (req) => {
         shift_id,
         worker_email: shift.assigned_to,
       },
-    });
+    }, { idempotencyKey });
 
     // Update payment with session ID
     await base44.entities.Payment.update(payment.id, {

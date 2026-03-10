@@ -35,6 +35,10 @@ export default function ApplyModal({ shift, onClose }) {
       if (!user?.email) throw new Error('You must be logged in to apply');
       if (!shift.id) throw new Error('Invalid shift');
 
+      // Server-side race condition guard: re-check immediately before creating
+      const existingApps = await base44.entities.ShiftApplication.filter({ shift_id: shift.id, applicant_email: user.email });
+      if (existingApps.length > 0) throw new Error('You have already applied for this shift');
+
       // Create application
       await base44.entities.ShiftApplication.create({
         shift_id: shift.id,
@@ -205,12 +209,14 @@ export default function ApplyModal({ shift, onClose }) {
           </label>
           <Textarea
             value={coverNote}
-            onChange={(e) => setCoverNote(e.target.value)}
+            onChange={(e) => setCoverNote(e.target.value.slice(0, 500))}
             placeholder="Add a personal message to the employer..."
             className="rounded-xl border"
             style={{ borderColor: 'var(--sand)' }}
             rows={3}
+            maxLength={500}
           />
+          <p className="text-xs mt-1 text-right" style={{ color: 'var(--clay)' }}>{coverNote.length}/500</p>
         </div>
 
         {alreadyApplied && (
