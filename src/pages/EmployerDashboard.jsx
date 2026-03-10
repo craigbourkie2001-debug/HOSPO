@@ -239,16 +239,16 @@ export default function EmployerDashboard() {
 
         {/* Tabs */}
         <Tabs defaultValue="shifts" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-3 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
-            <TabsTrigger value="shifts" className="rounded-lg font-normal">
-              Shift Management
+          <TabsList className="grid w-full grid-cols-3 p-1.5 rounded-2xl h-auto" style={{ backgroundColor: 'var(--sand)' }}>
+            <TabsTrigger value="shifts" className="rounded-xl py-2.5 font-normal text-sm tracking-wide transition-all data-[state=active]:shadow-none" style={{ color: 'var(--earth)' }}>
+              Shifts
             </TabsTrigger>
-            <TabsTrigger value="jobs" className="px-3 py-1 text-sm font-normal rounded-md inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow">
+            <TabsTrigger value="jobs" className="rounded-xl py-2.5 font-normal text-sm tracking-wide transition-all data-[state=active]:shadow-none" style={{ color: 'var(--earth)' }}>
               Job Postings
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="rounded-lg font-normal">
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Analytics
+            <TabsTrigger value="analytics" className="rounded-xl py-2.5 font-normal text-sm tracking-wide transition-all data-[state=active]:shadow-none flex items-center justify-center gap-2" style={{ color: 'var(--earth)' }}>
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Analytics</span>
             </TabsTrigger>
           </TabsList>
 
