@@ -70,6 +70,10 @@ export default function Profile() {
         preferred_shift_times: userData.preferred_shift_times || [],
         desired_hourly_rate_min: userData.desired_hourly_rate_min || '',
         desired_hourly_rate_max: userData.desired_hourly_rate_max || '',
+        iban: userData.iban || '',
+        bic: userData.bic || '',
+        bank_holder_name: userData.bank_holder_name || '',
+        bank_name: userData.bank_name || '',
         work_experience: userData.work_experience || [],
         skill_portfolio: userData.skill_portfolio || []
       });
