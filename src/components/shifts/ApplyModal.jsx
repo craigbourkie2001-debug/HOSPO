@@ -213,15 +213,21 @@ export default function ApplyModal({ shift, onClose }) {
           />
         </div>
 
+        {alreadyApplied && (
+          <div className="mb-4 p-3 rounded-xl text-sm" style={{ backgroundColor: '#8A9B8E20', color: 'var(--sage)' }}>
+            ✓ You have already applied for this shift.
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex gap-3">
           <Button
             onClick={() => applyMutation.mutate()}
-            disabled={applyMutation.isPending}
+            disabled={applyMutation.isPending || alreadyApplied}
             className="flex-1 rounded-xl font-normal tracking-wide"
-            style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+            style={{ backgroundColor: alreadyApplied ? 'var(--sand)' : 'var(--terracotta)', color: alreadyApplied ? 'var(--clay)' : 'white' }}
           >
-            {applyMutation.isPending ? 'Submitting...' : 'Submit Application'}
+            {applyMutation.isPending ? 'Submitting...' : alreadyApplied ? 'Already Applied' : 'Submit Application'}
           </Button>
           <Button
             variant="outline"
