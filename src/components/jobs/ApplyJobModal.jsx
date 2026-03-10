@@ -149,14 +149,14 @@ Hospo Team
       toast.success('Application submitted successfully!');
       onClose();
     },
-    onError: () => {
-      toast.error('Failed to submit application');
+    onError: (err) => {
+      toast.error(err?.message || 'Failed to submit application. Please try again.');
     }
   });
 
   if (!user) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100]">
         <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ backgroundColor: 'var(--warm-white)' }}>
           <div className="animate-spin rounded-full h-12 w-12 border-2 mx-auto" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
         </div>
@@ -165,7 +165,7 @@ Hospo Team
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100] overflow-y-auto">
       <div className="max-w-2xl w-full rounded-2xl p-8 my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
