@@ -40,152 +40,87 @@ export default function MyShifts() {
   const completedShifts = shifts.filter(s => s.status === 'completed');
   const pendingApplications = applications.filter(a => a.status === 'pending');
 
+  const totalHours = shifts.reduce((sum, s) => {
+    if (!s.start_time || !s.end_time) return sum;
+    const [sh, sm] = s.start_time.split(':').map(Number);
+    const [eh, em] = s.end_time.split(':').map(Number);
+    const mins = (eh * 60 + em) - (sh * 60 + sm);
+    return sum + (mins > 0 ? mins / 60 : 0);
+  }, 0);
+
   return (
     <PullToRefresh onRefresh={handleRefresh}>
       <MobileHeader title="My Shifts" icon={Clock} />
-      <div className="min-h-screen p-4 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
-        <div className="max-w-6xl mx-auto">
-        <div className="mb-6 md:mb-12">
-          <h1 className="text-3xl md:text-6xl font-light mb-2 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+      <div className="min-h-screen pt-24 md:pt-12 pb-4" style={{ backgroundColor: 'var(--cream)', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif' }}>
+        <div className="max-w-6xl mx-auto px-4 md:px-12">
+
+        {/* Large Title */}
+        <div className="mb-6">
+          <h1 className="text-4xl md:text-5xl font-semibold tracking-tight" style={{ color: 'var(--earth)', letterSpacing: '-0.02em' }}>
             My Shifts
           </h1>
-          <p className="text-sm md:text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
-            Manage your claimed and completed shifts
-          </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-6 md:mb-10">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="p-4 md:p-6 rounded-2xl hover-lift"
-            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
-          >
-            <FileText className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ color: 'var(--terracotta)', strokeWidth: 1.5 }} />
-            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              {pendingApplications.length}
+        {/* Stats row — lightweight, no heavy borders */}
+        <div className="grid grid-cols-4 gap-3 mb-6">
+          {[
+            { label: 'Pending', value: pendingApplications.length, icon: FileText, color: 'var(--terracotta)' },
+            { label: 'Confirmed', value: upcomingShifts.length, icon: Calendar, color: 'var(--sage)' },
+            { label: 'Done', value: completedShifts.length, icon: CheckCircle, color: 'var(--earth)' },
+            { label: 'Hours', value: totalHours.toFixed(0) + 'h', icon: Clock, color: 'var(--clay)' },
+          ].map(({ label, value, icon: Icon, color }) => (
+            <div key={label} className="p-3 rounded-2xl text-center" style={{ backgroundColor: 'var(--warm-white)' }}>
+              <div className="text-2xl font-semibold mb-0.5" style={{ color, letterSpacing: '-0.02em' }}>{value}</div>
+              <div className="text-xs" style={{ color: 'var(--clay)' }}>{label}</div>
             </div>
-            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>PENDING APPS</div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="p-4 md:p-6 rounded-2xl hover-lift"
-            style={{ backgroundColor: 'var(--sage)', color: 'white' }}
-          >
-            <Calendar className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ strokeWidth: 1.5 }} />
-            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              {upcomingShifts.length}
-            </div>
-            <div className="text-xs tracking-wider opacity-90">CONFIRMED</div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="p-4 md:p-6 rounded-2xl hover-lift"
-            style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
-          >
-            <CheckCircle className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ strokeWidth: 1.5 }} />
-            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              {completedShifts.length}
-            </div>
-            <div className="text-xs tracking-wider opacity-90">COMPLETED</div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="p-4 md:p-6 rounded-2xl hover-lift"
-            style={{ backgroundColor: 'var(--clay)', color: 'white' }}
-          >
-            <Clock className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ strokeWidth: 1.5 }} />
-            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
-              {shifts.reduce((sum, s) => {
-                if (!s.start_time || !s.end_time) return sum;
-                const [sh, sm] = s.start_time.split(':').map(Number);
-                const [eh, em] = s.end_time.split(':').map(Number);
-                const mins = (eh * 60 + em) - (sh * 60 + sm);
-                return sum + (mins > 0 ? mins / 60 : 0);
-              }, 0).toFixed(1)}
-            </div>
-            <div className="text-xs tracking-wider opacity-90">TOTAL HOURS</div>
-          </motion.div>
+          ))}
         </div>
 
+        {/* Tabs — iOS segmented control style */}
         <Tabs defaultValue="applications" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-6 md:mb-8 p-1.5 rounded-2xl h-auto" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
-            <TabsTrigger 
-              value="applications" 
-              className="rounded-xl py-2.5 font-normal text-xs md:text-sm tracking-wide data-[state=active]:text-white transition-all"
-              style={{ color: 'var(--clay)' }}
-            >
-              <span className="hidden sm:inline">Applications </span>({applications.length})
+          <TabsList className="w-full grid grid-cols-3 mb-5 p-1 rounded-xl h-auto" style={{ backgroundColor: 'var(--sand)' }}>
+            <TabsTrigger value="applications" className="rounded-lg py-2.5 text-sm font-medium transition-all data-[state=active]:shadow-sm data-[state=active]:bg-white" style={{ color: 'var(--earth)' }}>
+              Applications {applications.length > 0 && <span className="ml-1 text-xs opacity-60">{applications.length}</span>}
             </TabsTrigger>
-            <TabsTrigger 
-              value="upcoming" 
-              className="rounded-xl py-2.5 font-normal text-xs md:text-sm tracking-wide data-[state=active]:text-white transition-all"
-              style={{ color: 'var(--clay)' }}
-            >
-              <span className="hidden sm:inline">Confirmed </span>({upcomingShifts.length})
+            <TabsTrigger value="upcoming" className="rounded-lg py-2.5 text-sm font-medium transition-all data-[state=active]:shadow-sm data-[state=active]:bg-white" style={{ color: 'var(--earth)' }}>
+              Confirmed {upcomingShifts.length > 0 && <span className="ml-1 text-xs opacity-60">{upcomingShifts.length}</span>}
             </TabsTrigger>
-            <TabsTrigger 
-              value="completed"
-              className="rounded-xl py-2.5 font-normal text-xs md:text-sm tracking-wide data-[state=active]:text-white transition-all"
-              style={{ color: 'var(--clay)' }}
-            >
-              <span className="hidden sm:inline">Completed </span>({completedShifts.length})
+            <TabsTrigger value="completed" className="rounded-lg py-2.5 text-sm font-medium transition-all data-[state=active]:shadow-sm data-[state=active]:bg-white" style={{ color: 'var(--earth)' }}>
+              Completed {completedShifts.length > 0 && <span className="ml-1 text-xs opacity-60">{completedShifts.length}</span>}
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="applications">
             {applications.length === 0 ? (
-              <div className="text-center py-20 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
-                <FileText className="w-20 h-20 mx-auto mb-6" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
-                <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                  No applications yet
-                </h3>
-                <p className="font-light" style={{ color: 'var(--clay)' }}>
-                  Browse available shifts and apply
-                </p>
+              <div className="text-center py-20">
+                <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+                  <FileText className="w-6 h-6" style={{ color: 'var(--clay)' }} />
+                </div>
+                <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--earth)' }}>No applications yet</h3>
+                <p className="text-sm" style={{ color: 'var(--clay)' }}>Browse shifts to apply</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-3">
                 {applications.map(app => (
-                  <div 
-                    key={app.id} 
-                    className="p-5 rounded-xl border"
-                    style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        {app.role_type === 'chef' ? (
-                          <ChefHat className="w-5 h-5" style={{ color: 'var(--sage)' }} />
-                        ) : (
-                          <Coffee className="w-5 h-5" style={{ color: 'var(--terracotta)' }} />
-                        )}
-                        <h4 className="font-normal text-lg" style={{ color: 'var(--earth)' }}>{app.venue_name}</h4>
+                  <div key={app.id} className="flex items-center justify-between p-4 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)' }}>
+                    <div className="flex items-center gap-3">
+                      {app.role_type === 'chef'
+                        ? <ChefHat className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--sage)' }} />
+                        : <Coffee className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--terracotta)' }} />
+                      }
+                      <div>
+                        <p className="font-medium text-sm" style={{ color: 'var(--earth)' }}>{app.venue_name}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'var(--clay)' }}>
+                          {new Date(app.shift_date).toLocaleDateString('en-IE', { weekday: 'short', month: 'short', day: 'numeric' })}
+                        </p>
                       </div>
-                      <Badge 
-                        className="font-normal"
-                        style={{ 
-                          backgroundColor: app.status === 'accepted' ? 'var(--sage)' : app.status === 'rejected' ? 'var(--clay)' : 'var(--sand)',
-                          color: app.status === 'pending' ? 'var(--earth)' : 'white'
-                        }}
-                      >
-                        {app.status}
-                      </Badge>
                     </div>
-                    <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--clay)' }}>
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(app.shift_date).toLocaleDateString('en-IE', { weekday: 'short', month: 'short', day: 'numeric' })}
-                      </span>
-                    </div>
+                    <Badge className="font-medium text-xs capitalize border-0" style={{
+                      backgroundColor: app.status === 'accepted' ? '#dcfce7' : app.status === 'rejected' ? '#fee2e2' : 'var(--sand)',
+                      color: app.status === 'accepted' ? '#166534' : app.status === 'rejected' ? '#991b1b' : 'var(--earth)'
+                    }}>
+                      {app.status}
+                    </Badge>
                   </div>
                 ))}
               </div>
@@ -194,40 +129,32 @@ export default function MyShifts() {
 
           <TabsContent value="upcoming">
             {upcomingShifts.length === 0 ? (
-              <div className="text-center py-20 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
-                <Calendar className="w-20 h-20 mx-auto mb-6" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
-                <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                  No upcoming shifts
-                </h3>
-                <p className="font-light" style={{ color: 'var(--clay)' }}>
-                  Browse available shifts to get started
-                </p>
+              <div className="text-center py-20">
+                <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+                  <Calendar className="w-6 h-6" style={{ color: 'var(--clay)' }} />
+                </div>
+                <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--earth)' }}>No confirmed shifts</h3>
+                <p className="text-sm" style={{ color: 'var(--clay)' }}>Browse shifts to get started</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {upcomingShifts.map(shift => (
-                  <MyShiftCard key={shift.id} shift={shift} />
-                ))}
+              <div className="grid md:grid-cols-2 gap-4">
+                {upcomingShifts.map(shift => <MyShiftCard key={shift.id} shift={shift} />)}
               </div>
             )}
           </TabsContent>
 
           <TabsContent value="completed">
             {completedShifts.length === 0 ? (
-              <div className="text-center py-20 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
-                <CheckCircle className="w-20 h-20 mx-auto mb-6" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
-                <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                  No completed shifts yet
-                </h3>
-                <p className="font-light" style={{ color: 'var(--clay)' }}>
-                  Your completed shifts will appear here
-                </p>
+              <div className="text-center py-20">
+                <div className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+                  <CheckCircle className="w-6 h-6" style={{ color: 'var(--clay)' }} />
+                </div>
+                <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--earth)' }}>No completed shifts</h3>
+                <p className="text-sm" style={{ color: 'var(--clay)' }}>Completed shifts appear here</p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {completedShifts.map(shift => (
-                  <MyShiftCard key={shift.id} shift={shift} />
-                ))}
+              <div className="grid md:grid-cols-2 gap-4">
+                {completedShifts.map(shift => <MyShiftCard key={shift.id} shift={shift} />)}
               </div>
             )}
           </TabsContent>
