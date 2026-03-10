@@ -7,19 +7,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import MobileSelect from "../mobile/MobileSelect";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Coffee, ChefHat } from "lucide-react";
+import { X, Coffee, ChefHat, Wine, UtensilsCrossed, Users } from "lucide-react";
 import { toast } from "sonner";
 
-const baristaSkillOptions = [
-  "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
-  "customer_service", "opening", "closing", "cash_handling"
-];
-
-const chefSkillOptions = [
-  "line_cook", "prep_cook", "grill", "saute", "pastry", 
-  "sous_chef", "head_chef", "food_safety", "inventory", 
-  "menu_planning", "plating", "butchery", "seafood", "vegetarian"
-];
+const skillsByRole = {
+  barista: ["espresso", "latte_art", "filter", "pour_over", "cold_brew", "customer_service", "opening", "closing", "cash_handling"],
+  bartender: ["cocktails", "wine", "beer", "spirits", "customer_service", "cash_handling", "speed", "upselling"],
+  mixologist: ["cocktails", "spirits", "garnishes", "menu_creation", "fermentation", "wine_pairing", "customer_service"],
+  waiter: ["table_service", "customer_service", "pos_system", "wine_service", "upselling", "allergen_awareness", "cash_handling"],
+  chef: ["line_cook", "prep_cook", "grill", "saute", "pastry", "sous_chef", "head_chef", "food_safety", "inventory", "menu_planning", "plating", "butchery", "seafood", "vegetarian"]
+};
 
 export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClose }) {
   const queryClient = useQueryClient();
@@ -39,7 +36,7 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
     base44.auth.me().then(setUser).catch(() => {});
   }, []);
 
-  const skillOptions = formData.role_type === 'chef' ? chefSkillOptions : baristaSkillOptions;
+  const skillOptions = skillsByRole[formData.role_type] || skillsByRole.barista;
 
   const createShiftMutation = useMutation({
     mutationFn: (data) => {
@@ -129,16 +126,19 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="barista">
-                  <div className="flex items-center gap-2">
-                    <Coffee className="w-4 h-4" />
-                    Barista
-                  </div>
+                  <div className="flex items-center gap-2"><Coffee className="w-4 h-4" />Barista</div>
+                </SelectItem>
+                <SelectItem value="bartender">
+                  <div className="flex items-center gap-2"><Wine className="w-4 h-4" />Bartender</div>
+                </SelectItem>
+                <SelectItem value="mixologist">
+                  <div className="flex items-center gap-2"><Wine className="w-4 h-4" />Mixologist</div>
+                </SelectItem>
+                <SelectItem value="waiter">
+                  <div className="flex items-center gap-2"><Users className="w-4 h-4" />Waiter / Server</div>
                 </SelectItem>
                 <SelectItem value="chef">
-                  <div className="flex items-center gap-2">
-                    <ChefHat className="w-4 h-4" />
-                    Chef / Kitchen
-                  </div>
+                  <div className="flex items-center gap-2"><ChefHat className="w-4 h-4" />Chef / Kitchen</div>
                 </SelectItem>
               </SelectContent>
             </MobileSelect>
