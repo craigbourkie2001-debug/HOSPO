@@ -46,14 +46,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Worker has not set up payment details (IBAN) yet' }, { status: 400 });
     }
 
-    // Calculate payment — 10% platform fee charged to employer only
+    // Calculate payment — 10% platform fee on both sides
     const startTime = new Date(`${shift.date}T${shift.start_time}`);
     const endTime = new Date(`${shift.date}T${shift.end_time}`);
     const hoursWorked = (endTime - startTime) / (1000 * 60 * 60);
     const grossAmount = hoursWorked * shift.hourly_rate;
-    const platformFee = grossAmount * 0.10;
-    const workerPayout = grossAmount; // worker receives full gross
-    const employerTotal = grossAmount + platformFee;
+    const platformFeeEmployer = grossAmount * 0.10;
+    const platformFeeWorker = grossAmount * 0.10;
+    const workerPayout = grossAmount - platformFeeWorker;
+    const employerTotal = grossAmount + platformFeeEmployer;
 
     // Create or update payment record
     let payment;
