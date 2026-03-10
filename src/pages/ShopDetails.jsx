@@ -40,6 +40,12 @@ export default function ShopDetails() {
     enabled: !!id
   });
 
+  const { data: workerReviews = [] } = useQuery({
+    queryKey: ['venueReviews', id],
+    queryFn: () => base44.entities.VenueReview.filter({ venue_id: id }, '-created_date'),
+    enabled: !!id
+  });
+
   const createReviewMutation = useMutation({
     mutationFn: (reviewData) => base44.entities.Review.create(reviewData),
     onSuccess: async () => {
