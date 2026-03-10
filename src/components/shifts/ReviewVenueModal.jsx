@@ -60,6 +60,19 @@ export default function ReviewVenueModal({ shift, onClose }) {
         would_work_again: wouldWorkAgain,
         comment
       });
+
+      // Update venue aggregate rating
+      try {
+        const allVenueReviews = await base44.entities.VenueReview.filter({ venue_id: shift.venue_id });
+        const avgRating = allVenueReviews.reduce((s, r) => s + r.overall_rating, 0) / allVenueReviews.length;
+        const EntityType = shift.venue_type === 'restaurant'
+          ? base44.entities.Restaurant
+          : base44.entities.CoffeeShop;
+        await EntityType.update(shift.venue_id, {
+          average_rating: parseFloat(avgRating.toFixed(2)),
+          total_reviews: allVenueReviews.length
+        });
+      } catch (e) { console.warn('Failed to update venue rating', e); }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['myShifts'] });

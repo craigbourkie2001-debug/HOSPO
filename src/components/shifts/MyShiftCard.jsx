@@ -4,11 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star, Wine, Users } from "lucide-react";
+import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star } from "lucide-react";
 import { format } from "date-fns";
 import ShiftChatButton from "../messaging/ShiftChatButton";
 import ReviewVenueModal from "../shifts/ReviewVenueModal";
-import ClockInButton from "./ClockInButton";
+import ClockInButton from "../shifts/ClockInButton";
 
 export default function MyShiftCard({ shift }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
