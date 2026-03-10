@@ -92,7 +92,13 @@ export default function BrowseShifts() {
            matchesPayRate && matchesShiftTime && matchesChefLevel && matchesProximity;
   });
 
-  const displayedShifts = isMobile ? filteredShifts.slice(0, mobileDisplayCount) : filteredShifts;
+  // Sort: featured first, then by date
+  const sortedShifts = [...filteredShifts].sort((a, b) => {
+    if (a.is_premium_featured && !b.is_premium_featured) return -1;
+    if (!a.is_premium_featured && b.is_premium_featured) return 1;
+    return new Date(a.date) - new Date(b.date);
+  });
+  const displayedShifts = isMobile ? sortedShifts.slice(0, mobileDisplayCount) : sortedShifts;
   const hasMore = isMobile && filteredShifts.length > mobileDisplayCount;
 
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
