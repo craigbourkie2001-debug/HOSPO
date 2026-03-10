@@ -4,11 +4,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star } from "lucide-react";
+import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star, Wine, Users } from "lucide-react";
 import { format } from "date-fns";
 import ShiftChatButton from "../messaging/ShiftChatButton";
 import ReviewVenueModal from "../shifts/ReviewVenueModal";
-import ClockInButton from "../shifts/ClockInButton";
+import ClockInButton from "./ClockInButton";
 
 export default function MyShiftCard({ shift }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -107,8 +107,7 @@ export default function MyShiftCard({ shift }) {
         )}
 
         {shift.status === 'filled' && shift.assigned_to && (
-          <div className="mt-3 pt-3 border-t space-y-3" style={{ borderColor: 'var(--cream)' }}>
-            <ClockInButton shift={shift} />
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--cream)' }}>
             <ShiftChatButton 
               shift={shift} 
               size="sm" 
