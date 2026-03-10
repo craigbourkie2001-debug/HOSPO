@@ -102,7 +102,7 @@ export default function ApplyModal({ shift, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="max-w-2xl w-full rounded-2xl p-8 my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
+      <div className="max-w-2xl w-full rounded-2xl p-4 md:p-8 my-4 md:my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             {isChefRole ? (

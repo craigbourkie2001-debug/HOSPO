@@ -40,7 +40,7 @@ export default function ShiftFilters({ filters, setFilters, availableLocations, 
   }, [roleFilter]);
 
   return (
-    <div className="mb-10 p-8 rounded-2xl border" style={{ backgroundColor: 'var(--warm-white)', borderColor: 'var(--sand)' }}>
+    <div className="mb-10 p-4 md:p-8 rounded-2xl border" style={{ backgroundColor: 'var(--warm-white)', borderColor: 'var(--sand)' }}>
       <div className="flex items-center gap-2 mb-6">
         <Filter className="w-5 h-5" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
         <h3 className="text-xl font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>

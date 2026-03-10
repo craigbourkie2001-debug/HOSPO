@@ -107,7 +107,7 @@ export default function BrowseShifts() {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="min-h-screen p-6 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
+      <div className="min-h-screen p-4 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-10 flex items-start justify-between">
@@ -115,10 +115,10 @@ export default function BrowseShifts() {
             <div className="mb-4">
               <HospoLogo size="md" />
             </div>
-            <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            <h1 className="text-3xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               Available Shifts
             </h1>
-            <p className="text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
+            <p className="text-sm md:text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
               Find your next opportunity in Irish hospitality
             </p>
           </div>
@@ -187,45 +187,45 @@ export default function BrowseShifts() {
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8 md:mb-12">
           <div 
             className="p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {filteredShifts.length}
             </div>
-            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>AVAILABLE SHIFTS</div>
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>SHIFTS</div>
           </div>
           
           <div 
-            className="p-6 rounded-2xl"
+            className="p-4 md:p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
           >
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif' }}>
               €{Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}
             </div>
-            <div className="text-xs tracking-wider opacity-90">AVG. HOURLY RATE</div>
+            <div className="text-xs tracking-wider opacity-90">AVG RATE</div>
           </div>
           
           <div 
-            className="p-6 rounded-2xl"
+            className="p-4 md:p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {availableLocations.length}
             </div>
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>LOCATIONS</div>
           </div>
           
           <div 
-            className="p-6 rounded-2xl"
+            className="p-4 md:p-6 rounded-2xl"
             style={{ backgroundColor: 'var(--sage)', color: 'white' }}
           >
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {[...new Set(shifts.map(s => s.coffee_shop_id))].length}
             </div>
-            <div className="text-xs tracking-wider opacity-90">COFFEE SHOPS</div>
+            <div className="text-xs tracking-wider opacity-90">VENUES</div>
           </div>
         </div>
 
