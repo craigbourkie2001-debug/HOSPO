@@ -4,7 +4,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, CheckCircle, Clock, FileText, Coffee, ChefHat } from "lucide-react";
-import { motion } from "framer-motion";
 import MyShiftCard from "../components/shifts/MyShiftCard";
 import MobileHeader from "../components/mobile/MobileHeader";
 import PullToRefresh from "../components/mobile/PullToRefresh";
