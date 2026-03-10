@@ -218,6 +218,31 @@ export default function ShopDetails() {
           </div>
         )}
 
+        {/* Worker Shift Reviews Section */}
+        {workerReviews.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              Worker Ratings
+            </h3>
+            <VenueRatingBreakdown reviews={workerReviews} />
+            <div className="space-y-3">
+              {workerReviews.slice(0, 3).map((review, idx) => (
+                <div key={idx} className="p-4 rounded-xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-normal" style={{ color: 'var(--earth)' }}>{review.worker_name}</span>
+                    <div className="flex">
+                      {[1,2,3,4,5].map(i => (
+                        <Star key={i} className="w-3.5 h-3.5" style={{ color: i <= review.overall_rating ? 'var(--terracotta)' : 'var(--sand)', fill: i <= review.overall_rating ? 'var(--terracotta)' : 'none' }} />
+                      ))}
+                    </div>
+                  </div>
+                  {review.comment && <p className="text-sm font-light" style={{ color: 'var(--clay)' }}>{review.comment}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Reviews Section */}
         <div className="pt-6">
           <div className="flex items-center justify-between mb-4">
