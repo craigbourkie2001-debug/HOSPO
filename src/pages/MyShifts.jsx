@@ -43,26 +43,26 @@ export default function MyShifts() {
   return (
     <PullToRefresh onRefresh={handleRefresh}>
       <MobileHeader title="My Shifts" icon={Clock} />
-      <div className="min-h-screen p-6 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
+      <div className="min-h-screen p-4 md:p-12 md:pt-12 pt-24" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="max-w-6xl mx-auto">
-        <div className="mb-12">
-          <h1 className="text-5xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+        <div className="mb-6 md:mb-12">
+          <h1 className="text-3xl md:text-6xl font-light mb-2 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
             My Shifts
           </h1>
-          <p className="text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
+          <p className="text-sm md:text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
             Manage your claimed and completed shifts
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-6 md:mb-10">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-6 rounded-2xl hover-lift"
+            className="p-4 md:p-6 rounded-2xl hover-lift"
             style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
           >
-            <FileText className="w-8 h-8 mb-3" style={{ color: 'var(--terracotta)', strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+            <FileText className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ color: 'var(--terracotta)', strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
               {pendingApplications.length}
             </div>
             <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>PENDING APPS</div>
@@ -72,11 +72,11 @@ export default function MyShifts() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="p-6 rounded-2xl hover-lift"
+            className="p-4 md:p-6 rounded-2xl hover-lift"
             style={{ backgroundColor: 'var(--sage)', color: 'white' }}
           >
-            <Calendar className="w-8 h-8 mb-3" style={{ strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <Calendar className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {upcomingShifts.length}
             </div>
             <div className="text-xs tracking-wider opacity-90">CONFIRMED</div>
@@ -86,11 +86,11 @@ export default function MyShifts() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="p-6 rounded-2xl hover-lift"
+            className="p-4 md:p-6 rounded-2xl hover-lift"
             style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
           >
-            <CheckCircle className="w-8 h-8 mb-3" style={{ strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <CheckCircle className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {completedShifts.length}
             </div>
             <div className="text-xs tracking-wider opacity-90">COMPLETED</div>
@@ -100,11 +100,11 @@ export default function MyShifts() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="p-6 rounded-2xl hover-lift"
+            className="p-4 md:p-6 rounded-2xl hover-lift"
             style={{ backgroundColor: 'var(--clay)', color: 'white' }}
           >
-            <Clock className="w-8 h-8 mb-3" style={{ strokeWidth: 1.5 }} />
-            <div className="text-4xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
+            <Clock className="w-6 h-6 md:w-8 md:h-8 mb-2 md:mb-3" style={{ strokeWidth: 1.5 }} />
+            <div className="text-3xl md:text-4xl font-light mb-1 md:mb-2" style={{ fontFamily: 'Crimson Pro, serif' }}>
               {shifts.reduce((sum, s) => {
                 if (!s.start_time || !s.end_time) return sum;
                 const [sh, sm] = s.start_time.split(':').map(Number);
@@ -118,27 +118,27 @@ export default function MyShifts() {
         </div>
 
         <Tabs defaultValue="applications" className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-8 p-2 rounded-2xl h-auto" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
+          <TabsList className="w-full grid grid-cols-3 mb-6 md:mb-8 p-1.5 rounded-2xl h-auto" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
             <TabsTrigger 
               value="applications" 
-              className="rounded-xl py-3 font-normal tracking-wide data-[state=active]:text-white transition-all"
+              className="rounded-xl py-2.5 font-normal text-xs md:text-sm tracking-wide data-[state=active]:text-white transition-all"
               style={{ color: 'var(--clay)' }}
             >
-              Applications ({applications.length})
+              <span className="hidden sm:inline">Applications </span>({applications.length})
             </TabsTrigger>
             <TabsTrigger 
               value="upcoming" 
-              className="rounded-xl py-3 font-normal tracking-wide data-[state=active]:text-white transition-all"
+              className="rounded-xl py-2.5 font-normal text-xs md:text-sm tracking-wide data-[state=active]:text-white transition-all"
               style={{ color: 'var(--clay)' }}
             >
-              Confirmed ({upcomingShifts.length})
+              <span className="hidden sm:inline">Confirmed </span>({upcomingShifts.length})
             </TabsTrigger>
             <TabsTrigger 
               value="completed"
-              className="rounded-xl py-3 font-normal tracking-wide data-[state=active]:text-white transition-all"
+              className="rounded-xl py-2.5 font-normal text-xs md:text-sm tracking-wide data-[state=active]:text-white transition-all"
               style={{ color: 'var(--clay)' }}
             >
-              Completed ({completedShifts.length})
+              <span className="hidden sm:inline">Completed </span>({completedShifts.length})
             </TabsTrigger>
           </TabsList>
 
