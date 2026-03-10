@@ -31,8 +31,8 @@ export default function StartConversationButton({ recipientEmail, recipientName,
         });
       }
       
-      // Navigate to messages page
-      navigate(createPageUrl("Messages"));
+      // Navigate to messages page with the conversation highlighted
+      navigate(createPageUrl("Messages"), { state: { conversationId } });
       
     } catch (error) {
       console.error('Error starting conversation:', error);
