@@ -132,14 +132,14 @@ export default function Layout({ children }) {
     <SidebarProvider>
       <style>{`
       :root {
-        --cream: #F2F2F7;
-        --sand: #E5E5EA;
+        --cream: #FAF8F5;
+        --sand: #E8E3DC;
         --terracotta: #C89F8C;
         --clay: #8E8E93;
         --earth: #1C1C1E;
         --sage: #8A9B8E;
         --olive: #6B7565;
-        --warm-white: #FFFFFF;
+        --warm-white: #FFFCF7;
       }
 
       body {
