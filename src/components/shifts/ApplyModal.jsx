@@ -97,7 +97,7 @@ export default function ApplyModal({ shift, onClose }) {
   if (!user) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ backgroundColor: 'var(--warm-white)', zIndex: 101 }}>
+        <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ backgroundColor: 'var(--warm-white)' }}>
           <div className="animate-spin rounded-full h-12 w-12 border-2 mx-auto" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
         </div>
       </div>
@@ -105,8 +105,8 @@ export default function ApplyModal({ shift, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-[100] overflow-y-auto">
-      <div className="max-w-2xl w-full rounded-2xl p-4 md:p-8 my-4 md:my-8" style={{ backgroundColor: 'var(--warm-white)' }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={onClose}>
+      <div className="max-w-2xl w-full rounded-2xl p-4 md:p-8 my-4 md:my-8" style={{ backgroundColor: 'var(--warm-white)' }} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             {isChefRole ? (

@@ -75,8 +75,8 @@ export default function ApplicationsModal({ shift, onClose }) {
   const processedApplications = applications.filter(a => a.status !== 'pending');
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-      <div className="max-w-3xl w-full rounded-2xl p-8 my-8 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--warm-white)' }}>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto" onClick={onClose}>
+      <div className="max-w-3xl w-full rounded-2xl p-8 my-8 max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--warm-white)' }} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             {isChefRole ? (
