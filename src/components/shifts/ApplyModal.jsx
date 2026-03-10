@@ -21,10 +21,14 @@ export default function ApplyModal({ shift, onClose }) {
   const userSkills = isChefRole ? (user?.chef_skills || []) : (user?.barista_skills || user?.skills || []);
   const matchingSkills = shift.skills_required?.filter(s => userSkills.includes(s)) || [];
 
-  // Check if user already applied to this shift
-  const alreadyApplied = React.useMemo(() => {
-    return false; // Will be checked server-side
-  }, []);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+
+  useEffect(() => {
+    if (!user?.email || !shift?.id) return;
+    base44.entities.ShiftApplication.filter({ shift_id: shift.id, applicant_email: user.email })
+      .then(apps => setAlreadyApplied(apps.length > 0))
+      .catch(() => {});
+  }, [user?.email, shift?.id]);
 
   const applyMutation = useMutation({
     mutationFn: async () => {
