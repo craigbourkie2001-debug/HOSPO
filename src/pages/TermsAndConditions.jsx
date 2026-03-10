@@ -93,28 +93,24 @@ These Terms and Conditions ("Terms") govern your use of the Hospo platform ("Ser
   },
   {
     id: 6,
-    title: "Payments & Platform Fee",
-    content: `**6.1 Mandatory Shift Payments.** All shift payments must be processed through the Hospo platform. Once a shift is marked as completed, the Employer is required to pay the Worker via the Hospo payment system. Direct payments outside the platform are strictly prohibited and constitute a breach of these Terms.
+    title: "Payments & Subscriptions",
+    content: `**6.1 Subscription Plans.** Access to the full Service requires a paid Subscription. Current pricing is displayed on our pricing page and may include monthly and annual billing options. Prices are in **Euro (€)** and are exclusive of VAT unless stated otherwise.
 
-**6.2 Platform Fee.** Hospo charges a 10% platform fee on the gross shift value, payable by the Employer only. Workers receive their full agreed hourly rate with no deductions taken by Hospo.
+**6.2 VAT.** Irish VAT will be applied to all Subscriptions at the applicable rate. Business Users with a valid EU VAT number may be eligible for reverse charge treatment.
 
-Example: A 5-hour shift at €15/hr = €75 gross. The Worker receives €75. The Employer pays €75 + €7.50 (10% fee) = €82.50 total.
+**6.3 Billing.** Subscriptions are billed in advance. Payment is due on the billing date and is processed via our payment provider (Stripe). You authorise us to charge your payment method on each renewal date.
 
-**6.3 Payment Processing.** All payments are processed securely via Stripe. Employers pay by card through Stripe Checkout. Workers must register their IBAN bank details during onboarding to receive payment.
+**6.4 Auto-Renewal.** Subscriptions renew automatically at the end of each billing period unless you cancel before the renewal date via your Account settings.
 
-**6.4 Worker Bank Details.** Workers are required to provide a valid IBAN and account holder name during profile setup. These details are stored securely and used solely to transfer shift earnings. It is the Worker's responsibility to keep their bank details accurate and up to date.
+**6.5 Free Trial.** Where a free trial is offered, your payment method will be charged at the end of the trial period unless you cancel beforehand.
 
-**6.5 Payout Timeline.** Following a successful Employer payment, worker earnings are transferred to the registered IBAN within 3-5 business days. Hospo is not liable for delays caused by the receiving bank.
+**6.6 Refunds & Cooling-Off Period.**
+- **Consumers (Staff Users acting outside a business capacity):** Under the EU Consumer Rights Directive and the Irish Consumer Rights Act 2022, you have a **14-day right of withdrawal** from the date of purchase of a digital service, provided you have not begun using it. If you have begun using the Service, you expressly consent to immediate provision and acknowledge the withdrawal right is waived.
+- **Business Users:** Subscription fees are non-refundable except where required by law or where Hospo has materially failed to provide the Service.
 
-**6.6 Payment Obligation.** Employers agree that payment is mandatory upon shift completion. Failure to pay may result in account suspension and removal of posted shifts.
+**6.7 Failed Payments.** If payment fails, we will notify you and may suspend access to the Service after a reasonable grace period.
 
-**6.7 Disputes.** If either party disputes a payment, they must contact Hospo at hello@hospo.ie within 7 days of the shift date.
-
-**6.8 VAT.** Platform fees are subject to Irish VAT at the applicable rate.
-
-**6.9 Refunds.** Platform fees are non-refundable once a payment has been processed, except in cases of verified fraud or processing error.
-
-**6.10 Failed Payments.** If a payment fails, the Employer will be notified and must retry within 48 hours. Repeated failures may result in account suspension.`
+**6.8 Price Changes.** We will give at least **30 days' notice** of any price increase. Continued use after the effective date constitutes acceptance.`
   },
   {
     id: 7,

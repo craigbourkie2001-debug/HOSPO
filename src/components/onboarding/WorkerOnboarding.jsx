@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import MobileSelect from "../mobile/MobileSelect";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X, FileText, Building } from "lucide-react";
+import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X, FileText } from "lucide-react";
 import { toast } from "sonner";
 import HospoLogo from "../HospoLogo";
 
@@ -52,7 +52,6 @@ function getSteps(visaStatus) {
     { id: 'skills', label: 'Skills' },
     { id: 'availability', label: 'Availability' },
     { id: 'rates', label: 'Rates' },
-    { id: 'banking', label: 'Banking' },
     { id: 'about', label: 'About' },
   );
   return base;
@@ -80,11 +79,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
     availability: [],
     preferred_shift_times: [],
     desired_hourly_rate_min: '',
-    desired_hourly_rate_max: '',
-    iban: '',
-    bic: '',
-    bank_holder_name: '',
-    bank_name: ''
+    desired_hourly_rate_max: ''
   });
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCV, setUploadingCV] = useState(false);
@@ -277,7 +272,6 @@ export default function WorkerOnboarding({ user, onComplete }) {
         return formData.worker_type === 'chef' ? formData.chef_skills.length > 0 : formData.barista_skills.length > 0;
       case 'availability': return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
       case 'rates': return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
-      case 'banking': return formData.iban && formData.bank_holder_name;
       case 'about': return formData.bio;
       default: return true;
     }
@@ -718,69 +712,6 @@ export default function WorkerOnboarding({ user, onComplete }) {
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-
-          {/* Banking / Payment Details */}
-          {currentStepId === 'banking' && (
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-2xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>Payment Details</h2>
-                <p className="text-sm" style={{ color: 'var(--clay)' }}>Your bank details are required to receive payment for shifts</p>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
-                <Building className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: 'var(--terracotta)' }} />
-                <div className="text-sm" style={{ color: 'var(--clay)' }}>
-                  <p className="font-normal mb-1" style={{ color: 'var(--earth)' }}>Secure & mandatory</p>
-                  <p>Employers pay through Hospo, and your earnings are transferred directly to this account within 3–5 business days. We take a 10% platform fee from the employer — you receive the full agreed rate.</p>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Account Holder Name *</label>
-                <Input
-                  value={formData.bank_holder_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bank_holder_name: e.target.value }))}
-                  placeholder="As it appears on your bank account"
-                  className="rounded-xl border h-12"
-                  style={{ borderColor: 'var(--sand)' }}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>IBAN *</label>
-                <Input
-                  value={formData.iban}
-                  onChange={(e) => setFormData(prev => ({ ...prev, iban: e.target.value.replace(/\s/g, '').toUpperCase() }))}
-                  placeholder="IE29 AIBK 9311 5212 3456 78"
-                  className="rounded-xl border h-12 font-mono"
-                  style={{ borderColor: 'var(--sand)' }}
-                />
-                <p className="text-xs mt-1" style={{ color: 'var(--clay)' }}>Irish IBANs start with IE and are 22 characters long</p>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>BIC / SWIFT (Optional)</label>
-                  <Input
-                    value={formData.bic}
-                    onChange={(e) => setFormData(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))}
-                    placeholder="AIBKIE2D"
-                    className="rounded-xl border h-12 font-mono"
-                    style={{ borderColor: 'var(--sand)' }}
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Bank Name (Optional)</label>
-                  <Input
-                    value={formData.bank_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, bank_name: e.target.value }))}
-                    placeholder="AIB, Bank of Ireland..."
-                    className="rounded-xl border h-12"
-                    style={{ borderColor: 'var(--sand)' }}
-                  />
-                </div>
-              </div>
-              <p className="text-xs" style={{ color: 'var(--clay)' }}>
-                🔒 Your banking details are encrypted and stored securely. They are only used to transfer your shift earnings.
-              </p>
             </div>
           )}
 

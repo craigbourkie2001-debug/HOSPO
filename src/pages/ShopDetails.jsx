@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Phone, Mail, MessageSquare, Plus, ArrowLeft } from "lucide-react";
 import ReviewCard from "../components/reviews/ReviewCard";
-import VenueRatingBreakdown from "../components/reviews/VenueRatingBreakdown";
 import { toast } from "sonner";
 
 export default function ShopDetails() {
@@ -37,12 +36,6 @@ export default function ShopDetails() {
     queryKey: ['reviews', id],
     queryFn: () => base44.entities.Review.filter({ review_type: 'coffee_shop', target_id: id }, '-created_date'),
     initialData: [],
-    enabled: !!id
-  });
-
-  const { data: workerReviews = [] } = useQuery({
-    queryKey: ['venueReviews', id],
-    queryFn: () => base44.entities.VenueReview.filter({ venue_id: id }, '-created_date'),
     enabled: !!id
   });
 
@@ -213,31 +206,6 @@ export default function ShopDetails() {
                 <Badge key={idx} style={{ backgroundColor: 'var(--latte)', color: 'var(--coffee-brown)' }}>
                   {specialty.replace(/_/g, ' ')}
                 </Badge>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Worker Shift Reviews Section */}
-        {workerReviews.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-2xl font-light mb-4" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-              Worker Ratings
-            </h3>
-            <VenueRatingBreakdown reviews={workerReviews} />
-            <div className="space-y-3">
-              {workerReviews.slice(0, 3).map((review, idx) => (
-                <div key={idx} className="p-4 rounded-xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-normal" style={{ color: 'var(--earth)' }}>{review.worker_name}</span>
-                    <div className="flex">
-                      {[1,2,3,4,5].map(i => (
-                        <Star key={i} className="w-3.5 h-3.5" style={{ color: i <= review.overall_rating ? 'var(--terracotta)' : 'var(--sand)', fill: i <= review.overall_rating ? 'var(--terracotta)' : 'none' }} />
-                      ))}
-                    </div>
-                  </div>
-                  {review.comment && <p className="text-sm font-light" style={{ color: 'var(--clay)' }}>{review.comment}</p>}
-                </div>
               ))}
             </div>
           </div>

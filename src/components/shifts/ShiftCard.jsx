@@ -1,5 +1,8 @@
 import React from 'react';
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { formatDistance } from "./geoUtils";
 
@@ -11,119 +14,123 @@ const roleLabels = {
   waiter: 'Waiter / Server',
 };
 
+const roleColors = {
+  barista: 'var(--terracotta)',
+  chef: 'var(--sage)',
+  bartender: 'var(--olive)',
+  mixologist: 'var(--clay)',
+  waiter: 'var(--earth)',
+};
+
 export default function ShiftCard({ shift, onApply, isLoading, featured = false, distance = null }) {
+  const roleColor = roleColors[shift.role_type] || 'var(--terracotta)';
   const roleLabel = shift.role_type === 'chef' && shift.chef_level
     ? shift.chef_level.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
     : roleLabels[shift.role_type] || shift.role_type;
 
   return (
-    <div
-      className="bg-white rounded-2xl overflow-hidden"
-      style={{
-        boxShadow: featured
-          ? '0 0 0 2px #C89F8C, 0 4px 20px rgba(200,159,140,0.15)'
-          : '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
-      }}
-    >
-      <div className="p-5">
+    <Card className="overflow-hidden transition-all duration-300 hover:-translate-y-1 border rounded-2xl hover-lift" style={{ 
+      borderColor: featured ? 'var(--terracotta)' : 'var(--sand)', 
+      backgroundColor: 'var(--warm-white)',
+      borderWidth: featured ? '2px' : '1px'
+    }}>
+      {/* Coloured top bar */}
+      <div className="h-1.5 w-full" style={{ backgroundColor: roleColor }} />
 
-        {/* Venue name + rate */}
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="text-[17px] font-semibold leading-snug flex-1 pr-3" style={{ color: '#1C1C1E' }}>
-            {shift.venue_name || shift.coffee_shop_name}
-          </h3>
-          <div className="flex-shrink-0 text-right">
-            <span className="text-[22px] font-bold" style={{ color: '#1C1C1E' }}>€{shift.hourly_rate}</span>
-            <span className="text-[13px] ml-0.5" style={{ color: '#8E8E93' }}>/hr</span>
-          </div>
-        </div>
-
-        {/* Location · role · distance */}
-        <div className="flex items-center flex-wrap gap-x-1.5 gap-y-1 mb-4">
-          <span className="text-[13px]" style={{ color: '#8E8E93' }}>{shift.location}</span>
-          <span style={{ color: '#D1D1D6' }}>·</span>
-          <span
-            className="text-[12px] font-medium px-2 py-0.5 rounded-full"
-            style={{ backgroundColor: '#F2F2F7', color: '#6E6E73' }}
-          >
+      <CardContent className="p-5">
+        {/* Top row: role badge + rate */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-normal tracking-widest uppercase px-3 py-1 rounded-full" style={{ backgroundColor: roleColor + '20', color: roleColor }}>
             {roleLabel}
           </span>
           {featured && (
-            <span
-              className="text-[12px] font-medium px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: '#C89F8C', color: 'white' }}
-            >
+            <span className="text-xs font-normal tracking-widest uppercase px-3 py-1 rounded-full" style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}>
               Featured
             </span>
           )}
+          <div className="text-right">
+            <span className="text-2xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              €{shift.hourly_rate}
+            </span>
+            <span className="text-xs ml-1 font-light" style={{ color: 'var(--clay)' }}>/hr</span>
+          </div>
+        </div>
+
+        {/* Venue name */}
+        <h3 className="text-xl font-normal mb-1 leading-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+          {shift.venue_name || shift.coffee_shop_name}
+        </h3>
+
+        {/* Location + distance */}
+        <div className="flex items-center gap-2 mb-4">
+          <p className="text-sm font-light" style={{ color: 'var(--clay)' }}>
+            {shift.location}
+          </p>
           {distance !== null && (
-            <>
-              <span style={{ color: '#D1D1D6' }}>·</span>
-              <span className="flex items-center gap-1 text-[13px]" style={{ color: '#8E8E93' }}>
-                <MapPin className="w-3 h-3" />
-                {formatDistance(distance)}
-              </span>
-            </>
+            <span className="flex items-center gap-1 text-xs font-normal px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--sage)' + '22', color: 'var(--sage)' }}>
+              <MapPin className="w-3 h-3" style={{ strokeWidth: 2 }} />
+              {formatDistance(distance)}
+            </span>
           )}
         </div>
 
-        {/* Date & time chips */}
-        <div className="flex gap-2 mb-4">
-          <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl" style={{ backgroundColor: '#F2F2F7' }}>
-            <Calendar className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#8E8E93' }} />
-            <span className="text-[13px] font-medium" style={{ color: '#3A3A3C' }}>
+        {/* Date & time row */}
+        <div className="flex gap-3 mb-4">
+          <div className="flex-1 p-3 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
+            <div className="text-xs tracking-wider mb-0.5" style={{ color: 'var(--clay)' }}>DATE</div>
+            <div className="font-normal text-sm" style={{ color: 'var(--earth)' }}>
               {format(new Date(shift.date), 'EEE, d MMM')}
-            </span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl" style={{ backgroundColor: '#F2F2F7' }}>
-            <Clock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#8E8E93' }} />
-            <span className="text-[13px] font-medium" style={{ color: '#3A3A3C' }}>
+          <div className="flex-1 p-3 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
+            <div className="text-xs tracking-wider mb-0.5" style={{ color: 'var(--clay)' }}>TIME</div>
+            <div className="font-normal text-sm" style={{ color: 'var(--earth)' }}>
               {shift.start_time} – {shift.end_time}
-            </span>
+            </div>
           </div>
+          {shift.applications_count > 0 && (
+            <div className="flex-1 p-3 rounded-xl text-center" style={{ backgroundColor: 'var(--cream)' }}>
+              <div className="text-xs tracking-wider mb-0.5" style={{ color: 'var(--clay)' }}>APPLIED</div>
+              <div className="font-normal text-sm" style={{ color: 'var(--earth)' }}>{shift.applications_count}</div>
+            </div>
+          )}
         </div>
 
         {/* Description */}
         {shift.description && (
-          <p className="text-[14px] mb-4 line-clamp-2 leading-relaxed" style={{ color: '#6E6E73' }}>
+          <p className="text-sm mb-4 line-clamp-2 font-light" style={{ color: 'var(--clay)' }}>
             {shift.description}
           </p>
         )}
 
         {/* Skills */}
         {shift.skills_required && shift.skills_required.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {shift.skills_required.slice(0, 4).map((skill, idx) => (
-              <span
-                key={idx}
-                className="text-[12px] px-2.5 py-1 rounded-full"
-                style={{ backgroundColor: '#F2F2F7', color: '#6E6E73' }}
-              >
-                {skill.replace(/_/g, ' ')}
-              </span>
-            ))}
-            {shift.skills_required.length > 4 && (
-              <span
-                className="text-[12px] px-2.5 py-1 rounded-full"
-                style={{ backgroundColor: '#F2F2F7', color: '#8E8E93' }}
-              >
-                +{shift.skills_required.length - 4}
-              </span>
-            )}
+          <div className="mb-4">
+            <div className="text-xs tracking-wider mb-2" style={{ color: 'var(--clay)' }}>SKILLS REQUIRED</div>
+            <div className="flex flex-wrap gap-1.5">
+              {shift.skills_required.map((skill, idx) => (
+                <Badge 
+                  key={idx}
+                  variant="outline"
+                  className="text-xs font-normal"
+                  style={{ borderColor: 'var(--sand)', color: 'var(--clay)' }}
+                >
+                  {skill.replace(/_/g, ' ')}
+                </Badge>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* CTA */}
-        <button
+        <Button
           onClick={onApply}
           disabled={isLoading}
-          className="w-full py-3 rounded-xl text-[15px] font-semibold transition-opacity disabled:opacity-50 active:opacity-80"
-          style={{ backgroundColor: '#C89F8C', color: 'white' }}
+          className="w-full rounded-xl font-normal tracking-wide transition-all duration-300 hover-lift"
+          style={{ backgroundColor: 'var(--earth)', color: 'white' }}
         >
-          {isLoading ? 'Applying…' : 'Apply for Shift'}
-        </button>
-
-      </div>
-    </div>
+          {isLoading ? 'Applying...' : 'Apply for Shift'}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

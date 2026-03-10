@@ -8,7 +8,6 @@ import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star } from "luc
 import { format } from "date-fns";
 import ShiftChatButton from "../messaging/ShiftChatButton";
 import ReviewVenueModal from "../shifts/ReviewVenueModal";
-import ClockInButton from "../shifts/ClockInButton";
 
 export default function MyShiftCard({ shift }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -107,8 +106,7 @@ export default function MyShiftCard({ shift }) {
         )}
 
         {shift.status === 'filled' && shift.assigned_to && (
-          <div className="mt-3 pt-3 border-t space-y-2" style={{ borderColor: 'var(--cream)' }}>
-            <ClockInButton shift={shift} />
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--cream)' }}>
             <ShiftChatButton 
               shift={shift} 
               size="sm" 

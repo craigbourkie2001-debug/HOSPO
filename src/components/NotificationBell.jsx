@@ -66,10 +66,7 @@ export default function NotificationBell() {
     refetchInterval: 60000 // Refetch every minute
   });
 
-  // Show accepted/assigned as "new" notifications
-  const unreadCount = notifications.filter(n => 
-    n.type === 'application_accepted' || n.type === 'shift_assigned' || n.type === 'review_received'
-  ).length;
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   if (!user) return null;
 

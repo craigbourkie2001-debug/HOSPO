@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.20';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 import Stripe from 'npm:stripe@17.5.0';
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'));
@@ -23,78 +23,60 @@ Deno.serve(async (req) => {
     if (shifts.length === 0) {
       return Response.json({ error: 'Shift not found' }, { status: 404 });
     }
+
     const shift = shifts[0];
 
+    // Verify shift is completed and assigned
     if (shift.status !== 'completed') {
       return Response.json({ error: 'Shift must be completed before payment' }, { status: 400 });
     }
+
     if (!shift.assigned_to) {
       return Response.json({ error: 'Shift has no assigned worker' }, { status: 400 });
     }
 
-    // Check if payment already exists and completed
+    // Check if payment already exists
     const existingPayments = await base44.entities.Payment.filter({ shift_id });
-    if (existingPayments.length > 0 && existingPayments[0].status === 'completed') {
-      return Response.json({ error: 'Payment already completed for this shift' }, { status: 400 });
+    if (existingPayments.length > 0 && existingPayments[0].status !== 'failed') {
+      return Response.json({ error: 'Payment already exists for this shift' }, { status: 400 });
     }
 
-    // Get worker's IBAN details
-    const workers = await base44.entities.User.filter({ email: shift.assigned_to });
-    const worker = workers[0];
-    if (!worker?.iban) {
-      console.error('Worker has no IBAN on file:', shift.assigned_to);
-      return Response.json({ error: 'Worker has not set up payment details (IBAN) yet' }, { status: 400 });
-    }
-
-    // Calculate payment — 10% platform fee on both sides
+    // Calculate payment details
+    const shiftDate = new Date(shift.date);
     const startTime = new Date(`${shift.date}T${shift.start_time}`);
     const endTime = new Date(`${shift.date}T${shift.end_time}`);
     const hoursWorked = (endTime - startTime) / (1000 * 60 * 60);
+    
     const grossAmount = hoursWorked * shift.hourly_rate;
-    const platformFeeEmployer = grossAmount * 0.10;
-    const platformFeeWorker = grossAmount * 0.10;
+    const platformFeeEmployer = grossAmount * 0.10; // 10% employer fee
+    const platformFeeWorker = grossAmount * 0.10;   // 10% worker fee
     const workerPayout = grossAmount - platformFeeWorker;
     const employerTotal = grossAmount + platformFeeEmployer;
 
-    // Create or update payment record
-    let payment;
-    if (existingPayments.length > 0) {
-      payment = existingPayments[0];
-      await base44.entities.Payment.update(payment.id, {
-        status: 'pending',
-        hours_worked: hoursWorked,
-        gross_amount: grossAmount,
-        platform_fee_employer: platformFeeEmployer,
-        platform_fee_worker: platformFeeWorker,
-        worker_payout: workerPayout,
-        employer_total: employerTotal,
-        worker_iban: worker.iban,
-        worker_bank_name: worker.bank_name || ''
-      });
-    } else {
-      payment = await base44.entities.Payment.create({
-        shift_id,
-        worker_email: shift.assigned_to,
-        worker_name: shift.assigned_to_name,
-        employer_email: user.email,
-        venue_name: shift.venue_name,
-        shift_date: shift.date,
-        hours_worked: hoursWorked,
-        hourly_rate: shift.hourly_rate,
-        gross_amount: grossAmount,
-        platform_fee_employer: platformFeeEmployer,
-        platform_fee_worker: platformFeeWorker,
-        worker_payout: workerPayout,
-        employer_total: employerTotal,
-        worker_iban: worker.iban,
-        worker_bank_name: worker.bank_name || '',
-        status: 'pending'
-      });
-    }
+    // Create payment record
+    const FEE_RATE = 0.10;
+    const payment = await base44.entities.Payment.create({
+      shift_id,
+      worker_email: shift.assigned_to,
+      worker_name: shift.assigned_to_name,
+      employer_email: user.email,
+      venue_name: shift.venue_name,
+      shift_date: shift.date,
+      hours_worked: hoursWorked,
+      hourly_rate: shift.hourly_rate,
+      gross_amount: grossAmount,
+      platform_fee_employer: platformFeeEmployer,
+      platform_fee_worker: platformFeeWorker,
+      worker_payout: workerPayout,
+      employer_total: employerTotal,
+      fee_rate: FEE_RATE,
+      status: 'pending'
+    });
 
+    // Create Stripe checkout session
     const origin = req.headers.get('origin') || 'https://app.base44.com';
-    const idempotencyKey = `shift-payment-${payment.id}-v2`;
-
+    
+    const idempotencyKey = `shift-payment-${payment.id}`;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -102,38 +84,40 @@ Deno.serve(async (req) => {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: `Shift Payment: ${shift.role_type} at ${shift.venue_name}`,
-              description: `${new Date(shift.date).toLocaleDateString('en-IE')} · ${hoursWorked}h @ €${shift.hourly_rate}/h · 10% fee each side`,
+              name: `Payment for ${shift.role_type} shift`,
+              description: `${shift.venue_name} - ${new Date(shift.date).toLocaleDateString()} (${hoursWorked}h @ €${shift.hourly_rate}/h)`,
             },
-            unit_amount: Math.round(employerTotal * 100),
+            unit_amount: Math.round(employerTotal * 100), // Convert to cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${origin}/employerdashboard?payment=success&shift=${shift_id}`,
+      success_url: `${origin}/employerdashboard?payment=success`,
       cancel_url: `${origin}/employerdashboard?payment=cancelled`,
       metadata: {
         base44_app_id: Deno.env.get('BASE44_APP_ID'),
         payment_id: payment.id,
         shift_id,
         worker_email: shift.assigned_to,
-        worker_iban: worker.iban,
-        worker_name: shift.assigned_to_name || shift.assigned_to
       },
     }, { idempotencyKey });
 
+    // Update payment with session ID
     await base44.entities.Payment.update(payment.id, {
-      stripe_payment_intent_id: session.id,
-      status: 'processing'
+      stripe_payment_intent_id: session.id
     });
 
-    console.log('Checkout session created:', session.id, 'for shift:', shift_id, 'worker:', shift.assigned_to);
-
-    return Response.json({ sessionUrl: session.url, payment_id: payment.id });
+    return Response.json({ 
+      sessionUrl: session.url,
+      payment_id: payment.id 
+    });
 
   } catch (error) {
-    console.error('Error creating shift payment:', error);
-    return Response.json({ error: 'Failed to create payment', details: error.message }, { status: 500 });
+    console.error('Error creating payment:', error);
+    return Response.json({ 
+      error: 'Failed to create payment',
+      details: error.message 
+    }, { status: 500 });
   }
 });

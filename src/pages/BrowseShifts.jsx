@@ -11,6 +11,7 @@ import ShiftFilters from "../components/shifts/ShiftFilters";
 import ApplyModal from "../components/shifts/ApplyModal";
 import RecommendedShifts from "../components/matching/RecommendedShifts";
 import PullToRefresh from "../components/mobile/PullToRefresh";
+import HospoLogo from "../components/HospoLogo";
 import ProximityFilter from "../components/shifts/ProximityFilter";
 import { getShiftDistance } from "../components/shifts/geoUtils";
 
@@ -92,13 +93,7 @@ export default function BrowseShifts() {
            matchesPayRate && matchesShiftTime && matchesChefLevel && matchesProximity;
   });
 
-  // Sort: featured first, then by date
-  const sortedShifts = [...filteredShifts].sort((a, b) => {
-    if (a.is_premium_featured && !b.is_premium_featured) return -1;
-    if (!a.is_premium_featured && b.is_premium_featured) return 1;
-    return new Date(a.date) - new Date(b.date);
-  });
-  const displayedShifts = isMobile ? sortedShifts.slice(0, mobileDisplayCount) : sortedShifts;
+  const displayedShifts = isMobile ? filteredShifts.slice(0, mobileDisplayCount) : filteredShifts;
   const hasMore = isMobile && filteredShifts.length > mobileDisplayCount;
 
   const availableLocations = [...new Set(shifts.map(s => s.location).filter(Boolean))];
@@ -115,33 +110,40 @@ export default function BrowseShifts() {
       <div className="min-h-screen p-4 md:p-12" style={{ backgroundColor: 'var(--cream)' }}>
         <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6 pt-2">
-          <h1 className="text-[28px] md:text-[34px] font-bold tracking-tight mb-1" style={{ color: 'var(--earth)' }}>
-            Available Shifts
-          </h1>
-          <p className="text-[15px]" style={{ color: 'var(--clay)' }}>
-            Find your next opportunity in Irish hospitality
-          </p>
+        <div className="mb-10 flex items-start justify-between">
+          <div>
+            <div className="mb-4">
+              <HospoLogo size="md" />
+            </div>
+            <h1 className="text-3xl md:text-6xl font-light mb-3 tracking-tight" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              Available Shifts
+            </h1>
+            <p className="text-sm md:text-lg font-light tracking-wide" style={{ color: 'var(--clay)' }}>
+              Find your next opportunity in Irish hospitality
+            </p>
+          </div>
         </div>
 
         {/* Role Tabs */}
         <Tabs value={roleFilter} onValueChange={setRoleFilter} className="mb-6">
-          <TabsList className="flex w-full p-1 rounded-2xl h-auto gap-1" style={{ backgroundColor: '#E5E5EA' }}>
+          <TabsList className="flex flex-wrap w-full p-1 rounded-2xl h-auto gap-1" style={{ backgroundColor: 'var(--sand)' }}>
             {[
-              { value: 'all', label: 'All', count: shifts.length },
-              { value: 'barista', label: 'Barista', count: roleCounts.barista },
-              { value: 'bartender', label: 'Bar', count: roleCounts.bartender },
-              { value: 'mixologist', label: 'Mix', count: roleCounts.mixologist },
-              { value: 'chef', label: 'Chef', count: roleCounts.chef },
-              { value: 'waiter', label: 'Waiter', count: roleCounts.waiter },
+              { value: 'all', label: `All`, count: shifts.length },
+              { value: 'barista', label: `Barista`, count: roleCounts.barista },
+              { value: 'bartender', label: `Bar`, count: roleCounts.bartender },
+              { value: 'mixologist', label: `Mix`, count: roleCounts.mixologist },
+              { value: 'chef', label: `Chef`, count: roleCounts.chef },
+              { value: 'waiter', label: `Waiter`, count: roleCounts.waiter },
             ].map(tab => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
-                className="rounded-xl py-2 px-2 text-[12px] font-medium tracking-wide data-[state=active]:bg-white data-[state=active]:shadow-sm transition-all flex-1 min-w-0"
-                style={{ color: '#3A3A3C' }}
+                className="rounded-xl py-2 px-3 font-normal text-xs md:text-sm tracking-wide data-[state=active]:bg-white transition-all flex-1 min-w-0"
+                style={{ color: 'var(--earth)' }}
               >
                 <span className="truncate">{tab.label}</span>
+                <span className="ml-1 opacity-60 hidden md:inline">({tab.count})</span>
+                <span className="ml-1 opacity-60 md:hidden text-xs">{tab.count > 0 ? tab.count : ''}</span>
               </TabsTrigger>
             ))}
           </TabsList>
@@ -155,14 +157,14 @@ export default function BrowseShifts() {
           <div className="relative">
             <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
             <Input
-              placeholder="Search by venue or location…"
+              placeholder="Search by venue or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-12 rounded-2xl text-[15px] border-0"
+              className="pl-14 h-14 rounded-2xl border text-base"
               style={{ 
-                backgroundColor: 'white',
-                color: '#1C1C1E',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                borderColor: 'var(--sand)',
+                backgroundColor: 'var(--warm-white)',
+                color: 'var(--earth)'
               }}
             />
           </div>
@@ -187,18 +189,46 @@ export default function BrowseShifts() {
         />
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-3 mb-8">
-          {[
-            { value: filteredShifts.length, label: 'Shifts' },
-            { value: `€${Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}`, label: 'Avg/hr' },
-            { value: availableLocations.length, label: 'Locations' },
-            { value: [...new Set(shifts.map(s => s.venue_id || s.coffee_shop_id))].length, label: 'Venues' },
-          ].map(({ value, label }) => (
-            <div key={label} className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-              <div className="text-[20px] font-bold tracking-tight" style={{ color: '#1C1C1E' }}>{value}</div>
-              <div className="text-[11px] font-medium mt-0.5" style={{ color: '#8E8E93' }}>{label}</div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5 mb-8 md:mb-12">
+          <div 
+            className="p-4 md:p-6 rounded-2xl"
+            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
+          >
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              {filteredShifts.length}
             </div>
-          ))}
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>SHIFTS</div>
+          </div>
+          
+          <div 
+            className="p-4 md:p-6 rounded-2xl"
+            style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
+          >
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif' }}>
+              €{Math.round(shifts.reduce((sum, s) => sum + (s.hourly_rate || 0), 0) / (shifts.length || 1))}
+            </div>
+            <div className="text-xs tracking-wider opacity-90">AVG RATE</div>
+          </div>
+          
+          <div 
+            className="p-4 md:p-6 rounded-2xl"
+            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}
+          >
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              {availableLocations.length}
+            </div>
+            <div className="text-xs tracking-wider" style={{ color: 'var(--clay)' }}>LOCATIONS</div>
+          </div>
+          
+          <div 
+            className="p-4 md:p-6 rounded-2xl"
+            style={{ backgroundColor: 'var(--sage)', color: 'white' }}
+          >
+            <div className="text-3xl md:text-4xl font-light mb-1" style={{ fontFamily: 'Crimson Pro, serif' }}>
+              {[...new Set(shifts.map(s => s.coffee_shop_id))].length}
+            </div>
+            <div className="text-xs tracking-wider opacity-90">VENUES</div>
+          </div>
         </div>
 
         {/* Shifts Grid */}
@@ -209,21 +239,20 @@ export default function BrowseShifts() {
             ))}
           </div>
         ) : filteredShifts.length === 0 ? (
-          <div className="text-center py-20 rounded-2xl bg-white" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-            <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#F2F2F7' }}>
-              <Search className="w-8 h-8" style={{ color: '#8E8E93' }} />
+          <div className="text-center py-24 rounded-2xl" style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)' }}>
+            <div className="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: 'var(--sand)' }}>
+              <Search className="w-10 h-10" style={{ color: 'var(--clay)', strokeWidth: 1.5 }} />
             </div>
-            <h3 className="text-[17px] font-semibold mb-1" style={{ color: '#1C1C1E' }}>No shifts found</h3>
-            <p className="text-[14px]" style={{ color: '#8E8E93' }}>Try adjusting your filters or check back later</p>
+            <h3 className="text-2xl font-light mb-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
+              No shifts found
+            </h3>
+            <p className="font-light" style={{ color: 'var(--clay)' }}>
+              Try adjusting your filters or check back later
+            </p>
           </div>
         ) : (
           <>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sortedShifts.length > 0 && sortedShifts[0]?.is_premium_featured && (
-                <div className="col-span-full flex items-center gap-2 text-xs mb-1" style={{ color: 'var(--terracotta)' }}>
-                  ⭐ Featured shifts shown first
-                </div>
-              )}
               {displayedShifts.map((shift) => (
                 <ShiftCard 
                   key={shift.id}
@@ -235,14 +264,14 @@ export default function BrowseShifts() {
             </div>
             
             {hasMore && (
-              <div className="mt-6 flex justify-center">
-                <button
+              <div className="mt-8 flex justify-center">
+                <Button
                   onClick={() => setMobileDisplayCount(prev => prev + 12)}
-                  className="px-6 py-3 rounded-xl text-[15px] font-semibold"
-                  style={{ backgroundColor: 'white', color: '#C89F8C', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+                  className="rounded-xl font-normal tracking-wide px-8"
+                  style={{ backgroundColor: 'var(--terracotta)', color: 'white' }}
                 >
-                  Show more ({filteredShifts.length - mobileDisplayCount} remaining)
-                </button>
+                  Load More ({filteredShifts.length - mobileDisplayCount} remaining)
+                </Button>
               </div>
             )}
           </>

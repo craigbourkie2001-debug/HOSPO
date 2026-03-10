@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X, Star, Briefcase, MapPin, Award, Clock, Coffee, ChefHat, Shield, Euro } from "lucide-react";
-import WorkerRatingBreakdown from "../reviews/WorkerRatingBreakdown";
 
 export default function WorkerProfileModal({ workerEmail, onClose }) {
   const { data: workers = [] } = useQuery({
@@ -227,7 +226,6 @@ export default function WorkerProfileModal({ workerEmail, onClose }) {
               <h3 className="text-lg font-normal mb-3" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
                 Reviews ({reviews.length})
               </h3>
-              <WorkerRatingBreakdown reviews={reviews} />
               <div className="space-y-3">
                 {reviews.map((review, idx) => (
                   <div key={idx} className="p-4 rounded-xl" style={{ backgroundColor: 'var(--cream)' }}>

@@ -16,7 +16,7 @@ export default function PayShiftModal({ shift, onClose }) {
     queryFn: () => base44.entities.Payment.filter({ shift_id: shift.id })
   });
 
-  // Calculate payment details — 10% fee on both sides
+  // Calculate payment details
   const calculatePayment = () => {
     const startTime = new Date(`${shift.date}T${shift.start_time}`);
     const endTime = new Date(`${shift.date}T${shift.end_time}`);
@@ -28,7 +28,14 @@ export default function PayShiftModal({ shift, onClose }) {
     const workerPayout = grossAmount - platformFeeWorker;
     const employerTotal = grossAmount + platformFeeEmployer;
 
-    return { hoursWorked, grossAmount, platformFeeEmployer, platformFeeWorker, workerPayout, employerTotal };
+    return {
+      hoursWorked,
+      grossAmount,
+      platformFeeEmployer,
+      platformFeeWorker,
+      workerPayout,
+      employerTotal
+    };
   };
 
   const payment = calculatePayment();
@@ -152,28 +159,24 @@ export default function PayShiftModal({ shift, onClose }) {
                     <span className="font-normal" style={{ color: 'var(--earth)' }}>€{shift.hourly_rate}/h</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: 'var(--clay)' }}>Worker Gross Earnings</span>
+                    <span style={{ color: 'var(--clay)' }}>Gross Amount</span>
                     <span className="font-normal" style={{ color: 'var(--earth)' }}>€{payment.grossAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: 'var(--clay)' }}>Employer Platform Fee (10%)</span>
-                    <span className="font-normal" style={{ color: 'var(--earth)' }}>+€{payment.platformFeeEmployer.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span style={{ color: 'var(--clay)' }}>Worker Service Fee (10%)</span>
-                    <span className="font-normal" style={{ color: 'var(--earth)' }}>−€{payment.platformFeeWorker.toFixed(2)}</span>
+                    <span style={{ color: 'var(--clay)' }}>Platform Fee (10%)</span>
+                    <span className="font-normal" style={{ color: 'var(--earth)' }}>€{payment.platformFeeEmployer.toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t" style={{ borderColor: 'var(--sand)' }}>
-                  <div className="flex justify-between items-center mb-1">
+                  <div className="flex justify-between items-center mb-2">
                     <span className="font-normal" style={{ color: 'var(--earth)' }}>Worker Receives</span>
                     <span className="text-lg font-normal" style={{ fontFamily: 'Crimson Pro, serif', color: '#8A9B8E' }}>
                       €{payment.workerPayout.toFixed(2)}
                     </span>
                   </div>
-                  <div className="text-xs mb-0" style={{ color: 'var(--clay)' }}>
-                    Transferred to worker's IBAN within 3–5 business days
+                  <div className="text-xs" style={{ color: 'var(--clay)' }}>
+                    (After 10% platform fee deducted from worker)
                   </div>
                 </div>
 

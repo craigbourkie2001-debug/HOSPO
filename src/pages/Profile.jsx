@@ -12,7 +12,6 @@ import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import MobileHeader from "../components/mobile/MobileHeader";
 import { createPageUrl } from "@/utils";
-import WorkerRatingBreakdown from "../components/reviews/WorkerRatingBreakdown";
 
 const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
@@ -70,10 +69,6 @@ export default function Profile() {
         preferred_shift_times: userData.preferred_shift_times || [],
         desired_hourly_rate_min: userData.desired_hourly_rate_min || '',
         desired_hourly_rate_max: userData.desired_hourly_rate_max || '',
-        iban: userData.iban || '',
-        bic: userData.bic || '',
-        bank_holder_name: userData.bank_holder_name || '',
-        bank_name: userData.bank_name || '',
         work_experience: userData.work_experience || [],
         skill_portfolio: userData.skill_portfolio || []
       });
@@ -972,10 +967,6 @@ export default function Profile() {
                       preferred_shift_times: user.preferred_shift_times || [],
                       desired_hourly_rate_min: user.desired_hourly_rate_min || '',
                       desired_hourly_rate_max: user.desired_hourly_rate_max || '',
-                      iban: user.iban || '',
-                      bic: user.bic || '',
-                      bank_holder_name: user.bank_holder_name || '',
-                      bank_name: user.bank_name || '',
                       work_experience: user.work_experience || [],
                       skill_portfolio: user.skill_portfolio || []
                     });
@@ -1332,7 +1323,6 @@ export default function Profile() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <WorkerRatingBreakdown reviews={workerReviews} />
               {workerReviews.map((review, idx) => (
                 <div key={idx} className="p-5 rounded-xl border" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--cream)' }}>
                   <div className="flex justify-between items-start mb-3">
@@ -1373,74 +1363,6 @@ export default function Profile() {
             </CardContent>
           </Card>
         )}
-        {/* Banking / Payment Details */}
-        <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="font-normal flex items-center gap-2" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--earth)' }}>
-                Payment Details
-              </CardTitle>
-              {!isEditing && (
-                <Button size="sm" variant="outline" onClick={() => setIsEditing(true)} className="rounded-xl font-normal" style={{ borderColor: 'var(--sand)' }}>
-                  {user.iban ? 'Update' : 'Add Banking'}
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            {!user.iban && !isEditing && (
-              <div className="flex items-start gap-3 p-4 rounded-xl mb-3" style={{ backgroundColor: '#FFF3E0', border: '1px solid #FFB74D' }}>
-                <span className="text-xl">⚠️</span>
-                <div>
-                  <p className="font-normal text-sm" style={{ color: '#E65100' }}>No bank details on file</p>
-                  <p className="text-xs mt-0.5" style={{ color: '#BF360C' }}>You won't be able to receive shift payments until you add your IBAN.</p>
-                </div>
-              </div>
-            )}
-            {isEditing && (
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>ACCOUNT HOLDER NAME *</label>
-                  <Input value={formData.bank_holder_name} onChange={(e) => setFormData(prev => ({ ...prev, bank_holder_name: e.target.value }))} placeholder="As it appears on your bank account" className="rounded-xl border" style={{ borderColor: 'var(--sand)' }} />
-                </div>
-                <div>
-                  <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>IBAN *</label>
-                  <Input value={formData.iban} onChange={(e) => setFormData(prev => ({ ...prev, iban: e.target.value.replace(/\s/g, '').toUpperCase() }))} placeholder="IE29AIBK93115212345678" className="rounded-xl border font-mono" style={{ borderColor: 'var(--sand)' }} />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>BIC / SWIFT (Optional)</label>
-                    <Input value={formData.bic} onChange={(e) => setFormData(prev => ({ ...prev, bic: e.target.value.toUpperCase() }))} placeholder="AIBKIE2D" className="rounded-xl border font-mono" style={{ borderColor: 'var(--sand)' }} />
-                  </div>
-                  <div>
-                    <label className="text-xs tracking-wider mb-2 block font-normal" style={{ color: 'var(--clay)' }}>BANK NAME (Optional)</label>
-                    <Input value={formData.bank_name} onChange={(e) => setFormData(prev => ({ ...prev, bank_name: e.target.value }))} placeholder="AIB, Bank of Ireland..." className="rounded-xl border" style={{ borderColor: 'var(--sand)' }} />
-                  </div>
-                </div>
-                <p className="text-xs" style={{ color: 'var(--clay)' }}>🔒 Stored securely and only used to transfer your shift earnings.</p>
-              </div>
-            )}
-            {user.iban && !isEditing && (
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--sand)' }}>
-                  <span style={{ color: 'var(--clay)' }}>Account Holder</span>
-                  <span style={{ color: 'var(--earth)' }}>{user.bank_holder_name || '—'}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b" style={{ borderColor: 'var(--sand)' }}>
-                  <span style={{ color: 'var(--clay)' }}>IBAN</span>
-                  <span className="font-mono" style={{ color: 'var(--earth)' }}>••••{user.iban?.slice(-4)}</span>
-                </div>
-                {user.bank_name && (
-                  <div className="flex justify-between py-2">
-                    <span style={{ color: 'var(--clay)' }}>Bank</span>
-                    <span style={{ color: 'var(--earth)' }}>{user.bank_name}</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
         {/* Logout and Delete Account Section */}
         <Card className="border rounded-2xl" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
           <CardHeader>
