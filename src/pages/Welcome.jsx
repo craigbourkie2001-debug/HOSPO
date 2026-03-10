@@ -39,74 +39,66 @@ export default function Welcome() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#F2F2F7' }}>
-      
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--cream)', fontFamily: 'Crimson Pro, Georgia, serif' }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;500;600;700&display=swap');`}</style>
+
       {/* Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
 
         {/* Logo */}
-        <div className="mb-8">
-          <HospoLogo size="lg" showText={false} />
+        <div className="mb-10">
+          <HospoLogo size="xl" showText={true} />
         </div>
 
-        {/* Title */}
-        <div className="text-center mb-12">
-          <h1
-            className="text-[34px] font-bold tracking-tight mb-2"
-            style={{ color: '#1C1C1E', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}
-          >
-            Hospo Ireland
-          </h1>
-          <p className="text-[17px] leading-relaxed" style={{ color: '#8E8E93' }}>
+        {/* Tagline */}
+        <div className="text-center mb-14">
+          <p className="text-xl font-light tracking-wide" style={{ color: 'var(--clay)' }}>
             Hospitality staffing, done right.
           </p>
         </div>
 
         {/* Choice cards */}
-        <div className="w-full max-w-sm space-y-3">
+        <div className="w-full max-w-sm space-y-4">
 
           <button
             onClick={() => handleSignIn('worker')}
-            className="w-full bg-white rounded-2xl p-5 text-left transition-all active:scale-[0.98] active:opacity-90"
-            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)' }}
+            className="w-full rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
+            style={{ backgroundColor: 'var(--warm-white)', border: '1px solid var(--sand)', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
           >
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#F2F2F7' }}>
-                <Briefcase className="w-5 h-5" style={{ color: '#C89F8C', strokeWidth: 1.5 }} />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--sand)' }}>
+                <Briefcase className="w-5 h-5" style={{ color: 'var(--terracotta)', strokeWidth: 1.5 }} />
               </div>
               <div className="flex-1 text-left">
-                <div className="text-[16px] font-semibold mb-0.5" style={{ color: '#1C1C1E' }}>
+                <div className="text-lg font-normal mb-0.5" style={{ color: 'var(--earth)' }}>
                   Looking for work
                 </div>
-                <div className="text-[13px]" style={{ color: '#8E8E93' }}>
+                <div className="text-sm font-light" style={{ color: 'var(--clay)' }}>
                   Browse shifts across Ireland
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: '#C7C7CC' }} />
+              <ChevronRight className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--clay)' }} />
             </div>
           </button>
 
           <button
             onClick={() => handleSignIn('employer')}
-            className="w-full rounded-2xl p-5 text-left transition-all active:scale-[0.98] active:opacity-90"
-            style={{
-              backgroundColor: '#C89F8C',
-              boxShadow: '0 2px 10px rgba(200,159,140,0.35)'
-            }}
+            className="w-full rounded-2xl p-6 text-left transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.98]"
+            style={{ backgroundColor: 'var(--earth)', border: '1px solid var(--earth)', boxShadow: '0 2px 12px rgba(28,28,30,0.15)' }}
           >
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
                 <Store className="w-5 h-5 text-white" strokeWidth={1.5} />
               </div>
               <div className="flex-1 text-left">
-                <div className="text-[16px] font-semibold mb-0.5 text-white">
+                <div className="text-lg font-normal mb-0.5 text-white">
                   Hiring staff
                 </div>
-                <div className="text-[13px] text-white" style={{ opacity: 0.75 }}>
+                <div className="text-sm font-light text-white" style={{ opacity: 0.6 }}>
                   Post shifts, find verified talent
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 flex-shrink-0 text-white" style={{ opacity: 0.6 }} />
+              <ChevronRight className="w-4 h-4 flex-shrink-0 text-white" style={{ opacity: 0.4 }} />
             </div>
           </button>
 
@@ -115,9 +107,9 @@ export default function Welcome() {
 
       {/* Footer */}
       <div className="px-6 pb-10 text-center">
-        <p className="text-[12px]" style={{ color: '#C7C7CC' }}>
+        <p className="text-xs font-light" style={{ color: 'var(--clay)' }}>
           By continuing you agree to our{' '}
-          <a href={createPageUrl('TermsAndConditions')} className="underline" style={{ color: '#AEAEB2' }}>
+          <a href={createPageUrl('TermsAndConditions')} className="underline" style={{ color: 'var(--terracotta)' }}>
             Terms & Conditions
           </a>
           {' '}· GDPR compliant
