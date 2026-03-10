@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import MobileSelect from "../mobile/MobileSelect";
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X, FileText } from "lucide-react";
+import { Camera, Upload, CheckCircle2, Coffee, ChefHat, Shield, MapPin, Clock, DollarSign, Sparkles, X, FileText, Building } from "lucide-react";
 import { toast } from "sonner";
 import HospoLogo from "../HospoLogo";
 
@@ -52,6 +52,7 @@ function getSteps(visaStatus) {
     { id: 'skills', label: 'Skills' },
     { id: 'availability', label: 'Availability' },
     { id: 'rates', label: 'Rates' },
+    { id: 'banking', label: 'Banking' },
     { id: 'about', label: 'About' },
   );
   return base;
@@ -79,7 +80,11 @@ export default function WorkerOnboarding({ user, onComplete }) {
     availability: [],
     preferred_shift_times: [],
     desired_hourly_rate_min: '',
-    desired_hourly_rate_max: ''
+    desired_hourly_rate_max: '',
+    iban: '',
+    bic: '',
+    bank_holder_name: '',
+    bank_name: ''
   });
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCV, setUploadingCV] = useState(false);
@@ -272,6 +277,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
         return formData.worker_type === 'chef' ? formData.chef_skills.length > 0 : formData.barista_skills.length > 0;
       case 'availability': return formData.availability.length > 0 && formData.preferred_shift_times.length > 0;
       case 'rates': return formData.desired_hourly_rate_min && formData.desired_hourly_rate_max;
+      case 'banking': return formData.iban && formData.bank_holder_name;
       case 'about': return formData.bio;
       default: return true;
     }
