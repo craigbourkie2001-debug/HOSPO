@@ -236,8 +236,8 @@ export default function Layout({ children }) {
       `}</style>
       
       <div className="min-h-screen flex w-full" style={{ backgroundColor: 'var(--cream)' }}>
-        <Sidebar className="border-r" style={{ borderColor: 'var(--sand)', backgroundColor: 'var(--warm-white)' }}>
-          <SidebarHeader className="border-b p-8" style={{ borderColor: 'var(--sand)' }}>
+        <Sidebar className="border-r" style={{ borderColor: 'rgba(60,60,67,0.12)', backgroundColor: 'var(--warm-white)' }}>
+          <SidebarHeader className="border-b p-6" style={{ borderColor: 'rgba(60,60,67,0.12)' }}>
             <div className="flex items-center justify-between">
               <HospoLogo size="md" />
               <NotificationBell />
@@ -372,7 +372,7 @@ export default function Layout({ children }) {
             )}
           </SidebarContent>
 
-          <SidebarFooter className="border-t p-4" style={{ borderColor: 'var(--sand)' }}>
+          <SidebarFooter className="border-t p-4" style={{ borderColor: 'rgba(60,60,67,0.12)' }}>
             {user && (
               <div className="space-y-3">
                 <div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: 'var(--sand)' }}>
