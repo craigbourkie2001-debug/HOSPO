@@ -89,23 +89,26 @@ Deno.serve(async (req) => {
         paid_at: new Date().toISOString()
       });
 
-      // Send confirmation email to worker
-      await base44.asServiceRole.integrations.Core.SendEmail({
-        to: worker_email,
-        subject: 'Payment Received for Your Shift',
-        body: `Great news! Your payment for the shift has been processed.\n\nThe payment has been completed and will be transferred to your account shortly.\n\nThank you for your hard work!`
-      });
-
-      // Get shift and employer details for employer email
+      // Get payment record for full details
       const payments = await base44.asServiceRole.entities.Payment.filter({ id: payment_id });
       if (payments.length > 0) {
         const payment = payments[0];
-        
+
+        // Send confirmation to worker with IBAN details
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: worker_email,
+          subject: `Payment of €${payment.worker_payout?.toFixed(2)} on its way!`,
+          body: `Hi ${payment.worker_name || 'there'},\n\nGreat news! Your employer has completed payment for your shift at ${payment.venue_name}.\n\nPayment Summary:\n- Shift Date: ${new Date(payment.shift_date).toLocaleDateString('en-IE')}\n- Hours Worked: ${payment.hours_worked}h @ €${payment.hourly_rate}/h\n- Your Payout: €${payment.worker_payout?.toFixed(2)}\n\nThe payment will be transferred to your registered IBAN within 3–5 business days.\n\nIBAN on file: ${payment.worker_iban ? `****${payment.worker_iban.slice(-4)}` : 'not set'}\n\nIf you have any questions, contact us at hello@hospo.ie.\n\nThank you for working with Hospo Ireland!`
+        });
+
+        // Send confirmation to employer
         await base44.asServiceRole.integrations.Core.SendEmail({
           to: payment.employer_email,
-          subject: 'Shift Payment Confirmed',
-          body: `Your payment for ${payment.worker_name}'s shift has been successfully processed.\n\nShift Date: ${new Date(payment.shift_date).toLocaleDateString()}\nHours Worked: ${payment.hours_worked}h\nTotal Paid: €${payment.employer_total.toFixed(2)}\n\nThank you for using Hospo!`
+          subject: `Shift Payment Confirmed — €${payment.employer_total?.toFixed(2)}`,
+          body: `Your payment for ${payment.worker_name}'s shift has been successfully processed.\n\nPayment Breakdown:\n- Shift Date: ${new Date(payment.shift_date).toLocaleDateString('en-IE')}\n- Hours Worked: ${payment.hours_worked}h @ €${payment.hourly_rate}/h\n- Worker Earnings: €${payment.gross_amount?.toFixed(2)}\n- Platform Fee (10%): €${payment.platform_fee_employer?.toFixed(2)}\n- Total Charged: €${payment.employer_total?.toFixed(2)}\n\nThe worker will receive €${payment.worker_payout?.toFixed(2)} directly to their registered bank account within 3–5 business days.\n\nThank you for using Hospo Ireland!`
         });
+
+        console.log('Payment emails sent for payment:', payment_id);
       }
 
       console.log('Payment processed successfully:', payment_id);
