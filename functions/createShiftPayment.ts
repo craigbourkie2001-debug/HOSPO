@@ -103,7 +103,7 @@ Deno.serve(async (req) => {
             currency: 'eur',
             product_data: {
               name: `Shift Payment: ${shift.role_type} at ${shift.venue_name}`,
-              description: `${new Date(shift.date).toLocaleDateString('en-IE')} · ${hoursWorked}h @ €${shift.hourly_rate}/h · 10% platform fee included`,
+              description: `${new Date(shift.date).toLocaleDateString('en-IE')} · ${hoursWorked}h @ €${shift.hourly_rate}/h · 10% fee each side`,
             },
             unit_amount: Math.round(employerTotal * 100),
           },
