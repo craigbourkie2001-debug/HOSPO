@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
-import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown, Settings } from "lucide-react";
+import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Settings } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
 import HospoLogo from "./components/HospoLogo";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
