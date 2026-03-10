@@ -152,12 +152,16 @@ export default function PayShiftModal({ shift, onClose }) {
                     <span className="font-normal" style={{ color: 'var(--earth)' }}>€{shift.hourly_rate}/h</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: 'var(--clay)' }}>Worker Earnings</span>
+                    <span style={{ color: 'var(--clay)' }}>Worker Gross Earnings</span>
                     <span className="font-normal" style={{ color: 'var(--earth)' }}>€{payment.grossAmount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span style={{ color: 'var(--clay)' }}>Hospo Platform Fee (10%)</span>
-                    <span className="font-normal" style={{ color: 'var(--earth)' }}>€{payment.platformFee.toFixed(2)}</span>
+                    <span style={{ color: 'var(--clay)' }}>Employer Platform Fee (10%)</span>
+                    <span className="font-normal" style={{ color: 'var(--earth)' }}>+€{payment.platformFeeEmployer.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span style={{ color: 'var(--clay)' }}>Worker Service Fee (10%)</span>
+                    <span className="font-normal" style={{ color: 'var(--earth)' }}>−€{payment.platformFeeWorker.toFixed(2)}</span>
                   </div>
                 </div>
 
