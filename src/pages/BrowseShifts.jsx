@@ -11,7 +11,6 @@ import ShiftFilters from "../components/shifts/ShiftFilters";
 import ApplyModal from "../components/shifts/ApplyModal";
 import RecommendedShifts from "../components/matching/RecommendedShifts";
 import PullToRefresh from "../components/mobile/PullToRefresh";
-import HospoLogo from "../components/HospoLogo";
 import ProximityFilter from "../components/shifts/ProximityFilter";
 import { getShiftDistance } from "../components/shifts/geoUtils";
 
