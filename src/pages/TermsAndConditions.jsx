@@ -93,7 +93,7 @@ These Terms and Conditions ("Terms") govern your use of the Hospo platform ("Ser
   },
   {
     id: 6,
-    title: "Payments & Subscriptions",
+    title: "Payments & Platform Fee",
     content: `**6.1 Subscription Plans.** Access to the full Service requires a paid Subscription. Current pricing is displayed on our pricing page and may include monthly and annual billing options. Prices are in **Euro (€)** and are exclusive of VAT unless stated otherwise.
 
 **6.2 VAT.** Irish VAT will be applied to all Subscriptions at the applicable rate. Business Users with a valid EU VAT number may be eligible for reverse charge treatment.
