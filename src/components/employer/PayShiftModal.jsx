@@ -16,18 +16,19 @@ export default function PayShiftModal({ shift, onClose }) {
     queryFn: () => base44.entities.Payment.filter({ shift_id: shift.id })
   });
 
-  // Calculate payment details — 10% fee from employer only, worker gets full gross
+  // Calculate payment details — 10% fee on both sides
   const calculatePayment = () => {
     const startTime = new Date(`${shift.date}T${shift.start_time}`);
     const endTime = new Date(`${shift.date}T${shift.end_time}`);
     const hoursWorked = (endTime - startTime) / (1000 * 60 * 60);
     
     const grossAmount = hoursWorked * shift.hourly_rate;
-    const platformFee = grossAmount * 0.10;
-    const workerPayout = grossAmount; // worker gets full gross
-    const employerTotal = grossAmount + platformFee;
+    const platformFeeEmployer = grossAmount * 0.10;
+    const platformFeeWorker = grossAmount * 0.10;
+    const workerPayout = grossAmount - platformFeeWorker;
+    const employerTotal = grossAmount + platformFeeEmployer;
 
-    return { hoursWorked, grossAmount, platformFee, workerPayout, employerTotal };
+    return { hoursWorked, grossAmount, platformFeeEmployer, platformFeeWorker, workerPayout, employerTotal };
   };
 
   const payment = calculatePayment();
