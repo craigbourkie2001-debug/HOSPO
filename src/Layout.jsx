@@ -142,8 +142,10 @@ export default function Layout({ children }) {
         --warm-white: #FFFCF7;
       }
 
+      @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;500;600;700&display=swap');
+
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+        font-family: 'Crimson Pro', Georgia, serif;
         overscroll-behavior: none;
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
@@ -151,9 +153,8 @@ export default function Layout({ children }) {
       }
 
       h1, h2, h3, h4, h5, h6 {
-        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
-        font-weight: 600;
-        letter-spacing: -0.02em;
+        font-family: 'Crimson Pro', Georgia, serif;
+        letter-spacing: -0.01em;
       }
 
       .hover-lift {
