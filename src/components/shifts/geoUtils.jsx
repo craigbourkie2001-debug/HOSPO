@@ -13,7 +13,21 @@ export function getDistanceKm(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
-// Irish city/area approximate coordinates
+// Geocode an Irish address or Eircode using Nominatim (OpenStreetMap)
+export async function geocodeIrishAddress(address) {
+  try {
+    const query = encodeURIComponent(`${address}, Ireland`);
+    const url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=ie`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'HospoIreland/1.0' } });
+    const data = await res.json();
+    if (data && data.length > 0) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    }
+  } catch (e) {}
+  return null;
+}
+
+// Irish city/area approximate coordinates (fallback)
 const LOCATION_COORDS = {
   "Dublin": { lat: 53.3498, lng: -6.2603 },
   "Dublin 1": { lat: 53.3498, lng: -6.2603 },
@@ -70,6 +84,11 @@ export function formatDistance(km) {
 
 export function getShiftDistance(shift, userLocation) {
   if (!userLocation) return null;
+  // Prefer stored GPS coordinates on the shift
+  if (shift.venue_latitude && shift.venue_longitude) {
+    return getDistanceKm(userLocation.lat, userLocation.lng, shift.venue_latitude, shift.venue_longitude);
+  }
+  // Fallback to lookup table by location name
   const coords = getLocationCoords(shift.location);
   if (!coords) return null;
   return getDistanceKm(userLocation.lat, userLocation.lng, coords.lat, coords.lng);

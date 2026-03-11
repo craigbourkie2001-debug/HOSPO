@@ -127,7 +127,7 @@ Return ONLY a JSON array of shift IDs in ranked order, nothing else.`,
                     Best Match
                   </Badge>
                 )}
-                <ShiftCard shift={shift} onApply={onApply} />
+                <ShiftCard shift={shift} onApply={() => onApply(shift)} />
               </div>
             ))}
           </div>
