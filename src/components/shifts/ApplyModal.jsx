@@ -57,11 +57,15 @@ export default function ApplyModal({ shift, onClose }) {
         status: 'pending'
       });
 
-      // Update shift applications count + status
-      await base44.entities.Shift.update(shift.id, {
-        applications_count: (shift.applications_count || 0) + 1,
-        status: 'applications_open'
-      });
+      // Update shift applications count + status (best-effort — worker may lack write permission)
+      try {
+        await base44.entities.Shift.update(shift.id, {
+          applications_count: (shift.applications_count || 0) + 1,
+          status: 'applications_open'
+        });
+      } catch (updateErr) {
+        console.warn('Shift count update skipped (non-critical):', updateErr?.message);
+      }
 
       // Send notification email to employer (non-blocking)
       try {
