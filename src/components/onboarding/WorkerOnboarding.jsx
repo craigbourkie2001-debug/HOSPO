@@ -196,24 +196,28 @@ export default function WorkerOnboarding({ user, onComplete }) {
     setVerifyError('');
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an identity verification system. Analyze this image and determine if it is a government-issued photo ID document (passport, driving licence, national ID card, or similar). Be lenient — if the image clearly shows any official ID document with a photo, consider it valid. Only reject if the image is clearly not an ID document (e.g. it's a selfie, a random photo, a blank page, etc.).`,
+        prompt: `You are a strict identity verification system. Analyze this ID document (passport, driving licence, or national ID card) and extract the name exactly as printed on it. Then check if it matches the name provided: First name: "${formData.legal_first_name}", Last name: "${formData.legal_last_name}". The name match must be exact (case-insensitive). Do not accept partial matches or nicknames. Also verify the document appears to be a genuine government-issued photo ID.`,
         file_urls: [documentUrl],
         response_json_schema: {
           type: "object",
           properties: {
             is_valid_id: { type: "boolean" },
-            document_type: { type: "string" },
+            first_name_on_document: { type: "string" },
+            last_name_on_document: { type: "string" },
+            name_matches: { type: "boolean" },
             rejection_reason: { type: "string" }
           }
         }
       });
-      if (result.is_valid_id) {
-        setFormData(prev => ({ ...prev, identity_verified: true }));
-        toast.success('Identity document accepted!');
-      } else {
-        const reason = result.rejection_reason || 'The image does not appear to be a valid government-issued ID.';
-        setVerifyError(reason);
+      if (!result.is_valid_id) {
+        setVerifyError('The image does not appear to be a valid government-issued ID. Please upload a clear photo of your passport or driving licence.');
         setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+      } else if (!result.name_matches) {
+        setVerifyError(`Name mismatch: your document shows "${result.first_name_on_document} ${result.last_name_on_document}" but you entered "${formData.legal_first_name} ${formData.legal_last_name}". Please go back and correct your legal name, or upload the correct document.`);
+        setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+      } else {
+        setFormData(prev => ({ ...prev, identity_verified: true }));
+        toast.success('Identity verified successfully!');
       }
     } catch (err) {
       setVerifyError('Verification failed. Please try again.');
