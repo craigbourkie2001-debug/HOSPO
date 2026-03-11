@@ -189,38 +189,38 @@ export default function WorkerOnboarding({ user, onComplete }) {
     } finally { setVerifyingVisa(false); }
   };
 
+  const [verifyError, setVerifyError] = useState('');
+
   const verifyIdentity = async (documentUrl) => {
     setVerifyingIdentity(true);
+    setVerifyError('');
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an identity verification system. Analyze this ID document (passport or driving license) and extract information. Check that the document is clear and appears to be a real government-issued ID.`,
+        prompt: `You are an identity verification system. Analyze this image and determine if it is a government-issued photo ID document (passport, driving licence, national ID card, or similar). Be lenient — if the image clearly shows any official ID document with a photo, consider it valid. Only reject if the image is clearly not an ID document (e.g. it's a selfie, a random photo, a blank page, etc.).`,
         file_urls: [documentUrl],
         response_json_schema: {
           type: "object",
           properties: {
-            first_name: { type: "string" },
-            last_name: { type: "string" },
-            is_valid: { type: "boolean" },
-            verification_notes: { type: "string" }
+            is_valid_id: { type: "boolean" },
+            document_type: { type: "string" },
+            rejection_reason: { type: "string" }
           }
         }
       });
-      const firstNameMatch = result.first_name?.toLowerCase() === formData.legal_first_name.toLowerCase();
-      const lastNameMatch = result.last_name?.toLowerCase() === formData.legal_last_name.toLowerCase();
-      if (result.is_valid && firstNameMatch && lastNameMatch) {
+      if (result.is_valid_id) {
         setFormData(prev => ({ ...prev, identity_verified: true }));
-        toast.success('Identity verified successfully!');
-      } else if (!result.is_valid) {
-        toast.error('Document appears invalid or unclear. Please upload a clear photo of a valid ID.');
-        setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+        toast.success('Identity document accepted!');
       } else {
-        toast.error(`Name mismatch: Document shows "${result.first_name} ${result.last_name}" but you entered "${formData.legal_first_name} ${formData.legal_last_name}"`);
+        const reason = result.rejection_reason || 'The image does not appear to be a valid government-issued ID.';
+        setVerifyError(reason);
         setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
       }
-    } catch {
-      toast.error('Failed to verify document. Please try again.');
+    } catch (err) {
+      setVerifyError('Verification failed. Please try again.');
       setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
-    } finally { setVerifyingIdentity(false); }
+    } finally {
+      setVerifyingIdentity(false);
+    }
   };
 
   const generateSummary = async () => {
