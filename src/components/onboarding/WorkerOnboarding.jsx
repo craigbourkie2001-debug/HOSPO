@@ -407,6 +407,12 @@ export default function WorkerOnboarding({ user, onComplete }) {
                 </label>
                 <Input value={formData.pps_number} onChange={(e) => setFormData(prev => ({ ...prev, pps_number: e.target.value.toUpperCase() }))} placeholder="1234567XX" className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} maxLength={9} />
                 <p className="text-xs mt-2" style={{ color: 'var(--clay)' }}>Required to confirm work authorization in Ireland</p>
+              <div className="p-3 rounded-xl flex items-start gap-2 mt-2" style={{ backgroundColor: 'var(--sand)' }}>
+                <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: 'var(--terracotta)' }} />
+                <p className="text-xs" style={{ color: 'var(--earth)' }}>
+                  <strong>Important:</strong> Enter your name <em>exactly</em> as it appears on your passport or driving licence. This will be checked against your ID in the next step — any mismatch will fail verification.
+                </p>
+              </div>
               </div>
             </div>
           )}
