@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import MobileHeader from "../components/mobile/MobileHeader";
 import { createPageUrl } from "@/utils";
 import ReliabilityScore from "../components/profile/ReliabilityScore";
+import { geocodeIrishAddress } from "../components/shifts/geoUtils";
 
 const baristaSkillOptions = [
   "espresso", "latte_art", "filter", "pour_over", "cold_brew", 
@@ -318,8 +319,17 @@ export default function Profile() {
     }));
   };
 
-  const handleSubmit = () => {
-    updateProfileMutation.mutate(formData);
+  const handleSubmit = async () => {
+    let data = { ...formData };
+    // Geocode worker location if it changed or coords not yet stored
+    if (data.location && (!user.location_lat || data.location !== user.location)) {
+      const coords = await geocodeIrishAddress(data.location);
+      if (coords) {
+        data.location_lat = coords.lat;
+        data.location_lng = coords.lng;
+      }
+    }
+    updateProfileMutation.mutate(data);
   };
 
   if (!user) {
