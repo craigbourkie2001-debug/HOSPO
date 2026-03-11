@@ -4,12 +4,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown, Settings } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
+import { Toaster } from "sonner";
 import HospoLogo from "./components/HospoLogo";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
 import EmployerOnboarding from "./components/onboarding/EmployerOnboarding";
 import RoleSelection from "./components/onboarding/RoleSelection";
 import { base44 } from "@/api/base44Client";
-import { Toaster } from "@/components/ui/sonner";
 import {
   Sidebar,
   SidebarContent,
@@ -501,6 +501,7 @@ export default function Layout({ children }) {
             }} 
           />
         )}
+        <Toaster richColors position="top-center" />
       </div>
     </SidebarProvider>
   );
