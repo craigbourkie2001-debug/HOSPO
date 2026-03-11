@@ -42,7 +42,13 @@ export default function BrowseShifts() {
   }, []);
 
   React.useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    base44.auth.me().then(userData => {
+      setUser(userData);
+      // Auto-set user location from stored geocoded profile coords
+      if (userData.location_lat && userData.location_lng) {
+        setUserLocation({ lat: userData.location_lat, lng: userData.location_lng });
+      }
+    }).catch(() => {});
   }, []);
 
   const handleRefresh = async () => {
