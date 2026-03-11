@@ -134,21 +134,38 @@ export default function ApplyModal({ shift, onClose }) {
           </h3>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div className="flex items-center gap-2" style={{ color: 'var(--clay)' }}>
-              <Calendar className="w-4 h-4" />
-              {shift.date ? format(new Date(shift.date), 'EEE, MMM d, yyyy') : 'Date not set'}
+              <Calendar className="w-4 h-4 flex-shrink-0" />
+              <span>{shift.date ? format(new Date(shift.date), 'EEE, MMM d, yyyy') : 'Date not set'}</span>
             </div>
             <div className="flex items-center gap-2" style={{ color: 'var(--clay)' }}>
-              <Clock className="w-4 h-4" />
-              {shift.start_time} - {shift.end_time}
+              <Clock className="w-4 h-4 flex-shrink-0" />
+              <span>{shift.start_time && shift.end_time ? `${shift.start_time} – ${shift.end_time}` : 'Time not set'}</span>
             </div>
             <div className="flex items-center gap-2" style={{ color: 'var(--clay)' }}>
-              <MapPin className="w-4 h-4" />
-              {shift.location}
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span>{shift.location || 'Location not set'}</span>
             </div>
-            <div className="font-normal text-lg" style={{ color: 'var(--terracotta)' }}>
-              €{shift.hourly_rate}/hr
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-lg" style={{ color: 'var(--terracotta)' }}>
+                {shift.hourly_rate ? `€${shift.hourly_rate}/hr` : 'Rate not set'}
+              </span>
             </div>
           </div>
+          {shift.hourly_rate && shift.start_time && shift.end_time && (() => {
+            const [sh, sm] = shift.start_time.split(':').map(Number);
+            const [eh, em] = shift.end_time.split(':').map(Number);
+            const hours = ((eh * 60 + em) - (sh * 60 + sm)) / 60;
+            if (hours > 0) {
+              return (
+                <div className="mt-3 pt-3 border-t text-sm flex justify-between" style={{ borderColor: 'var(--sand)', color: 'var(--clay)' }}>
+                  <span>Estimated total ({hours}h)</span>
+                  <span className="font-semibold" style={{ color: 'var(--earth)' }}>
+                    €{(hours * shift.hourly_rate).toFixed(2)}
+                  </span>
+                </div>
+              );
+            }
+          })()}
         </div>
 
         {/* Your Profile Summary */}
