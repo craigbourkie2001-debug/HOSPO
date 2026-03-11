@@ -444,21 +444,34 @@ export default function WorkerOnboarding({ user, onComplete }) {
                         <p className="text-sm" style={{ color: 'var(--clay)' }}>This can take up to 30 seconds, please don't close or refresh the page</p>
                       </div>
                     </div>
-                  ) : formData.identity_document_url && !formData.identity_verified ? (
-                    <div className="space-y-3">
-                      <img src={formData.identity_document_url} alt="ID Document" className="w-full max-h-64 object-contain rounded-xl border-2" style={{ borderColor: 'var(--sand)' }} />
+                  ) : verifyError ? (
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-xl flex items-start gap-3" style={{ backgroundColor: '#FEF2F2', border: '1px solid #FECACA' }}>
+                        <X className="w-5 h-5 mt-0.5 flex-shrink-0 text-red-500" />
+                        <div>
+                          <p className="font-medium text-sm text-red-700 mb-1">Verification failed</p>
+                          <p className="text-sm text-red-600">{verifyError}</p>
+                        </div>
+                      </div>
+                      <label>
+                        <input type="file" accept="image/*" onChange={(e) => { setVerifyError(''); handleIdentityUpload(e); }} className="hidden" />
+                        <Button type="button" variant="outline" className="rounded-xl w-full h-14 border-2" style={{ borderColor: 'var(--terracotta)', color: 'var(--terracotta)' }} onClick={(e) => e.currentTarget.previousElementSibling.click()}>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Try Again — Upload a Different Photo
+                        </Button>
+                      </label>
                     </div>
-                  ) : !formData.identity_verified ? (
+                  ) : (
                     <label>
                       <input type="file" accept="image/*" onChange={handleIdentityUpload} className="hidden" disabled={uploadingIdentity || verifyingIdentity} />
                       <Button type="button" variant="outline" className="rounded-xl w-full h-32 border-2 border-dashed" style={{ borderColor: 'var(--sand)' }} disabled={uploadingIdentity || verifyingIdentity} onClick={(e) => e.currentTarget.previousElementSibling.click()}>
                         <div className="text-center">
                           <Upload className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--clay)' }} />
-                          <span className="text-sm" style={{ color: 'var(--clay)' }}>Click to upload ID document</span>
+                          <span className="text-sm" style={{ color: 'var(--clay)' }}>Click to upload passport or driving licence</span>
                         </div>
                       </Button>
                     </label>
-                  ) : null}
+                  )}
                 </div>
               )}
             </div>
