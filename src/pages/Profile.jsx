@@ -388,6 +388,8 @@ export default function Profile() {
           </div>
         </div>
 
+        <ReliabilityScore user={user} />
+
         {/* Stats row */}
         <div className="grid grid-cols-4 gap-3 mb-6">
           {[
