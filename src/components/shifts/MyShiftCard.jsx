@@ -8,6 +8,7 @@ import { MapPin, Calendar, Clock, CheckCircle, Coffee, ChefHat, Star } from "luc
 import { format } from "date-fns";
 import ShiftChatButton from "../messaging/ShiftChatButton";
 import ReviewVenueModal from "../shifts/ReviewVenueModal";
+import ShiftCheckInOut from "../shifts/ShiftCheckInOut";
 
 export default function MyShiftCard({ shift }) {
   const [showReviewModal, setShowReviewModal] = useState(false);
