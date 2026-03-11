@@ -91,12 +91,22 @@ export default function MyShiftCard({ shift }) {
             <span className="font-normal" style={{ color: 'var(--earth)' }}>€{shift.hourly_rate}/hr</span>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-light" style={{ color: 'var(--clay)' }}>Duration</span>
-            <span className="font-normal" style={{ color: 'var(--earth)' }}>{hours} hours</span>
+            <span className="text-sm font-light" style={{ color: 'var(--clay)' }}>
+              {shift.actual_hours_worked ? 'Actual Hours' : 'Duration'}
+            </span>
+            <span className="font-normal" style={{ color: 'var(--earth)' }}>
+              {shift.actual_hours_worked ? `${shift.actual_hours_worked}h` : `${hours} hours`}
+            </span>
           </div>
           <div className="pt-3 border-t flex justify-between items-center" style={{ borderColor: 'var(--cream)' }}>
-            <span className="font-normal" style={{ color: 'var(--clay)' }}>Total Earnings</span>
-            <span className="text-2xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--terracotta)' }}>€{totalPay}</span>
+            <span className="font-normal" style={{ color: 'var(--clay)' }}>
+              {shift.actual_hours_worked ? 'Actual Earnings' : 'Est. Earnings'}
+            </span>
+            <span className="text-2xl font-light" style={{ fontFamily: 'Crimson Pro, serif', color: 'var(--terracotta)' }}>
+              €{shift.actual_hours_worked
+                ? Math.round(shift.actual_hours_worked * (shift.hourly_rate || 0) * 100) / 100
+                : totalPay}
+            </span>
           </div>
         </div>
 
