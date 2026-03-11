@@ -117,6 +117,8 @@ export default function MyShiftCard({ shift }) {
           </div>
         )}
 
+        <ShiftCheckInOut shift={shift} />
+
         {shift.status === 'completed' && (
           <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--cream)' }}>
             {hasReviewed ? (
