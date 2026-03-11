@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Settings, Save, Upload, Building2, DollarSign, Bell, Image, Palette, X } from "lucide-react";
+import { Settings, Save, Upload, Building2, DollarSign, Bell, Image, Palette, X, MapPin, Loader2 } from "lucide-react";
+import { geocodeIrishAddress } from "../components/shifts/geoUtils";
 import { toast } from "sonner";
 
 export default function EmployerSettings() {
@@ -153,8 +154,17 @@ export default function EmployerSettings() {
     setVenueForm({ ...venueForm, gallery: newGallery });
   };
 
-  const handleSaveVenue = () => {
+  const handleSaveVenue = async () => {
     const { id, created_date, updated_date, created_by, ...data } = venueForm;
+    // Geocode the address/location for accurate distance filtering
+    const addressToGeocode = data.address || data.location;
+    if (addressToGeocode && (!data.latitude || !data.longitude)) {
+      const coords = await geocodeIrishAddress(addressToGeocode);
+      if (coords) {
+        data.latitude = coords.lat;
+        data.longitude = coords.lng;
+      }
+    }
     updateVenueMutation.mutate({ ...data, custom_colors: customColors });
   };
 
