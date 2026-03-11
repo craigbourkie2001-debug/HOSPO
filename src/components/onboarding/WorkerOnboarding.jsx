@@ -394,11 +394,11 @@ export default function WorkerOnboarding({ user, onComplete }) {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Legal First Name *</label>
-                  <Input value={formData.legal_first_name} onChange={(e) => setFormData(prev => ({ ...prev, legal_first_name: e.target.value }))} placeholder="As appears on ID" className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
+                  <Input value={formData.legal_first_name} onChange={(e) => setFormData(prev => ({ ...prev, legal_first_name: e.target.value }))} placeholder="Exactly as on your passport/licence" className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
                 </div>
                 <div>
                   <label className="text-sm font-normal mb-2 block" style={{ color: 'var(--clay)' }}>Legal Last Name *</label>
-                  <Input value={formData.legal_last_name} onChange={(e) => setFormData(prev => ({ ...prev, legal_last_name: e.target.value }))} placeholder="As appears on ID" className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
+                  <Input value={formData.legal_last_name} onChange={(e) => setFormData(prev => ({ ...prev, legal_last_name: e.target.value }))} placeholder="Exactly as on your passport/licence" className="rounded-xl border h-12" style={{ borderColor: 'var(--sand)' }} />
                 </div>
               </div>
               <div>
