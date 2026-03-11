@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { createPageUrl } from "@/utils";
 import { Coffee, Briefcase, Store, User, LogOut, Clock, LayoutDashboard, ChefHat, MessageCircle, Crown, Settings } from "lucide-react";
 import NotificationBell from "./components/NotificationBell";
+import { Toaster } from "sonner";
 import HospoLogo from "./components/HospoLogo";
 import WorkerOnboarding from "./components/onboarding/WorkerOnboarding";
 import EmployerOnboarding from "./components/onboarding/EmployerOnboarding";
