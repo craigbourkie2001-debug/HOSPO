@@ -46,6 +46,8 @@ export default function ShiftFormModal({ venue, venueType = 'coffee_shop', onClo
         venue_id: venue.id,
         venue_name: venue.name,
         location: venue.location,
+        venue_latitude: venue.latitude || null,
+        venue_longitude: venue.longitude || null,
         status: 'available',
         applications_count: 0,
         is_premium_featured: isPremium,
