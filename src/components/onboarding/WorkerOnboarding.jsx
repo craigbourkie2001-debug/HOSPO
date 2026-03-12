@@ -214,16 +214,23 @@ export default function WorkerOnboarding({ user, onComplete }) {
       if (!result.is_valid_id) {
         setVerifyError('The image does not appear to be a valid government-issued ID. Please upload a clear photo of your passport or driving licence.');
         setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+        // Clear pending state without reloading auth
+        await base44.auth.updateMe({ identity_document_url: '', verification_pending: false, onboarding_step: 'id_upload' });
       } else if (!result.name_matches) {
         setVerifyError(`Name mismatch: your document shows "${result.first_name_on_document} ${result.last_name_on_document}" but you entered "${formData.legal_first_name} ${formData.legal_last_name}". Please go back and correct your legal name, or upload the correct document.`);
         setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+        // Clear pending state without reloading auth
+        await base44.auth.updateMe({ identity_document_url: '', verification_pending: false, onboarding_step: 'id_upload' });
       } else {
         setFormData(prev => ({ ...prev, identity_verified: true }));
+        // Mark verified without reloading auth session
+        await base44.auth.updateMe({ identity_verified: true, verification_pending: false, onboarding_step: 'id_verified' });
         toast.success('Identity verified successfully!');
       }
     } catch (err) {
       setVerifyError('Verification failed. Please try again.');
       setFormData(prev => ({ ...prev, identity_document_url: '', identity_verified: false }));
+      await base44.auth.updateMe({ verification_pending: false, onboarding_step: 'id_upload' });
     } finally {
       setVerifyingIdentity(false);
     }
