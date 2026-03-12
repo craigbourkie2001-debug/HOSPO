@@ -132,6 +132,8 @@ export default function WorkerOnboarding({ user, onComplete }) {
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData(prev => ({ ...prev, identity_document_url: file_url }));
+      // Mark as pending without reloading auth session
+      await base44.auth.updateMe({ identity_document_url: file_url, verification_pending: true, onboarding_step: 'id_pending' });
       toast.success('Document uploaded! Now verifying...');
       await verifyIdentity(file_url);
     } catch { toast.error('Failed to upload document'); }
