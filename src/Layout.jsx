@@ -99,17 +99,16 @@ export default function Layout({ children }) {
     base44.auth.me().then(userData => {
       setUser(userData);
       
-      // If account_type not set, show role selection first
-      if (!userData.account_type) {
-        setShowOnboarding('role-selection');
-      } else if (!userData.onboarding_completed) {
-        // Show onboarding for their specific role
-        if (userData.account_type === 'employer') {
-          setShowOnboarding('employer');
-        } else if (userData.account_type === 'worker') {
-          setShowOnboarding('worker');
+      // Only set onboarding if not already showing — prevents resetting mid-flow
+      setShowOnboarding(current => {
+        if (current !== false) return current;
+        if (!userData.account_type) return 'role-selection';
+        if (!userData.onboarding_completed) {
+          if (userData.account_type === 'employer') return 'employer';
+          if (userData.account_type === 'worker') return 'worker';
         }
-      }
+        return false;
+      });
     }).catch(() => {});
   }, [location.pathname]);
 
