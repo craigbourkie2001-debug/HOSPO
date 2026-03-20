@@ -204,8 +204,6 @@ export default function WorkerOnboarding({ user, onComplete }) {
     } finally { setVerifyingVisa(false); }
   };
 
-  const [verifyError, setVerifyError] = useState('');
-
   const verifyIdentity = async (documentUrl) => {
     setVerifyingIdentity(true);
     setVerifyError('');
