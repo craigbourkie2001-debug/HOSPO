@@ -141,16 +141,21 @@ export default function WorkerOnboarding({ user, onComplete }) {
   const handleIdentityUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    // Reset input so same file can be re-selected after failure
+    e.target.value = '';
+    setVerifyError('');
     setUploadingIdentity(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       setFormData(prev => ({ ...prev, identity_document_url: file_url }));
-      // Mark as pending without reloading auth session
       await base44.auth.updateMe({ identity_document_url: file_url, verification_pending: true, onboarding_step: 'id_pending' });
+      setUploadingIdentity(false);
       toast.success('Document uploaded! Now verifying...');
       await verifyIdentity(file_url);
-    } catch { toast.error('Failed to upload document'); }
-    finally { setUploadingIdentity(false); }
+    } catch {
+      toast.error('Failed to upload document');
+      setUploadingIdentity(false);
+    }
   };
 
   const handleVisaDocUpload = async (e) => {
