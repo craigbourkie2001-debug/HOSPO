@@ -57,30 +57,43 @@ function getSteps(visaStatus) {
   return base;
 }
 
+// Determine the initial step index based on user's saved onboarding progress
+function getInitialStepIndex(user, visaStatus) {
+  if (!user) return 0;
+  const steps = getSteps(visaStatus || user?.visa_status || '');
+  if (user.onboarding_step === 'id_verified') {
+    // User passed ID verify — resume at role_visa step
+    const idx = steps.findIndex(s => s.id === 'role_visa');
+    return idx >= 0 ? idx : 0;
+  }
+  return 0;
+}
+
 export default function WorkerOnboarding({ user, onComplete }) {
-  const [stepIndex, setStepIndex] = useState(0);
+  const [verifyError, setVerifyError] = useState('');
   const [formData, setFormData] = useState({
-    legal_first_name: '',
-    legal_last_name: '',
-    pps_number: '',
-    identity_document_url: '',
-    identity_verified: false,
-    worker_type: 'barista',
-    visa_status: '',
-    location: '',
-    phone: '',
-    bio: '',
-    professional_summary: '',
-    profile_picture_url: '',
-    resume_url: '',
-    experience_years: 0,
-    barista_skills: [],
-    chef_skills: [],
-    availability: [],
-    preferred_shift_times: [],
-    desired_hourly_rate_min: '',
-    desired_hourly_rate_max: ''
+    legal_first_name: user?.legal_first_name || '',
+    legal_last_name: user?.legal_last_name || '',
+    pps_number: user?.pps_number || '',
+    identity_document_url: user?.identity_document_url || '',
+    identity_verified: user?.identity_verified || false,
+    worker_type: user?.worker_type || 'barista',
+    visa_status: user?.visa_status || '',
+    location: user?.location || '',
+    phone: user?.phone || '',
+    bio: user?.bio || '',
+    professional_summary: user?.professional_summary || '',
+    profile_picture_url: user?.profile_picture_url || '',
+    resume_url: user?.resume_url || '',
+    experience_years: user?.experience_years || 0,
+    barista_skills: user?.barista_skills || [],
+    chef_skills: user?.chef_skills || [],
+    availability: user?.availability || [],
+    preferred_shift_times: user?.preferred_shift_times || [],
+    desired_hourly_rate_min: user?.desired_hourly_rate_min || '',
+    desired_hourly_rate_max: user?.desired_hourly_rate_max || ''
   });
+  const [stepIndex, setStepIndex] = useState(() => getInitialStepIndex(user, user?.visa_status || ''));
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCV, setUploadingCV] = useState(false);
   const [uploadingIdentity, setUploadingIdentity] = useState(false);
