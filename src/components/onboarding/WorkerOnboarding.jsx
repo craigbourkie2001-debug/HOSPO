@@ -474,7 +474,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
                       <div className="animate-spin rounded-full h-10 w-10 border-4" style={{ borderColor: 'var(--sand)', borderTopColor: 'var(--terracotta)' }} />
                       <div className="text-center">
                         <p className="font-normal mb-1" style={{ color: 'var(--earth)' }}>
-                          {uploadingIdentity ? 'Uploading document...' : 'Verifying your identity...'}
+                          {uploadingIdentity ? 'Uploading document...' : 'Verifying your identity…'}
                         </p>
                         <p className="text-sm" style={{ color: 'var(--clay)' }}>This can take up to 30 seconds, please don't close or refresh the page</p>
                       </div>
