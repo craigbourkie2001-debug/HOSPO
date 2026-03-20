@@ -211,7 +211,7 @@ export default function WorkerOnboarding({ user, onComplete }) {
 
   const verifyIdentity = async (documentUrl) => {
     setVerifyingIdentity(true);
-    setVerifyError('');
+    setVerifyError(''); // reset error
     try {
       const result = await base44.integrations.Core.InvokeLLM({
         prompt: `You are a strict identity verification system. Analyze this ID document (passport, driving licence, or national ID card) and extract the name exactly as printed on it. Then check if it matches the name provided: First name: "${formData.legal_first_name}", Last name: "${formData.legal_last_name}". The name match must be exact (case-insensitive). Do not accept partial matches or nicknames. Also verify the document appears to be a genuine government-issued photo ID.`,
