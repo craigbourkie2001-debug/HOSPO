@@ -34,7 +34,7 @@ export default function Welcome() {
         window.location.href = createPageUrl(type === 'employer' ? 'EmployerDashboard' : 'BrowseShifts');
       }
     } else {
-      const returnUrl = window.location.origin + createPageUrl('Welcome') + `?intent=${type}`;
+      const returnUrl = `${window.location.origin}/welcome?intent=${type}`;
       base44.auth.redirectToLogin(returnUrl);
     }
   };
