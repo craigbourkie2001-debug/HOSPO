@@ -88,11 +88,6 @@ export default function Layout({ children }) {
   const [user, setUser] = React.useState(null);
   const [showOnboarding, setShowOnboarding] = React.useState(false);
 
-  // Don't show layout on Welcome page
-  if (location.pathname.includes('/welcome')) {
-    return children;
-  }
-
   React.useEffect(() => {
     if (location.pathname.includes('/welcome')) return;
     
@@ -114,6 +109,10 @@ export default function Layout({ children }) {
 
   const isEmployer = user?.account_type === 'employer';
   const isWorker = user?.account_type === 'worker';
+
+  if (location.pathname.includes('/welcome')) {
+    return <>{children}</>;
+  }
 
   const mobileNavItems = isEmployer
     ? [
