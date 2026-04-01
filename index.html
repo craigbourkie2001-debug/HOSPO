@@ -2,13 +2,73 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="https://base44.com/logo_v2.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary -->
+    <title>Hospo — Ireland's Hospitality Jobs & Shifts</title>
+    <meta name="description" content="Find casual hospitality work across Ireland. Connecting baristas, chefs, bartenders & waiters with top venues — instantly." />
+    <meta name="theme-color" content="#C17C5E" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    <title>Base44 APP</title>
+
+    <!-- Apple PWA — critical for iOS "Add to Home Screen" -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Hospo" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png" />
+
+    <!-- Microsoft -->
+    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+    <meta name="msapplication-TileColor" content="#C17C5E" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://hospo.ie/" />
+    <meta property="og:title" content="Hospo — Ireland's Hospitality Jobs & Shifts" />
+    <meta property="og:description" content="Find casual hospitality work across Ireland. Connecting baristas, chefs, bartenders & waiters with top venues — instantly." />
+    <meta property="og:image" content="https://hospo.ie/icons/icon-512x512.png" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Hospo — Ireland's Hospitality Jobs" />
+    <meta name="twitter:description" content="Find casual hospitality work across Ireland — instantly." />
+    <meta name="twitter:image" content="https://hospo.ie/icons/icon-512x512.png" />
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .then(function (reg) {
+              console.log('[Hospo] SW registered:', reg.scope);
+              reg.addEventListener('updatefound', function () {
+                var nw = reg.installing;
+                nw.addEventListener('statechange', function () {
+                  if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('[Hospo] New version available — refresh to update');
+                  }
+                });
+              });
+            })
+            .catch(function (err) {
+              console.error('[Hospo] SW registration failed:', err);
+            });
+        });
+      }
+    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
