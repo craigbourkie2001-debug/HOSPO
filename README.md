@@ -1,1 +1,1 @@
-# Base44 App
+npm install -g netlify-cli
