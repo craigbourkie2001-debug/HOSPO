@@ -17,7 +17,7 @@ export const auth = {
   async logout() { try { await request("/api/auth?action=logout", { method: "POST" }); } catch (_) {} clearToken(); },
   async me() { return request("/api/auth?action=me"); },
   async updateProfile(updates) { return request("/api/auth?action=update-profile", { method: "POST", body: JSON.stringify(updates) }); },
-  redirectToLogin() { window.location.href = "/Welcome"; },
+  redirectToLogin(returnUrl) { const url = returnUrl ? `/login?returnUrl=${encodeURIComponent(returnUrl)}` : "/login"; window.location.href = url; },
 };
 
 export const shifts = {

@@ -70,7 +70,7 @@ export default async function handler(req) {
     if (method === "POST" && action === "update-profile") {
       const user = await getUserFromToken(req.headers.get("authorization"));
       if (!user) return new Response(JSON.stringify({ error: "Not authenticated" }), { status: 401, headers: { "Content-Type": "application/json" } });
-      const allowed = ["full_name","phone","date_of_birth","county","profile_photo_url","onboarding_completed","experience_years","skills","bio","availability","max_travel_km","id_verification_status","id_document_url","id_selfie_url"];
+      const allowed = ["full_name","phone","date_of_birth","county","profile_photo_url","onboarding_completed","experience_years","skills","bio","availability","max_travel_km","id_verification_status","id_document_url","id_selfie_url","account_type"];
       const updates = {};
       for (const key of allowed) { if (body[key] !== undefined) updates[key] = body[key]; }
       if (Object.keys(updates).length === 0) return new Response(JSON.stringify(userPublic(user)), { status: 200, headers: { "Content-Type": "application/json" } });

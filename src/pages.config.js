@@ -57,6 +57,7 @@ import EmployerSignup from './pages/EmployerSignup';
 import Events from './pages/Events';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
+import Login from './pages/Login';
 import Marketplace from './pages/Marketplace';
 import Messages from './pages/Messages';
 import MyShifts from './pages/MyShifts';
@@ -84,6 +85,7 @@ export const PAGES = {
     "Events": Events,
     "Home": Home,
     "Jobs": Jobs,
+    "Login": Login,
     "Marketplace": Marketplace,
     "Messages": Messages,
     "MyShifts": MyShifts,
