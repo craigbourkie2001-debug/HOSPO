@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Background circle -->
+  <circle cx="16.0" cy="16.0" r="16.0" fill="#C17C5E"/>
+
+  <!-- White inner circle for contrast -->
+  <circle cx="16.0" cy="16.0" r="13.44" fill="white" opacity="0.12"/>
+
+  <!-- Steam lines -->
+  <g stroke="white" stroke-width="0.8" stroke-linecap="round" opacity="0.85">
+    <path d="M11.52,7.040000000000001 C10.719999999999999,5.760000000000001 12.32,5.120000000000001 11.52,3.8400000000000007"/>
+    <path d="M16.0,7.040000000000001 C15.2,5.760000000000001 16.8,5.120000000000001 16.0,3.8400000000000007"/>
+    <path d="M20.48,7.040000000000001 C19.68,5.760000000000001 21.28,5.120000000000001 20.48,3.8400000000000007"/>
+  </g>
+
+  <!-- Cup body -->
+  <rect x="7.04" y="8.96" width="17.92" height="14.079999999999998" rx="2.56" fill="white" opacity="0.92"/>
+
+  <!-- Cup handle -->
+  <path d="M24.96,11.212800000000001 A3.0975999999999995,3.0975999999999995 0 0,1 24.96,17.408"
+        fill="none" stroke="white" stroke-width="1.44" stroke-linecap="round" opacity="0.92"/>
+
+  <!-- Letter H -->
+  <g stroke="#C17C5E" stroke-width="1.76" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12.7744" y1="11.776" x2="12.7744" y2="19.0976"/>
+    <line x1="19.2256" y1="11.776" x2="19.2256" y2="19.0976"/>
+    <line x1="12.7744" y1="15.4368" x2="19.2256" y2="15.4368"/>
+  </g>
+
+  <!-- Saucer -->
+  <ellipse cx="16.0" cy="24.0" rx="10.393600000000001" ry="1.12" fill="white" opacity="0.6"/>
+</svg>
