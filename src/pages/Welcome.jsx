@@ -5,7 +5,7 @@ import { ArrowRight, Coffee, Store, Star, Shield, Clock, Users } from "lucide-re
 import { createPageUrl } from "@/utils";
 import HospoLogo from "../components/HospoLogo";
 
-export default function Welcome() {
+export default function Welcome() 
     React.useEffect(() => {
           const urlParams = new URLSearchParams(window.location.search);
           const intent = urlParams.get('intent');
