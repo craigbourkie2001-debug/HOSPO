@@ -19,11 +19,8 @@ export default function Welcome() {
           const isEmployer = user.account_type === 'employer' || user.role === 'employer';
           window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
         }
-        // If incomplete and no intent, STAY on Welcome page to let them choose
       }
-    }).catch(() => {
-      // Not authenticated, stay on welcome page
-    });
+    }).catch(() => {});
   }, []);
 
   const handleSignIn = async (type) => {
