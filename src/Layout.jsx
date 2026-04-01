@@ -89,7 +89,7 @@ export default function Layout({ children }) {
   const [showOnboarding, setShowOnboarding] = React.useState(false);
 
   React.useEffect(() => {
-    if (location.pathname.includes('/welcome')) return;
+    if (location.pathname.includes('/welcome') || location.pathname.includes('/login')) return;
     
     base44.auth.me().then(userData => {
       setUser(userData);
@@ -110,7 +110,7 @@ export default function Layout({ children }) {
   const isEmployer = user?.account_type === 'employer';
   const isWorker = user?.account_type === 'worker';
 
-  if (location.pathname.includes('/welcome')) {
+  if (location.pathname.includes('/welcome') || location.pathname.includes('/login')) {
     return <>{children}</>;
   }
 

@@ -28,7 +28,7 @@ export default function EmployerLogin() {
   }, []);
 
   const handleSignIn = () => {
-    base44.auth.redirectToLogin(createPageUrl("EmployerDashboard"));
+    window.location.href = "/login?intent=employer";
   };
 
   const handleCreateAccount = () => {

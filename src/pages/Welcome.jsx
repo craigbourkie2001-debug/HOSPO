@@ -7,36 +7,25 @@ import HospoLogo from "../components/HospoLogo";
 
 export default function Welcome() {
   React.useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const intent = urlParams.get('intent');
-
     base44.auth.me().then(async user => {
       if (user) {
-        if (!user.onboarding_completed && intent) {
-          await base44.auth.updateMe({ account_type: intent });
-          window.location.href = createPageUrl(intent === 'employer' ? 'EmployerDashboard' : 'BrowseShifts');
-        } else if (user.onboarding_completed) {
+        if (user.onboarding_completed) {
           const isEmployer = user.account_type === 'employer' || user.role === 'employer';
           window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
+        } else {
+          const urlParams = new URLSearchParams(window.location.search);
+          const intent = urlParams.get('intent');
+          if (intent) {
+            await base44.auth.updateProfile({ account_type: intent });
+            window.location.href = createPageUrl(intent === 'employer' ? 'EmployerDashboard' : 'BrowseShifts');
+          }
         }
       }
     }).catch(() => {});
   }, []);
 
-  const handleSignIn = async (type) => {
-    const user = await base44.auth.me().catch(() => null);
-    if (user) {
-      if (user.onboarding_completed) {
-        const isEmployer = user.account_type === 'employer' || user.role === 'employer';
-        window.location.href = createPageUrl(isEmployer ? 'EmployerDashboard' : 'BrowseShifts');
-      } else {
-        await base44.auth.updateMe({ account_type: type });
-        window.location.href = createPageUrl(type === 'employer' ? 'EmployerDashboard' : 'BrowseShifts');
-      }
-    } else {
-      const returnUrl = `${window.location.origin}/welcome?intent=${type}`;
-      base44.auth.redirectToLogin(returnUrl);
-    }
+  const handleSignIn = (type) => {
+    window.location.href = `/login?intent=${type}`;
   };
 
   return (

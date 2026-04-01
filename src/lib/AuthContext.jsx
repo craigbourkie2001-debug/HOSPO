@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
   const refreshUser = useCallback(async () => { try { const u = await auth.me(); setUser(u); return u; } catch (_) {} }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings: false, authError, isEmployer: user?.account_type === "employer", isWorker: user?.account_type === "worker", login, register, logout, updateProfile, refreshUser, navigateToLogin: () => { window.location.href = "/Welcome"; }, checkAppState: () => {} }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings: false, authError, isEmployer: user?.account_type === "employer", isWorker: user?.account_type === "worker", login, register, logout, updateProfile, refreshUser, navigateToLogin: () => { window.location.href = "/login"; }, checkAppState: () => {} }}>
       {children}
     </AuthContext.Provider>
   );
